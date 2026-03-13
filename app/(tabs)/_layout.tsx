@@ -1,10 +1,13 @@
+import { useMemo } from 'react';
 import { Tabs } from 'expo-router';
 import { View, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { useTranslation } from '../../hooks/useTranslation';
 
 export default function TabsLayout() {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   return (
     <Tabs
@@ -67,7 +70,8 @@ export default function TabsLayout() {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   tabBar: {
     backgroundColor: Colors.tabBackground,
     borderTopColor: '#EBEBEB',
@@ -100,4 +104,5 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 10,
   },
-});
+  });
+}

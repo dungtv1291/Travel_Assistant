@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
   ScrollView,
+  StyleSheet,
+  TouchableOpacity,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -19,11 +18,14 @@ import { Colors } from '../../constants/colors';
 import { Radius, Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { Button } from '../../components/common/Button';
+import { AuthInput } from '../../components/auth/AuthInput';
+import { SocialAuth } from '../../components/auth/SocialAuth';
+import { BackButton } from '../../components/auth/BackButton';
 import { useLoginForm } from '../../hooks';
 import { useTranslation } from '../../hooks/useTranslation';
 
 export default function LoginScreen() {
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPw, setShowPw] = useState(false);
   const { login, isLoading } = useAuthStore();
   const { t } = useTranslation();
   const { control, handleSubmit, formState: { errors } } = useLoginForm({
@@ -46,75 +48,65 @@ export default function LoginScreen() {
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-            <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
-          </TouchableOpacity>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Back */}
+          <BackButton style={{ marginBottom: Spacing['2xl'] }} />
 
-          <View style={styles.header}>
-            <Text style={styles.title}>{t('auth.login')}</Text>
-            <Text style={styles.subtitle}>{t('auth.loginSubtitle')}</Text>
+          {/* Brand mark */}
+          <View style={styles.brand}>
+            <View style={styles.brandIcon}>
+              <Ionicons name="compass" size={30} color="#FFF" />
+            </View>
+            <Text style={styles.brandName}>Travenor</Text>
+            <Text style={styles.brandTagline}>베트남 여행</Text>
           </View>
 
+          {/* Header */}
+          <Text style={styles.title}>{t('auth.login')}</Text>
+          <Text style={styles.subtitle}>{t('auth.loginSubtitle')}</Text>
+
+          {/* Form */}
           <View style={styles.form}>
-            <View style={styles.field}>
-              <Text style={styles.label}>{t('auth.email')}</Text>
-              <Controller
-                control={control}
-                name="email"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <>
-                    <View style={[styles.inputWrapper, errors.email && styles.inputError]}>
-                      <Ionicons name="mail-outline" size={18} color={Colors.textMuted} />
-                      <TextInput
-                        style={styles.input}
-                        value={value}
-                        onChangeText={onChange}
-                        onBlur={onBlur}
-                        placeholder={t('auth.emailPlaceholder')}
-                        placeholderTextColor={Colors.textMuted}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                      />
-                    </View>
-                    {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
-                  </>
-                )}
-              />
-            </View>
-
-            <View style={styles.field}>
-              <Text style={styles.label}>{t('auth.password')}</Text>
-              <Controller
-                control={control}
-                name="password"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <>
-                    <View style={[styles.inputWrapper, errors.password && styles.inputError]}>
-                      <Ionicons name="lock-closed-outline" size={18} color={Colors.textMuted} />
-                      <TextInput
-                        style={styles.input}
-                        value={value}
-                        onChangeText={onChange}
-                        onBlur={onBlur}
-                        placeholder={t('auth.passwordPlaceholder')}
-                        placeholderTextColor={Colors.textMuted}
-                        secureTextEntry={!showPassword}
-                      />
-                      <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                        <Ionicons
-                          name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-                          size={18}
-                          color={Colors.textMuted}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                    {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
-                  </>
-                )}
-              />
-            </View>
-
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <AuthInput
+                  label={t('auth.email')}
+                  icon="mail-outline"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder={t('auth.emailPlaceholder')}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  error={errors.email?.message}
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <AuthInput
+                  label={t('auth.password')}
+                  icon="lock-closed-outline"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder={t('auth.passwordPlaceholder')}
+                  secureTextEntry={!showPw}
+                  rightIcon={showPw ? 'eye-off-outline' : 'eye-outline'}
+                  onRightIconPress={() => setShowPw(p => !p)}
+                  error={errors.password?.message}
+                />
+              )}
+            />
             <TouchableOpacity
               style={styles.forgotBtn}
               onPress={() => router.push('/(auth)/forgot-password')}
@@ -123,37 +115,27 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* CTA */}
           <Button
             title={t('auth.login')}
             onPress={onSubmit}
             loading={isLoading}
             fullWidth
             size="lg"
-            style={styles.loginBtn}
+            style={styles.cta}
           />
 
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>{t('auth.orConnect')}</Text>
-            <View style={styles.dividerLine} />
-          </View>
+          {/* Social */}
+          <SocialAuth dividerLabel={t('auth.orConnect')} />
 
-          {/* Social icon row */}
-          <View style={styles.socialRow}>
-            <TouchableOpacity style={[styles.socialIcon, { backgroundColor: '#1877F2' }]}>
-              <Ionicons name="logo-facebook" size={22} color="#FFF" />
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.socialIcon, { backgroundColor: '#DB4437' }]}>
-              <Ionicons name="logo-google" size={22} color="#FFF" />
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.socialIcon, { backgroundColor: '#000000' }]}>
-              <Ionicons name="logo-apple" size={22} color="#FFF" />
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity style={styles.registerLink} onPress={() => router.push('/(auth)/register')}>
-            <Text style={styles.registerText}>
-              {t('auth.noAccount')} <Text style={styles.registerBold}>{t('auth.register')}</Text>
+          {/* Register link */}
+          <TouchableOpacity
+            style={styles.footerLink}
+            onPress={() => router.push('/(auth)/register')}
+          >
+            <Text style={styles.footerText}>
+              {t('auth.noAccount')}{' '}
+              <Text style={styles.footerBold}>{t('auth.register')}</Text>
             </Text>
           </TouchableOpacity>
         </ScrollView>
@@ -163,100 +145,65 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#FFFFFF' },
+  safe: { flex: 1, backgroundColor: '#FFF' },
   flex: { flex: 1 },
-  scroll: {
-    flexGrow: 1,
-    padding: Spacing.xl,
+  scroll: { flexGrow: 1, padding: Spacing.xl },
+
+  brand: {
+    alignItems: 'center',
+    marginBottom: Spacing.xl,
+    gap: Spacing.xs,
   },
-  backBtn: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: Colors.surfaceSecondary,
+  brandIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: Spacing.xl,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+    elevation: 8,
   },
-  header: {
-    marginBottom: Spacing['2xl'],
-    gap: Spacing.sm,
+  brandName: {
+    fontSize: FontSize['2xl'],
+    fontWeight: '800',
+    color: Colors.textPrimary,
+    letterSpacing: -0.5,
+    marginTop: Spacing.xs,
   },
+  brandTagline: {
+    fontSize: FontSize.sm,
+    color: Colors.textMuted,
+    letterSpacing: 0.5,
+  },
+
   title: {
     fontSize: FontSize['4xl'],
     fontWeight: '800',
     color: Colors.textPrimary,
     letterSpacing: -0.5,
+    marginBottom: Spacing.xs,
   },
   subtitle: {
-    fontSize: FontSize.lg,
-    color: Colors.textSecondary,
-  },
-  form: { gap: Spacing.base, marginBottom: Spacing.xl },
-  field: { gap: Spacing.sm },
-  label: {
-    fontSize: FontSize.sm,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.surfaceSecondary,
-    borderRadius: Radius.lg,
-    paddingHorizontal: Spacing.base,
-    paddingVertical: Spacing.md,
-    gap: Spacing.sm,
-  },
-  input: {
-    flex: 1,
     fontSize: FontSize.base,
-    color: Colors.textPrimary,
-    paddingVertical: 0,
+    color: Colors.textSecondary,
+    marginBottom: Spacing['2xl'],
   },
-  forgotBtn: { alignSelf: 'flex-end' },
+
+  form: { gap: Spacing.base, marginBottom: Spacing.xl },
+  forgotBtn: { alignSelf: 'flex-end', marginTop: -Spacing.xs },
   forgotText: {
     fontSize: FontSize.sm,
     color: Colors.accent,
     fontWeight: '600',
   },
-  errorText: {
-    fontSize: FontSize.xs,
-    color: Colors.error,
-    marginTop: 2,
-  },
-  inputError: {
-    borderWidth: 1,
-    borderColor: Colors.error,
-  },
-  loginBtn: { marginBottom: Spacing.xl },
-  divider: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.base,
-    marginBottom: Spacing.base,
-  },
-  dividerLine: { flex: 1, height: 1, backgroundColor: Colors.border },
-  dividerText: { fontSize: FontSize.sm, color: Colors.textMuted },
-  socialRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: Spacing.xl,
-    marginBottom: Spacing.xl,
-  },
-  socialIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  registerLink: { alignItems: 'center', marginTop: Spacing.sm },
-  registerText: { fontSize: FontSize.base, color: Colors.textSecondary },
-  registerBold: { color: Colors.primary, fontWeight: '700' },
+
+  cta: { marginBottom: Spacing.xl },
+
+  footerLink: { alignItems: 'center' },
+  footerText: { fontSize: FontSize.base, color: Colors.textSecondary },
+  footerBold: { color: Colors.primary, fontWeight: '700' },
 });

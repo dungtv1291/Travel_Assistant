@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Router } from 'expo-router';
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Radius, Shadow, Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -29,6 +29,8 @@ interface CategoryGridProps {
 }
 
 export function CategoryGrid({ router }: CategoryGridProps) {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   return (
     <ScrollView
@@ -54,7 +56,8 @@ export function CategoryGrid({ router }: CategoryGridProps) {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   container: { marginBottom: Spacing.lg },
   scrollContent: {
     paddingHorizontal: Spacing.base,
@@ -80,4 +83,5 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
   },
-});
+  });
+}

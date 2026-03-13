@@ -1,6 +1,7 @@
-import React from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, ScrollView, StyleSheet } from 'react-native';
 import { Chip } from '../common/Chip';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing } from '../../constants/spacing';
 import { useTranslation } from '../../hooks/useTranslation';
 
@@ -12,15 +13,17 @@ interface Props {
 }
 
 export function FilterChips({ selected, onSelect }: Props) {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   const filters = CATEGORY_FILTER_IDS.map(id => ({ id, label: t(`components.filterChips.${id}`) }));
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.content}
-      style={styles.scroll}
-    >
+    <View style={styles.wrapper}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
       {filters.map(cat => (
         <Chip
           key={cat.id}
@@ -29,14 +32,19 @@ export function FilterChips({ selected, onSelect }: Props) {
           onPress={() => onSelect(cat.id)}
         />
       ))}
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
+  wrapper: { height: 40, justifyContent: 'center', marginBottom: Spacing.md },
   scroll: { marginBottom: Spacing.md },
   content: {
     paddingHorizontal: Spacing.base,
     gap: Spacing.sm,
+    alignItems: 'center',
   },
-});
+  });
+}

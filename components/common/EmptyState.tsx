@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 
@@ -19,18 +19,23 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   description,
   action,
   style,
-}) => (
-  <View style={[styles.container, style]}>
-    <View style={styles.iconContainer}>
-      <Ionicons name={icon} size={40} color={Colors.textMuted} />
+}) => {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
+  return (
+    <View style={[styles.container, style]}>
+      <View style={styles.iconContainer}>
+        <Ionicons name={icon} size={40} color={Colors.textMuted} />
+      </View>
+      <Text style={styles.title}>{title}</Text>
+      {description && <Text style={styles.description}>{description}</Text>}
+      {action && <View style={styles.action}>{action}</View>}
     </View>
-    <Text style={styles.title}>{title}</Text>
-    {description && <Text style={styles.description}>{description}</Text>}
-    {action && <View style={styles.action}>{action}</View>}
-  </View>
-);
+  );
+};
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
@@ -62,4 +67,5 @@ const styles = StyleSheet.create({
   action: {
     marginTop: Spacing.xl,
   },
-});
+  });
+}

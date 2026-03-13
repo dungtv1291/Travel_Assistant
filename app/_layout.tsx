@@ -31,6 +31,7 @@ export default function RootLayout() {
         <Stack.Screen name="flights/results" options={{ headerShown: false }} />
         <Stack.Screen name="ai-planner/index" options={{ headerShown: false }} />
         <Stack.Screen name="ai-planner/results" options={{ headerShown: false }} />
+        <Stack.Screen name="profile-edit" options={{ headerShown: false }} />
       </Stack>
     </>
   );

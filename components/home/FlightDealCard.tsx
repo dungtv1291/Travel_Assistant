@@ -1,18 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Flight } from '../../types/flight.types';
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Radius, Shadow, Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { useTranslation } from '../../hooks/useTranslation';
-
-const TAG_COLORS: Record<string, { color: string; bg: string }> = {
-  cheapest:   { color: Colors.success,      bg: '#DCFCE7' },
-  fastest:    { color: Colors.primary,     bg: Colors.primaryLight },
-  best_value: { color: Colors.accent,       bg: Colors.accentLight },
-  popular:    { color: '#7C3AED',           bg: '#F5F3FF' },
-};
 
 interface FlightDealCardProps {
   flight: Flight;
@@ -20,7 +13,15 @@ interface FlightDealCardProps {
 }
 
 export function FlightDealCard({ flight, onPress }: FlightDealCardProps) {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const TAG_COLORS: Record<string, { color: string; bg: string }> = {
+    cheapest:   { color: Colors.success,      bg: '#DCFCE7' },
+    fastest:    { color: Colors.primary,      bg: Colors.primaryLight },
+    best_value: { color: Colors.accent,       bg: Colors.accentLight },
+    popular:    { color: '#7C3AED',           bg: '#F5F3FF' },
+  };
   const TAG_LABELS: Record<string, string> = {
     cheapest:   t('components.flightDealCard.cheapest'),
     fastest:    t('components.flightDealCard.fastest'),
@@ -86,7 +87,8 @@ export function FlightDealCard({ flight, onPress }: FlightDealCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   container: {
     backgroundColor: Colors.surface,
     borderRadius: Radius.xl,
@@ -181,4 +183,5 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xs,
     fontWeight: '700',
   },
-});
+  });
+}

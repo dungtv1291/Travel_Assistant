@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/colors';
 import { Radius, Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
@@ -17,6 +19,8 @@ import { useAuthStore } from '../../store/auth.store';
 import { useTranslation } from '../../hooks/useTranslation';
 
 const { width, height } = Dimensions.get('window');
+
+const SLIDE_HEIGHT = height * 0.56;
 
 export default function WelcomeScreen() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -73,7 +77,7 @@ export default function WelcomeScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Photo slides */}
+      {/* Slide photos */}
       <FlatList
         ref={flatListRef}
         data={SLIDES}
@@ -88,28 +92,33 @@ export default function WelcomeScreen() {
         renderItem={({ item }) => (
           <View style={styles.slide}>
             <Image source={{ uri: item.image }} style={styles.bgImage} resizeMode="cover" />
-            <View style={styles.slideBottomFade} />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.35)']}
+              style={StyleSheet.absoluteFillObject}
+            />
           </View>
         )}
         style={styles.slideList}
       />
 
-      {/* White bottom panel — Travenor style */}
-      <View style={styles.bottomPanel}>
-        {/* Skip */}
-        <TouchableOpacity style={styles.skipBtn} onPress={() => router.push('/(auth)/login')}>
-          <Text style={styles.skipText}>{t('welcome.skip')}</Text>
-        </TouchableOpacity>
+      {/* Floating header: brand pill + skip */}
+      <SafeAreaView style={styles.overlay} pointerEvents="box-none">
+        <View style={styles.headerRow}>
+          <View style={styles.logoBadge}>
+            <Ionicons name="compass" size={16} color={Colors.primary} />
+            <Text style={styles.logoText}>Travenor</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.skipPill}
+            onPress={() => router.push('/(auth)/login')}
+          >
+            <Text style={styles.skipText}>{t('welcome.skip')}</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
 
-        {/* Title with orange accent word */}
-        <Text style={styles.panelTitle}>
-          {currentSlide.titleBefore}
-          <Text style={styles.panelTitleAccent}>{currentSlide.titleAccent}</Text>
-        </Text>
-
-        {/* Subtitle */}
-        <Text style={styles.panelSubtitle}>{currentSlide.subtitle}</Text>
-
+      {/* White bottom panel */}
+      <View style={styles.panel}>
         {/* Progress dots */}
         <View style={styles.dots}>
           {SLIDES.map((_, i) => (
@@ -120,18 +129,32 @@ export default function WelcomeScreen() {
           ))}
         </View>
 
-        {/* CTA button */}
-        <TouchableOpacity style={styles.primaryBtn} onPress={handleNext} activeOpacity={0.85}>
-          <Text style={styles.primaryBtnText}>
+        {/* Title with accent */}
+        <Text style={styles.title}>
+          {currentSlide.titleBefore}
+          <Text style={styles.titleAccent}>{currentSlide.titleAccent}</Text>
+        </Text>
+
+        {/* Subtitle */}
+        <Text style={styles.subtitle}>{currentSlide.subtitle}</Text>
+
+        {/* CTA */}
+        <TouchableOpacity style={styles.cta} onPress={handleNext} activeOpacity={0.87}>
+          <Text style={styles.ctaText}>
             {activeIndex === SLIDES.length - 1 ? t('welcome.start') : t('common.next')}
           </Text>
+          <Ionicons
+            name={activeIndex === SLIDES.length - 1 ? 'rocket-outline' : 'arrow-forward'}
+            size={18}
+            color="#FFF"
+          />
         </TouchableOpacity>
 
         {/* Login link */}
         <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
-          <Text style={styles.loginText}>
+          <Text style={styles.secondaryText}>
             {t('welcome.alreadyHaveAccount')}{'  '}
-            <Text style={styles.loginLink}>{t('welcome.login')}</Text>
+            <Text style={styles.secondaryLink}>{t('welcome.login')}</Text>
           </Text>
         </TouchableOpacity>
 
@@ -145,72 +168,119 @@ export default function WelcomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFFFFF' },
+  container: { flex: 1, backgroundColor: '#FFF' },
 
-  slideList: { flexGrow: 0, height: height * 0.56 },
-  slide: { width, height: height * 0.56, overflow: 'hidden' },
+  slideList: { flexGrow: 0, height: SLIDE_HEIGHT },
+  slide: { width, height: SLIDE_HEIGHT, overflow: 'hidden' },
   bgImage: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%' },
-  slideBottomFade: {
+
+  overlay: {
     position: 'absolute',
-    bottom: 0, left: 0, right: 0,
-    height: 60,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: Spacing.xl,
+    paddingTop: Spacing.sm,
+  },
+  logoBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 8,
+  },
+  logoText: {
+    fontSize: FontSize.base,
+    fontWeight: '800',
+    color: Colors.textPrimary,
+    letterSpacing: -0.3,
+  },
+  skipPill: {
+    backgroundColor: 'rgba(255,255,255,0.88)',
+    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 8,
+  },
+  skipText: {
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+    fontWeight: '600',
   },
 
-  bottomPanel: {
+  panel: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF',
     borderTopLeftRadius: Radius['2xl'],
     borderTopRightRadius: Radius['2xl'],
     marginTop: -Radius['2xl'],
     paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.lg,
+    paddingTop: Spacing.xl,
     paddingBottom: Spacing.xl,
-    gap: Spacing.md,
+    gap: Spacing.base,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 6,
   },
-  skipBtn: { alignSelf: 'flex-end' },
-  skipText: { fontSize: FontSize.sm, color: Colors.textMuted, fontWeight: '500' },
 
-  panelTitle: {
+  dots: { flexDirection: 'row', gap: Spacing.xs },
+  dot: { height: 6, borderRadius: 3 },
+  dotActive: { width: 28, backgroundColor: Colors.primary },
+  dotInactive: { width: 6, backgroundColor: Colors.border },
+
+  title: {
     fontSize: 28,
     fontWeight: '800',
     color: Colors.textPrimary,
     lineHeight: 38,
     letterSpacing: -0.5,
   },
-  panelTitleAccent: { color: Colors.accent, fontWeight: '800' },
+  titleAccent: { color: Colors.accent },
 
-  panelSubtitle: {
-    fontSize: FontSize.base,
+  subtitle: {
+    fontSize: FontSize.lg,
     color: Colors.textSecondary,
-    lineHeight: 22,
+    lineHeight: 24,
   },
 
-  dots: { flexDirection: 'row', gap: Spacing.xs, marginVertical: 2 },
-  dot: { height: 6, borderRadius: 3 },
-  dotActive: { width: 24, backgroundColor: Colors.primary },
-  dotInactive: { width: 6, backgroundColor: Colors.border },
-
-  primaryBtn: {
+  cta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
     backgroundColor: Colors.primary,
     borderRadius: Radius['2xl'],
     paddingVertical: Spacing.base + 2,
-    alignItems: 'center',
+    marginTop: Spacing.xs,
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
     elevation: 6,
   },
-  primaryBtnText: {
+  ctaText: {
     fontSize: FontSize.lg,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: '#FFF',
     letterSpacing: 0.3,
   },
 
-  loginText: { textAlign: 'center', fontSize: FontSize.sm, color: Colors.textSecondary },
-  loginLink: { color: Colors.primary, fontWeight: '700' },
+  secondaryText: {
+    textAlign: 'center',
+    fontSize: FontSize.sm,
+    color: Colors.textSecondary,
+  },
+  secondaryLink: { color: Colors.primary, fontWeight: '700' },
+
   guestText: {
     textAlign: 'center',
     fontSize: FontSize.xs,
@@ -218,4 +288,3 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 });
-

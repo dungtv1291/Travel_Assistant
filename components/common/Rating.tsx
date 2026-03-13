@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 
@@ -20,6 +20,8 @@ export const Rating: React.FC<RatingProps> = ({
   showCount = true,
   style,
 }) => {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const starSize = size === 'sm' ? 12 : size === 'md' ? 14 : 18;
   const textSize = size === 'sm' ? FontSize.xs : size === 'md' ? FontSize.sm : FontSize.base;
 
@@ -34,7 +36,8 @@ export const Rating: React.FC<RatingProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -48,4 +51,5 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
     fontWeight: '400',
   },
-});
+  });
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useMemo} from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 
@@ -39,6 +39,8 @@ import { AIPlannerBanner } from '../../components/home/AIPlannerBanner';
 const DEAL_BADGES = ['32%', '28%', '35%', '24%', '30%'];
 
 export default function HomeScreen() {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { user } = useAuthStore();
   const { toggleFavorite, isFavorite } = useTripsStore();
   const { hotelBookings } = useBookingsStore();
@@ -253,7 +255,8 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
 
   // ── Header ──
@@ -417,4 +420,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   transportSub: { fontSize: FontSize.xs, color: Colors.textMuted, textAlign: 'center' },
-});
+  });
+}

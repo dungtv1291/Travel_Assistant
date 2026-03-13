@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 
@@ -24,6 +24,8 @@ import { useTranslation } from '../../hooks/useTranslation';
 type ViewMode = 'grid' | 'list';
 
 export default function ExploreScreen() {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { toggleFavorite, isFavorite, recentSearches, addRecentSearch } = useTripsStore();
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [loading, setLoading] = useState(true);
@@ -181,7 +183,8 @@ export default function ExploreScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   header: {
     flexDirection: 'row',
@@ -279,4 +282,5 @@ const styles = StyleSheet.create({
   gridRow: {
     justifyContent: 'space-between',
   },
-});
+  });
+}

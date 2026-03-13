@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useMemo} from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert,
 } from 'react-native';
@@ -9,7 +9,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { hotelsService } from '../../services/mock/hotels.service';
@@ -37,14 +37,19 @@ const DATE_OPTIONS = [
 ];
 
 export default function HotelBookingScreen() {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
-  const { hotelId, roomId } = useLocalSearchParams<{ hotelId: string; roomId: string }>();
+  const { hotelId, roomId, hotelName, roomName, hotelImage, roomPrice } = useLocalSearchParams<{
+    hotelId: string; roomId: string; hotelName: string;
+    roomName: string; hotelImage: string; roomPrice: string;
+  }>();
   const { user } = useAuthStore();
   const { addHotelBooking } = useBookingsStore();
   const [selectedDates, setSelectedDates] = useState(DATE_OPTIONS[1]);
   const [loading, setLoading] = useState(false);
 
-  const ROOM_PRICE = 450000; // mock KRW per night
+  const ROOM_PRICE = Number(roomPrice) || 0;
   const TOTAL = ROOM_PRICE * selectedDates.nights;
   const TAX = Math.round(TOTAL * 0.1);
   const GRAND_TOTAL = TOTAL + TAX;
@@ -65,23 +70,32 @@ export default function HotelBookingScreen() {
     try {
       const booking = await hotelsService.createBooking({
         hotelId: hotelId ?? '',
-        hotelName: hotelId ?? '',
-        hotelImage: '',
+        hotelName: String(hotelName ?? ''),
+        hotelImage: String(hotelImage ?? ''),
         roomId: roomId ?? '',
-        roomName: roomId ?? '',
+        roomName: String(roomName ?? ''),
         checkIn: selectedDates.checkIn,
         checkOut: selectedDates.checkOut,
         nights: selectedDates.nights,
         guests: 2,
-        pricePerNight: GRAND_TOTAL / 1350 / selectedDates.nights,
-        totalPrice: GRAND_TOTAL / 1350,
-        currency: 'USD',
+        pricePerNight: ROOM_PRICE,
+        totalPrice: GRAND_TOTAL,
+        currency: 'KRW',
         status: 'confirmed',
-        guestName: user?.name ?? '이름 없음',
+        guestName: user?.name ?? '김여행',
         guestEmail: user?.email ?? '',
       } as any);
       addHotelBooking(booking);
-      router.replace({ pathname: '/hotel/confirmation', params: { bookingId: booking.id } } as never);
+      router.replace({ pathname: '/hotel/confirmation', params: {
+        bookingId: booking.id,
+        confirmationCode: booking.confirmationCode ?? booking.id,
+        hotelName: String(hotelName ?? ''),
+        roomName: String(roomName ?? ''),
+        checkIn: selectedDates.checkIn,
+        checkOut: selectedDates.checkOut,
+        nights: String(selectedDates.nights),
+        totalPrice: String(GRAND_TOTAL),
+      } } as never);
     } catch {
       Alert.alert(t('common.error'), t('common.retry'));
     } finally {
@@ -216,7 +230,8 @@ export default function HotelBookingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Spacing.base, paddingVertical: Spacing.md },
   headerTitle: { fontSize: FontSize.xl, fontWeight: '700', color: Colors.textPrimary },
@@ -255,4 +270,5 @@ const styles = StyleSheet.create({
   bottomInner: { flexDirection: 'row', gap: Spacing.md, alignItems: 'center', paddingBottom: Spacing.sm },
   bottomLabel: { fontSize: FontSize.xs, color: Colors.textMuted },
   bottomTotal: { fontSize: FontSize.xl, fontWeight: '800', color: Colors.primary },
-});
+  });
+}

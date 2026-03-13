@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useMemo} from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
 } from 'react-native';
@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { Button } from '../../components/common/Button';
@@ -16,6 +16,8 @@ const VIETNAM_CITIES = ['하노이 (HAN)', '다낭 (DAD)', '호치민 (SGN)', '�
 const KOREAN_CITIES = ['서울 인천 (ICN)', '서울 김포 (GMP)', '부산 (PUS)', '제주 (CJU)'];
 
 export default function FlightSearchScreen() {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const [origin, setOrigin] = useState(KOREAN_CITIES[0]);
   const [destination, setDestination] = useState(VIETNAM_CITIES[1]);
   const [flightClass, setFlightClass] = useState('economy');
@@ -23,6 +25,7 @@ export default function FlightSearchScreen() {
   const [tripType, setTripType] = useState<'round' | 'one'>('round');
   const [departDate, setDepartDate] = useState('2026-04-10');
   const [returnDate, setReturnDate] = useState('2026-04-17');
+  const [isFlexible, setIsFlexible] = useState(false);
   const { t } = useTranslation();
 
   const swap = () => {
@@ -135,7 +138,7 @@ export default function FlightSearchScreen() {
             <View style={styles.card}>
               <Text style={styles.cardTitle}>{t('flights.cabinClass')}</Text>
               <View style={styles.optionRow}>
-                {(['economy', 'premiumEconomy', 'business'] as const).map(cls => (
+                {(['economy', 'business', 'first'] as const).map(cls => (
                   <TouchableOpacity
                     key={cls}
                     style={[styles.classBtn, flightClass === cls && styles.classBtnActive]}
@@ -157,6 +160,21 @@ export default function FlightSearchScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
+
+              {/* Flexible Dates Toggle */}
+              <TouchableOpacity
+                style={[styles.flexibleBtn, isFlexible && styles.flexibleBtnActive]}
+                onPress={() => setIsFlexible(v => !v)}
+              >
+                <Ionicons
+                  name={isFlexible ? 'checkmark-circle' : 'ellipse-outline'}
+                  size={16}
+                  color={isFlexible ? Colors.primary : Colors.textMuted}
+                />
+                <Text style={[styles.flexibleBtnText, isFlexible && styles.flexibleBtnTextActive]}>
+                  {t('flights.flexibleDates')}
+                </Text>
+              </TouchableOpacity>
             </View>
 
             {/* AI Notice */}
@@ -167,7 +185,7 @@ export default function FlightSearchScreen() {
 
             <Button
               title={t('flights.search')}
-              onPress={() => router.push({ pathname: '/flights/results', params: { origin, destination, departDate, returnDate, flightClass, passengers } } as never)}
+              onPress={() => router.push({ pathname: '/flights/results', params: { origin, destination, departDate, returnDate, flightClass, passengers, isFlexible: String(isFlexible) } } as never)}
               fullWidth
               size="lg"
             />
@@ -178,7 +196,8 @@ export default function FlightSearchScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Spacing.base, paddingVertical: Spacing.md },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center', ...Shadow.sm },
@@ -215,4 +234,9 @@ const styles = StyleSheet.create({
   classBtnTextActive: { color: '#FFF', fontWeight: '600' },
   aiNotice: { flexDirection: 'row', gap: Spacing.sm, backgroundColor: Colors.primaryLight, borderRadius: Radius.lg, padding: Spacing.md, alignItems: 'flex-start' },
   aiNoticeText: { flex: 1, fontSize: FontSize.sm, color: Colors.primary, lineHeight: 18 },
-});
+  flexibleBtn: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs, paddingHorizontal: Spacing.md, paddingVertical: Spacing.sm, borderRadius: Radius.full, borderWidth: 1.5, borderColor: Colors.border, backgroundColor: Colors.background, alignSelf: 'flex-start' },
+  flexibleBtnActive: { borderColor: Colors.primary, backgroundColor: Colors.primaryLight },
+  flexibleBtnText: { fontSize: FontSize.sm, color: Colors.textMuted, fontWeight: '600' },
+  flexibleBtnTextActive: { color: Colors.primary },
+  });
+}

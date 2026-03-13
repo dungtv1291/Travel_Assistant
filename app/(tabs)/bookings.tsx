@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useMemo} from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity, Image,
 } from 'react-native';
@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { useBookingsStore } from '../../store/bookings.store';
@@ -23,10 +23,12 @@ const STATUS_COLORS: Record<string, string> = {
   confirmed: '#22C55E',
   pending: '#F59E0B',
   cancelled: '#EF4444',
-  completed: Colors.primary,
+  completed: '#1BBCD4',
 };
 
 export default function BookingsScreen() {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { hotelBookings, transportBookings } = useBookingsStore();
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
   const { t } = useTranslation();
@@ -194,7 +196,8 @@ export default function BookingsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   header: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, padding: Spacing.base, paddingBottom: Spacing.sm },
   headerTitle: { fontSize: FontSize['2xl'], fontWeight: '800', color: Colors.textPrimary },
@@ -233,4 +236,5 @@ const styles = StyleSheet.create({
   priceLabel: { fontSize: FontSize.xs, color: Colors.textMuted },
   price: { fontSize: FontSize.base, fontWeight: '800', color: Colors.primary },
   bookingId: { fontSize: 10, fontFamily: 'monospace', color: Colors.textMuted, backgroundColor: Colors.surfaceSecondary, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 },
-});
+  });
+}

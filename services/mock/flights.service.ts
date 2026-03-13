@@ -1,16 +1,17 @@
 import { delay } from '../api.client';
-import { mockFlights, mockAIFlightAnalysis } from '../../mock/flights';
+import { mockFlights, generateMockFlights, generateAIAnalysis } from '../../mock/flights';
 import { Flight, FlightSearchParams, AIFlightAnalysis } from '../../types/flight.types';
 
 export const flightsService = {
-  search: async (_params: FlightSearchParams): Promise<Flight[]> => {
+  search: async (params: FlightSearchParams): Promise<Flight[]> => {
     await delay(2000); // simulate AI search time
-    return mockFlights;
+    return generateMockFlights(params.origin, params.destination);
   },
 
-  getAIAnalysis: async (_params: FlightSearchParams): Promise<AIFlightAnalysis> => {
+  getAIAnalysis: async (params: FlightSearchParams): Promise<AIFlightAnalysis> => {
     await delay(1500);
-    return mockAIFlightAnalysis;
+    const flights = generateMockFlights(params.origin, params.destination);
+    return generateAIAnalysis(flights);
   },
 
   getDeals: async (): Promise<Flight[]> => {

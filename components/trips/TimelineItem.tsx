@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { ItineraryActivity } from '../../types/trip.types';
@@ -12,15 +12,6 @@ interface Props {
   activity: ItineraryActivity;
   isLast?: boolean;
 }
-
-const ACTIVITY_COLORS: Record<string, string> = {
-  sightseeing: Colors.primary,
-  food: Colors.accent,
-  accommodation: Colors.success,
-  transport: '#6B7280',
-  shopping: '#8B5CF6',
-  relaxation: '#06B6D4',
-};
 
 const ACTIVITY_ICONS: Record<string, string> = {
   sightseeing: 'camera-outline',
@@ -32,7 +23,17 @@ const ACTIVITY_ICONS: Record<string, string> = {
 };
 
 export function TimelineItem({ activity, isLast }: Props) {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const ACTIVITY_COLORS: Record<string, string> = {
+    sightseeing: Colors.primary,
+    food: Colors.accent,
+    accommodation: Colors.success,
+    transport: '#6B7280',
+    shopping: '#8B5CF6',
+    relaxation: '#06B6D4',
+  };
   const color = ACTIVITY_COLORS[activity.type] ?? Colors.primary;
   const icon = ACTIVITY_ICONS[activity.type] ?? 'ellipse-outline';
 
@@ -61,11 +62,11 @@ export function TimelineItem({ activity, isLast }: Props) {
               <Text style={styles.locationText}>{activity.location}</Text>
             </View>
           )}
-          {activity.estimatedCost && (
+          {(activity.estimatedCost ?? 0) > 0 && (
             <View style={styles.costRow}>
               <Ionicons name="card-outline" size={12} color={Colors.textMuted} />
               <Text style={styles.costText}>
-                {t('components.timelineItem.estimatedCost', { cost: (activity.estimatedCost * 1350).toLocaleString() })}
+                {t('components.timelineItem.estimatedCost', { cost: (activity.estimatedCost! * 1350).toLocaleString() })}
               </Text>
             </View>
           )}
@@ -81,7 +82,8 @@ export function TimelineItem({ activity, isLast }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   container: {
     flexDirection: 'row',
     gap: Spacing.md,
@@ -163,4 +165,5 @@ const styles = StyleSheet.create({
     padding: Spacing.xs + 1,
   },
   tipText: { flex: 1, fontSize: FontSize.xs, color: Colors.textSecondary, lineHeight: 16 },
-});
+  });
+}

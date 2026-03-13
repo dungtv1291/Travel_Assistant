@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { Destination } from '../../types/destination.types';
@@ -19,6 +19,8 @@ interface Props {
 }
 
 export function DestinationCard({ destination, onPress, isFavorite, onFavoriteToggle, variant = 'grid' }: Props) {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   if (variant === 'list') {
     return (
@@ -95,7 +97,8 @@ export function DestinationCard({ destination, onPress, isFavorite, onFavoriteTo
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   // Grid variant
   gridCard: {
     width: (width - Spacing.base * 2 - Spacing.md) / 2,
@@ -213,4 +216,5 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xs,
     color: Colors.textMuted,
   },
-});
+  });
+}

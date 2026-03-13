@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useMemo} from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert,
 } from 'react-native';
@@ -7,7 +7,7 @@ import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { aiPlannerService } from '../../services/mock/ai-planner.service';
@@ -17,26 +17,31 @@ import { TimelineItem } from '../../components/trips/TimelineItem';
 import { LoadingState } from '../../components/common/LoadingState';
 import { Button } from '../../components/common/Button';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useLanguageStore } from '../../store/language.store';
 
 export default function AIPlannerResultsScreen() {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
-  const { destination, days, travelStyle, travelerType, budget } = useLocalSearchParams<Record<string, string>>();
+  const { locale } = useLanguageStore();
+  const { destination, days, travelStyle, travelerType, budget, pace, interests } = useLocalSearchParams<Record<string, string>>();
   const { saveTrip } = useTripsStore();
   const [trip, setTrip] = useState<Trip | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState(0);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const defaultDest = locale === 'ko' ? '다낭' : 'Da Nang';
 
   useEffect(() => {
     aiPlannerService.generateItinerary({
-      destination: destination ?? '다낭',
+      destination: destination ?? defaultDest,
       duration: parseInt(days ?? '5', 10),
       travelStyle: (travelStyle ?? 'cultural') as any,
       travelers: (travelerType ?? 'couple') as any,
-      budget: 1500000,
-      interests: [],
-      pace: 'moderate',
+      budget: budget === 'luxury' ? 3000000 : budget === 'budget' ? 500000 : 1500000,
+      interests: interests ? interests.split(',').filter(Boolean) : [],
+      pace: (pace as any) ?? 'moderate',
       startDate: new Date().toISOString().split('T')[0],
       endDate: new Date(Date.now() + parseInt(days ?? '5', 10) * 86400000).toISOString().split('T')[0],
     }).then(t => {
@@ -58,13 +63,13 @@ export default function AIPlannerResultsScreen() {
     setLoading(true);
     setSelectedDay(0);
     const newTrip = await aiPlannerService.generateItinerary({
-      destination: destination ?? '다낭',
+      destination: destination ?? defaultDest,
       duration: parseInt(days ?? '5', 10),
       travelStyle: (travelStyle ?? 'cultural') as any,
       travelers: (travelerType ?? 'couple') as any,
-      budget: 1500000,
-      interests: [],
-      pace: 'moderate',
+      budget: budget === 'luxury' ? 3000000 : budget === 'budget' ? 500000 : 1500000,
+      interests: interests ? interests.split(',').filter(Boolean) : [],
+      pace: (pace as any) ?? 'moderate',
       startDate: new Date().toISOString().split('T')[0],
       endDate: new Date(Date.now() + parseInt(days ?? '5', 10) * 86400000).toISOString().split('T')[0],
     });
@@ -128,25 +133,26 @@ export default function AIPlannerResultsScreen() {
         </LinearGradient>
 
         {/* Day Tabs */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.dayTabsContent}
-          style={styles.dayTabs}
-        >
-          {trip.itinerary.map((day, i) => (
-            <TouchableOpacity
-              key={i}
-              style={[styles.dayTab, selectedDay === i && styles.dayTabActive]}
-              onPress={() => setSelectedDay(i)}
-            >
-              <Text style={[styles.dayTabLabel, selectedDay === i && styles.dayTabLabelActive]}>DAY {i + 1}</Text>
-              <Text style={[styles.dayTabDate, selectedDay === i && styles.dayTabDateActive]}>
-                {t('aiPlanner.activities', { count: day.activities.length })}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+        <View style={styles.dayTabsWrapper}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.dayTabsContent}
+          >
+            {trip.itinerary.map((day, i) => (
+              <TouchableOpacity
+                key={i}
+                style={[styles.dayTab, selectedDay === i && styles.dayTabActive]}
+                onPress={() => setSelectedDay(i)}
+              >
+                <Text style={[styles.dayTabLabel, selectedDay === i && styles.dayTabLabelActive]}>DAY {i + 1}</Text>
+                <Text style={[styles.dayTabDate, selectedDay === i && styles.dayTabDateActive]}>
+                  {t('aiPlanner.activities', { count: day.activities.length })}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
         {/* Day Content */}
         <ScrollView showsVerticalScrollIndicator={false} style={styles.scroll}>
@@ -156,6 +162,12 @@ export default function AIPlannerResultsScreen() {
               <Text style={styles.dayTitle}>{t('aiPlanner.day', { number: selectedDay + 1 })} — {dayItinerary.date}</Text>
               {dayItinerary.title && (
                 <Text style={styles.dayTheme}>{dayItinerary.title}</Text>
+              )}
+              {dayItinerary.weatherNote && (
+                <View style={styles.weatherRow}>
+                  <Ionicons name="partly-sunny-outline" size={14} color={Colors.textMuted} />
+                  <Text style={styles.weatherText}>{dayItinerary.weatherNote}</Text>
+                </View>
               )}
             </View>
 
@@ -168,14 +180,43 @@ export default function AIPlannerResultsScreen() {
               />
             ))}
 
-            {/* Day Summary */}
+            {/* Day Budget Breakdown */}
             {dayItinerary.estimatedCost > 0 && (
               <View style={styles.dayCostCard}>
                 <Ionicons name="wallet-outline" size={16} color={Colors.primary} />
                 <Text style={styles.dayCostLabel}>{t('aiPlanner.estimatedCost')}</Text>
                 <Text style={styles.dayCostValue}>
-                  {dayItinerary.estimatedCost.toLocaleString()}원
+                  {dayItinerary.estimatedCost.toLocaleString()}₫
                 </Text>
+              </View>
+            )}
+
+            {/* Booking reminders */}
+            {dayItinerary.activities.filter(a => a.bookingRequired).length > 0 && (
+              <View style={styles.warningCard}>
+                <View style={styles.warningHeader}>
+                  <Ionicons name="alert-circle-outline" size={15} color="#E67E22" />
+                  <Text style={styles.warningTitle}>{t('aiPlanner.bookingReminder')}</Text>
+                </View>
+                {dayItinerary.activities.filter(a => a.bookingRequired).map(a => (
+                  <Text key={a.id} style={styles.warningItem}>• {a.title} — {t('aiPlanner.bookingRequired')}</Text>
+                ))}
+              </View>
+            )}
+
+            {/* AI Insights (shown once, at bottom) */}
+            {selectedDay === 0 && trip.aiInsights && trip.aiInsights.length > 0 && (
+              <View style={styles.insightsCard}>
+                <View style={styles.insightsHeader}>
+                  <Ionicons name="sparkles" size={16} color={Colors.primary} />
+                  <Text style={styles.insightsTitle}>{t('aiPlanner.aiInsightsTitle')}</Text>
+                </View>
+                {trip.aiInsights.map((tip, i) => (
+                  <View key={i} style={styles.insightRow}>
+                    <Text style={styles.insightBullet}>•</Text>
+                    <Text style={styles.insightText}>{tip}</Text>
+                  </View>
+                ))}
               </View>
             )}
           </View>
@@ -204,32 +245,34 @@ export default function AIPlannerResultsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   loadingContainer: { flex: 1 },
   loadingGrad: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.md, padding: Spacing.xl },
   loadingTitle: { fontSize: FontSize.xl, fontWeight: '800', color: '#FFF', textAlign: 'center' },
   loadingSub: { fontSize: FontSize.base, color: 'rgba(255,255,255,0.85)', textAlign: 'center' },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Spacing.base, paddingVertical: Spacing.md },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Spacing.base, paddingVertical: Spacing.sm },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center', ...Shadow.sm },
   headerCenter: { flex: 1, alignItems: 'center' },
   headerTitle: { fontSize: FontSize.base, fontWeight: '700', color: Colors.textPrimary },
   headerSub: { fontSize: FontSize.xs, color: Colors.textMuted },
   saveBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center', ...Shadow.sm },
   saveBtnSaved: { backgroundColor: Colors.primaryLight },
-  summaryCard: { marginHorizontal: Spacing.base, borderRadius: Radius.xl, padding: Spacing.base, marginBottom: Spacing.md },
+  summaryCard: { marginHorizontal: Spacing.base, borderRadius: Radius.xl, padding: Spacing.sm, marginBottom: Spacing.sm },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' },
   summaryStat: { alignItems: 'center', gap: 2 },
   summaryStatNum: { fontSize: FontSize.xl, fontWeight: '800', color: '#FFF' },
   summaryStatLabel: { fontSize: FontSize.xs, color: 'rgba(255,255,255,0.8)' },
   summaryDivider: { width: 1, height: 36, backgroundColor: 'rgba(255,255,255,0.3)' },
-  dayTabs: { marginBottom: Spacing.sm },
-  dayTabsContent: { paddingHorizontal: Spacing.base, gap: Spacing.sm },
-  dayTab: { minWidth: 72, alignItems: 'center', paddingVertical: Spacing.sm, paddingHorizontal: Spacing.md, borderRadius: Radius.xl, backgroundColor: Colors.surface, borderWidth: 1.5, borderColor: Colors.border },
+  dayTabsWrapper: { height: 54, justifyContent: 'center', marginBottom: Spacing.sm },
+  dayTabs: { marginBottom: Spacing.sm, height: 54 },
+  dayTabsContent: { paddingHorizontal: Spacing.base, gap: Spacing.sm, alignItems: 'center' },
+  dayTab: { minWidth: 56, alignItems: 'center', paddingVertical: 6, paddingHorizontal: Spacing.sm, borderRadius: Radius.xl, backgroundColor: Colors.surface, borderWidth: 1.5, borderColor: Colors.border },
   dayTabActive: { borderColor: Colors.primary, backgroundColor: Colors.primaryLight },
   dayTabLabel: { fontSize: FontSize.xs, fontWeight: '700', color: Colors.textMuted, textTransform: 'uppercase' },
   dayTabLabelActive: { color: Colors.primary },
-  dayTabDate: { fontSize: 10, color: Colors.textMuted },
+  dayTabDate: { fontSize: 9, color: Colors.textMuted, lineHeight: 12 },
   dayTabDateActive: { color: Colors.primary },
   scroll: { flex: 1 },
   dayContent: { padding: Spacing.base, paddingBottom: 100 },
@@ -239,6 +282,19 @@ const styles = StyleSheet.create({
   dayCostCard: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.primaryLight, borderRadius: Radius.lg, padding: Spacing.md, marginTop: Spacing.md },
   dayCostLabel: { flex: 1, fontSize: FontSize.base, color: Colors.primary, fontWeight: '600' },
   dayCostValue: { fontSize: FontSize.base, fontWeight: '800', color: Colors.primary },
+  insightsCard: { marginBottom: Spacing.md, backgroundColor: Colors.surface, borderRadius: Radius.xl, padding: Spacing.sm, gap: Spacing.xs, borderWidth: 1, borderColor: Colors.border },
+  insightsHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs, marginBottom: Spacing.xs },
+  insightsTitle: { fontSize: FontSize.sm, fontWeight: '700', color: Colors.primary },
+  insightRow: { flexDirection: 'row', gap: Spacing.xs },
+  insightBullet: { fontSize: FontSize.sm, color: Colors.textMuted, lineHeight: 18 },
+  insightText: { flex: 1, fontSize: FontSize.sm, color: Colors.textSecondary, lineHeight: 18 },
+  weatherRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs, marginTop: 2 },
+  weatherText: { fontSize: FontSize.sm, color: Colors.textMuted },
+  warningCard: { backgroundColor: '#FEF3E2', borderRadius: Radius.lg, padding: Spacing.md, marginTop: Spacing.sm, gap: Spacing.xs, borderWidth: 1, borderColor: '#FAD7A0' },
+  warningHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
+  warningTitle: { fontSize: FontSize.sm, fontWeight: '700', color: '#E67E22' },
+  warningItem: { fontSize: FontSize.sm, color: '#8B6914', lineHeight: 18 },
   bottomBar: { backgroundColor: Colors.surface, borderTopWidth: 1, borderTopColor: Colors.border, paddingHorizontal: Spacing.base, paddingTop: Spacing.sm },
   bottomInner: { flexDirection: 'row', gap: Spacing.sm, paddingBottom: Spacing.sm },
-});
+  });
+}

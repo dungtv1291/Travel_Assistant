@@ -1,17 +1,26 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef , useMemo} from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, Stack } from 'expo-router';
+import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { Button } from '../../components/common/Button';
 import { useTranslation } from '../../hooks/useTranslation';
 
 export default function HotelConfirmationScreen() {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const {
+    confirmationCode, hotelName, roomName,
+    checkIn, checkOut, nights, totalPrice,
+  } = useLocalSearchParams<{
+    confirmationCode: string; hotelName: string; roomName: string;
+    checkIn: string; checkOut: string; nights: string; totalPrice: string;
+  }>();
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -22,7 +31,7 @@ export default function HotelConfirmationScreen() {
     ]).start();
   }, []);
 
-  const bookingId = `VTH-${Math.floor(Math.random() * 900000 + 100000)}`;
+  const bookingId = confirmationCode || `VTH-${Math.floor(Math.random() * 900000 + 100000)}`;
 
   return (
     <>
@@ -47,12 +56,12 @@ export default function HotelConfirmationScreen() {
               <Text style={styles.bookingId}>{bookingId}</Text>
 
               {[
-                { label: '호텔', value: 'The Nam Hai, Hoi An' },
-                { label: '체크인', value: '2026년 4월 10일' },
-                { label: '체크아웃', value: '2026년 4월 12일' },
-                { label: '숙박', value: '2박' },
-                { label: '객실', value: '디럭스 가든 빌라' },
-                { label: '총 결제 금액', value: '990,000원' },
+                { label: t('bookings.hotel'), value: hotelName ?? '' },
+                { label: t('hotels.checkIn'), value: checkIn ?? '' },
+                { label: t('hotels.checkOut'), value: checkOut ?? '' },
+                { label: t('hotels.duration'), value: `${nights ?? ''}${t('common.nights')}` },
+                { label: t('hotels.roomInfo'), value: roomName ?? '' },
+                { label: t('common.total'), value: totalPrice ? `${Number(totalPrice).toLocaleString('ko-KR')}\uC6D0` : '' },
               ].map(row => (
                 <View key={row.label} style={styles.row}>
                   <Text style={styles.rowLabel}>{row.label}</Text>
@@ -87,7 +96,8 @@ export default function HotelConfirmationScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: Spacing.xl, gap: Spacing.xl },
   iconWrap: { alignItems: 'center' },
@@ -111,4 +121,5 @@ const styles = StyleSheet.create({
   infoBox: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.primaryLight, borderRadius: Radius.lg, padding: Spacing.md },
   infoText: { fontSize: FontSize.sm, color: Colors.primary, flex: 1 },
   actions: { width: '100%', gap: Spacing.md },
-});
+  });
+}

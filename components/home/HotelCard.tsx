@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Hotel } from '../../types/hotel.types';
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Radius, Shadow, Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { Rating } from '../common/Rating';
@@ -22,6 +22,8 @@ interface HotelCardProps {
 }
 
 export function HotelCard({ hotel, onPress, compact = false }: HotelCardProps) {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   return (
   <TouchableOpacity style={[styles.container, compact && styles.compact]} onPress={onPress} activeOpacity={0.9}>
@@ -53,7 +55,8 @@ export function HotelCard({ hotel, onPress, compact = false }: HotelCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   container: {
     backgroundColor: Colors.surface,
     borderRadius: Radius.xl,
@@ -113,4 +116,5 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xs,
     color: Colors.textMuted,
   },
-});
+  });
+}

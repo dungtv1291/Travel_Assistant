@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useMemo} from 'react';
 import {
   View, Text, FlatList, StyleSheet, TouchableOpacity, Alert,
 } from 'react-native';
@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { flightsService } from '../../services/mock/flights.service';
@@ -19,6 +19,8 @@ import { formatKRWPrice } from '../../utils/format';
 import { useTranslation } from '../../hooks/useTranslation';
 
 export default function FlightResultsScreen() {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   const SORT_OPTS = [
     { key: 'sortRecommended', label: t('flights.sortRecommended') },
@@ -26,7 +28,7 @@ export default function FlightResultsScreen() {
     { key: 'sortFastest', label: t('flights.sortFastest') },
     { key: 'sortShortest', label: t('flights.sortShortest') },
   ];
-  const { origin, destination, departDate, flightClass, passengers } = useLocalSearchParams<Record<string, string>>();
+  const { origin, destination, departDate, flightClass, passengers, isFlexible } = useLocalSearchParams<Record<string, string>>();
   const [flights, setFlights] = useState<Flight[]>([]);
   const [analysis, setAnalysis] = useState<AIFlightAnalysis | null>(null);
   const [loading, setLoading] = useState(true);
@@ -94,6 +96,13 @@ export default function FlightResultsScreen() {
           contentContainerStyle={styles.listContent}
           ListHeaderComponent={
             <>
+              {/* Flexible dates notice */}
+              {isFlexible === 'true' && (
+                <View style={styles.flexibleBanner}>
+                  <Ionicons name="calendar-outline" size={14} color={Colors.primary} />
+                  <Text style={styles.flexibleBannerText}>{t('flights.flexibleNote')}</Text>
+                </View>
+              )}
               {/* AI Analysis */}
               {analysis && (
                 <View style={styles.analysisWrap}>
@@ -122,7 +131,7 @@ export default function FlightResultsScreen() {
             <View style={styles.bottomInner}>
               <View>
                 <Text style={styles.bottomLabel}>{selectedFlightData.airline} · {selectedFlightData.flightNumber}</Text>
-                <Text style={styles.bottomPrice}>{formatKRWPrice(selectedFlightData.price * 1350)}</Text>
+                <Text style={styles.bottomPrice}>{formatKRWPrice(selectedFlightData.price)}</Text>
               </View>
               <Button
                 title={t('common.confirm')}
@@ -137,7 +146,8 @@ export default function FlightResultsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Spacing.base, paddingVertical: Spacing.md },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center', ...Shadow.sm },
@@ -154,8 +164,11 @@ const styles = StyleSheet.create({
   countText: { fontSize: FontSize.sm, color: Colors.textMuted },
   countNum: { fontWeight: '700', color: Colors.primary },
   sortLabel: { fontSize: FontSize.xs, color: Colors.textMuted },
+  flexibleBanner: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.primaryLight, borderRadius: Radius.lg, padding: Spacing.sm + 2, marginBottom: Spacing.md },
+  flexibleBannerText: { flex: 1, fontSize: FontSize.sm, color: Colors.primary, fontWeight: '500' },
   bottomBar: { backgroundColor: Colors.surface, borderTopWidth: 1, borderTopColor: Colors.border, paddingHorizontal: Spacing.base, paddingTop: Spacing.sm },
   bottomInner: { flexDirection: 'row', gap: Spacing.md, alignItems: 'center', paddingBottom: Spacing.sm },
   bottomLabel: { fontSize: FontSize.xs, color: Colors.textMuted },
   bottomPrice: { fontSize: FontSize.xl, fontWeight: '800', color: Colors.primary },
-});
+  });
+}

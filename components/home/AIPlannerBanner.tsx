@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Radius, Shadow, Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -12,6 +12,8 @@ interface AIPlannerBannerProps {
 }
 
 export function AIPlannerBanner({ onPress }: AIPlannerBannerProps) {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   return (
   <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.9}>
@@ -46,7 +48,8 @@ export function AIPlannerBanner({ onPress }: AIPlannerBannerProps) {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   container: {
     marginHorizontal: Spacing.base,
     borderRadius: Radius['2xl'],
@@ -132,4 +135,5 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     lineHeight: 14,
   },
-});
+  });
+}

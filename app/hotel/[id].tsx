@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useMemo} from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Dimensions,
 } from 'react-native';
@@ -7,7 +7,7 @@ import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { hotelsService } from '../../services/mock/hotels.service';
@@ -22,6 +22,8 @@ import { useTranslation } from '../../hooks/useTranslation';
 const { width } = Dimensions.get('window');
 
 export default function HotelDetailScreen() {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [hotel, setHotel] = useState<Hotel | null>(null);
@@ -189,14 +191,14 @@ export default function HotelDetailScreen() {
                 {(hotel.reviews ?? []).map((rev: any, i: number) => (
                   <View key={i} style={styles.reviewCard}>
                     <View style={styles.revHeader}>
-                      <View style={styles.revAvatar}><Text style={styles.revAvatarText}>{rev.authorName[0]}</Text></View>
+                      <View style={styles.revAvatar}><Text style={styles.revAvatarText}>{rev.userName[0]}</Text></View>
                       <View>
-                        <Text style={styles.revAuthor}>{rev.authorName}</Text>
+                        <Text style={styles.revAuthor}>{rev.userName}</Text>
                         <Rating value={rev.rating} size="sm" />
                       </View>
                       <Text style={styles.revDate}>{rev.date}</Text>
                     </View>
-                    <Text style={styles.revText}>{rev.commentKo ?? rev.comment}</Text>
+                    <Text style={styles.revText}>{rev.comment}</Text>
                   </View>
                 ))}
                 {(!hotel.reviews || hotel.reviews.length === 0) && (
@@ -218,7 +220,14 @@ export default function HotelDetailScreen() {
             </View>
             <Button
               title={t('hotels.book')}
-              onPress={() => router.push({ pathname: '/hotel/booking', params: { hotelId: hotel.id, roomId: selectedRoom ?? '' } } as never)}
+              onPress={() => router.push({ pathname: '/hotel/booking', params: {
+                hotelId: hotel.id,
+                roomId: selectedRoom ?? '',
+                hotelName: hotel.nameKo,
+                roomName: selectedRoomData?.nameKo ?? '',
+                hotelImage: hotel.imageUrl,
+                roomPrice: String(selectedRoomData?.pricePerNight ?? hotel.pricePerNight),
+              } } as never)}
               style={{ flex: 1 }}
             />
           </View>
@@ -228,7 +237,8 @@ export default function HotelDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   hero: { height: 300, position: 'relative' },
   heroImage: { width, height: 300, resizeMode: 'cover' },
@@ -284,4 +294,5 @@ const styles = StyleSheet.create({
   bottomInner: { flexDirection: 'row', gap: Spacing.md, alignItems: 'center', paddingBottom: Spacing.sm },
   bottomPriceLabel: { fontSize: FontSize.xs, color: Colors.textMuted },
   bottomPrice: { fontSize: FontSize.xl, fontWeight: '800', color: Colors.primary },
-});
+  });
+}

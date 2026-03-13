@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -8,7 +8,7 @@ import {
   TextStyle,
   View,
 } from 'react-native';
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Radius, Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 
@@ -42,6 +42,8 @@ export const Button: React.FC<ButtonProps> = ({
   textStyle,
   fullWidth = false,
 }) => {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const buttonStyle = [
     styles.base,
     styles[variant],
@@ -76,7 +78,8 @@ export const Button: React.FC<ButtonProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   base: {
     borderRadius: Radius.full,
     alignItems: 'center',
@@ -127,4 +130,5 @@ const styles = StyleSheet.create({
   textSize_sm: { fontSize: FontSize.sm },
   textSize_md: { fontSize: FontSize.base },
   textSize_lg: { fontSize: FontSize.lg },
-});
+  });
+}

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 
@@ -12,14 +12,19 @@ interface LoadingStateProps {
 export const LoadingState: React.FC<LoadingStateProps> = ({
   message,
   size = 'large',
-}) => (
-  <View style={styles.container}>
-    <ActivityIndicator size={size} color={Colors.primary} />
-    {message && <Text style={styles.message}>{message}</Text>}
-  </View>
-);
+}) => {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
+  return (
+    <View style={styles.container}>
+      <ActivityIndicator size={size} color={Colors.primary} />
+      {message && <Text style={styles.message}>{message}</Text>}
+    </View>
+  );
+};
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
@@ -33,4 +38,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: Spacing.sm,
   },
-});
+  });
+}

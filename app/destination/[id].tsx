@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useMemo} from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
   Image, Dimensions, Share,
@@ -8,7 +8,7 @@ import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 
@@ -27,6 +27,8 @@ const HERO_HEIGHT = 320;
 const SECTION_TAB_KEYS = ['overview', 'attractions', 'hotels', 'weather', 'tips'] as const;
 
 export default function DestinationDetailScreen() {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { toggleFavorite, isFavorite } = useTripsStore();
@@ -277,7 +279,8 @@ export default function DestinationDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
 
   heroContainer: { height: HERO_HEIGHT, position: 'relative' },
@@ -441,4 +444,5 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     paddingBottom: Spacing.sm,
   },
-});
+  });
+}

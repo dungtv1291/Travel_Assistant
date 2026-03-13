@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useMemo} from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, Switch,
 } from 'react-native';
@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { useAuthStore } from '../../store/auth.store';
@@ -14,14 +14,18 @@ import { useBookingsStore } from '../../store/bookings.store';
 import { useTripsStore } from '../../store/trips.store';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useLanguageStore } from '../../store/language.store';
+import { useThemeStore } from '../../store/theme.store';
 
 export default function ProfileScreen() {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { user, logout } = useAuthStore();
   const { hotelBookings, transportBookings } = useBookingsStore();
   const { savedTrips, favorites } = useTripsStore();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const { t } = useTranslation();
   const { locale, setLocale } = useLanguageStore();
+  const { isDark, toggleTheme } = useThemeStore();
 
   const handleLanguagePress = () => {
     Alert.alert(t('profile.selectLanguage'), '', [
@@ -63,6 +67,7 @@ export default function ProfileScreen() {
       title: t('profile.settings'),
       items: [
         { label: t('profile.appLanguage'), icon: 'language-outline', value: t(`languages.${locale}`), onPress: handleLanguagePress },
+        { label: t('profile.darkMode'), icon: 'moon-outline', value: null, darkToggle: true, route: null },
         { label: t('profile.notifications'), icon: 'notifications-outline', value: null, toggle: true, route: null },
         { label: t('profile.privacy'), icon: 'shield-outline', route: null },
         { label: t('profile.terms'), icon: 'document-text-outline', route: null },
@@ -83,7 +88,7 @@ export default function ProfileScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>{t('profile.title')}</Text>
-          <TouchableOpacity style={styles.editIconBtn} onPress={() => {}}>
+          <TouchableOpacity style={styles.editIconBtn} onPress={() => router.push('/profile-edit' as any)}>
             <Ionicons name="pencil-outline" size={18} color={Colors.primary} />
           </TouchableOpacity>
         </View>
@@ -108,7 +113,7 @@ export default function ProfileScreen() {
           <Text style={styles.userName}>{user?.name ?? t('home.traveler')}</Text>
           <Text style={styles.userEmail}>{user?.email ?? 'traveler@korea.com'}</Text>
 
-          <TouchableOpacity style={styles.editBtn}>
+          <TouchableOpacity style={styles.editBtn} onPress={() => router.push('/profile-edit' as any)}>
             <Ionicons name="pencil-outline" size={14} color={Colors.primary} />
             <Text style={styles.editBtnText}>{t('profile.editProfile')}</Text>
           </TouchableOpacity>
@@ -165,7 +170,14 @@ export default function ProfileScreen() {
                         <Text style={styles.badgeText}>{(item as any).badge}</Text>
                       </View>
                     )}
-                    {(item as any).toggle ? (
+                    {(item as any).darkToggle ? (
+                      <Switch
+                        value={isDark}
+                        onValueChange={toggleTheme}
+                        trackColor={{ false: Colors.border, true: Colors.primary + '66' }}
+                        thumbColor={isDark ? Colors.primary : Colors.textMuted}
+                      />
+                    ) : (item as any).toggle ? (
                       <Switch
                         value={notificationsEnabled}
                         onValueChange={setNotificationsEnabled}
@@ -198,7 +210,8 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   scroll: { paddingBottom: 100 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: Spacing.base, paddingBottom: Spacing.sm },
@@ -245,4 +258,5 @@ const styles = StyleSheet.create({
   footer: { alignItems: 'center', paddingVertical: Spacing.lg, gap: 4 },
   footerText: { fontSize: FontSize.xs, color: Colors.textMuted },
   footerVersion: { fontSize: 11, color: Colors.border },
-});
+  });
+}

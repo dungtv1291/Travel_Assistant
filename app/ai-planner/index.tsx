@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useMemo} from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
 } from 'react-native';
@@ -7,7 +7,7 @@ import { router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { Button } from '../../components/common/Button';
@@ -28,18 +28,40 @@ const TRAVELER_TYPES: { id: string; label: string; icon: string }[] = [
   { id: 'family', label: '가족', icon: '👨‍👩‍👧' },
   { id: 'friends', label: '친구들', icon: '👯' },
 ];
+const PACE_OPTIONS: { id: 'relaxed' | 'moderate' | 'intensive'; icon: string }[] = [
+  { id: 'relaxed', icon: '🌿' },
+  { id: 'moderate', icon: '⚡' },
+  { id: 'intensive', icon: '🚀' },
+];
+const INTEREST_OPTIONS: { id: string; icon: string }[] = [
+  { id: 'history', icon: '🏛️' },
+  { id: 'nature', icon: '🌿' },
+  { id: 'nightlife', icon: '🎶' },
+  { id: 'art', icon: '🎨' },
+  { id: 'sports', icon: '⚽' },
+  { id: 'wellness', icon: '🧘' },
+  { id: 'photography', icon: '📷' },
+  { id: 'local', icon: '🍜' },
+];
 const DAYS_OPTIONS = [3, 5, 7, 10, 14];
 
 export default function AIPlannerScreen() {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const [destination, setDestination] = useState(DESTINATIONS[0]);
   const [days, setDays] = useState(5);
   const [travelStyle, setTravelStyle] = useState<string[]>([]);
   const [travelerType, setTravelerType] = useState('couple');
   const [budget, setBudget] = useState<'budget' | 'medium' | 'luxury'>('medium');
+  const [pace, setPace] = useState<'relaxed' | 'moderate' | 'intensive'>('moderate');
+  const [interests, setInterests] = useState<string[]>([]);
   const { t } = useTranslation();
 
   const toggleStyle = (id: string) => {
     setTravelStyle(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
+  };
+  const toggleInterest = (id: string) => {
+    setInterests(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
   };
 
   return (
@@ -152,6 +174,44 @@ export default function AIPlannerScreen() {
               </View>
             </View>
 
+            {/* Pace */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>{t('aiPlanner.pace')}</Text>
+              <View style={styles.typeRow}>
+                {PACE_OPTIONS.map(p => (
+                  <TouchableOpacity
+                    key={p.id}
+                    style={[styles.typeBtn, pace === p.id && styles.typeBtnActive]}
+                    onPress={() => setPace(p.id)}
+                  >
+                    <Text style={styles.typeEmoji}>{p.icon}</Text>
+                    <Text style={[styles.typeBtnText, pace === p.id && styles.typeBtnTextActive]}>
+                      {t(`aiPlanner.paces.${p.id}`)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Interests */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>{t('aiPlanner.interests')}</Text>
+              <View style={styles.styleGrid}>
+                {INTEREST_OPTIONS.map(item => (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={[styles.styleBtn, interests.includes(item.id) && styles.styleBtnActive]}
+                    onPress={() => toggleInterest(item.id)}
+                  >
+                    <Text style={styles.styleEmoji}>{item.icon}</Text>
+                    <Text style={[styles.styleBtnText, interests.includes(item.id) && styles.styleBtnTextActive]}>
+                      {t(`aiPlanner.interestsList.${item.id}`)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
             {/* AI Notice */}
             <View style={styles.aiNotice}>
               <Ionicons name="flash-outline" size={18} color={Colors.primary} />
@@ -160,7 +220,7 @@ export default function AIPlannerScreen() {
 
             <Button
               title={t('aiPlanner.generate')}
-              onPress={() => router.push({ pathname: '/ai-planner/results', params: { destination, days, travelStyle: travelStyle.join(','), travelerType, budget } } as never)}
+              onPress={() => router.push({ pathname: '/ai-planner/results', params: { destination, days, travelStyle: travelStyle.join(','), travelerType, budget, pace, interests: interests.join(',') } } as never)}
               fullWidth
               size="lg"
             />
@@ -171,7 +231,8 @@ export default function AIPlannerScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Spacing.base, paddingVertical: Spacing.md },
   backBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center', ...Shadow.sm },
@@ -214,4 +275,5 @@ const styles = StyleSheet.create({
   budgetSub: { fontSize: 10, color: Colors.textMuted, textAlign: 'center' },
   aiNotice: { flexDirection: 'row', gap: Spacing.sm, backgroundColor: Colors.primaryLight, borderRadius: Radius.lg, padding: Spacing.md, alignItems: 'flex-start' },
   aiNoticeText: { flex: 1, fontSize: FontSize.sm, color: Colors.primary, lineHeight: 18 },
-});
+  });
+}

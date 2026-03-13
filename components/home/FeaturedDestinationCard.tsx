@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Destination } from '../../types/destination.types';
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Radius, Shadow, Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 
@@ -32,8 +32,11 @@ export const FeaturedDestinationCard: React.FC<FeaturedDestinationCardProps> = (
   isFavorite = false,
   onFavoriteToggle,
   dealBadge,
-}) => (
-  <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.92}>
+}) => {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
+  return (
+    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.92}>
     <Image source={{ uri: destination.imageUrl }} style={styles.image} />
     <LinearGradient
       colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.78)']}
@@ -77,10 +80,12 @@ export const FeaturedDestinationCard: React.FC<FeaturedDestinationCardProps> = (
         </View>
       </View>
     </View>
-  </TouchableOpacity>
-);
+    </TouchableOpacity>
+  );
+};
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   container: {
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
@@ -176,5 +181,6 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.9)',
     fontWeight: '600',
   },
-});
+  });
+}
 

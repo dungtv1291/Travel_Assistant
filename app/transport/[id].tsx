@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useMemo} from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Dimensions,
 } from 'react-native';
@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { transportService } from '../../services/mock/transport.service';
@@ -23,6 +23,8 @@ const { width } = Dimensions.get('window');
 const RENTAL_DAYS = [1, 2, 3, 5, 7];
 
 export default function TransportDetailScreen() {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [vehicle, setVehicle] = useState<TransportVehicle | null>(null);
@@ -144,7 +146,15 @@ export default function TransportDetailScreen() {
             </View>
             <Button
               title={t('transport.book')}
-              onPress={() => router.push({ pathname: '/transport/booking', params: { vehicleId: vehicle.id, days: selectedDays } } as never)}
+              onPress={() => router.push({ pathname: '/transport/booking', params: {
+                vehicleId: vehicle.id,
+                days: String(selectedDays),
+                vehicleName: vehicle.nameKo,
+                vehicleImage: vehicle.imageUrl,
+                vehiclePrice: String(vehicle.pricePerDay ?? vehicle.pricePerTrip ?? 0),
+                vehicleType: vehicle.type,
+                driverIncluded: vehicle.driverIncluded ? '1' : '0',
+              } } as never)}
               style={{ flex: 1 }}
             />
           </View>
@@ -154,7 +164,8 @@ export default function TransportDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.background },
   hero: { height: 260, position: 'relative' },
   heroImage: { width, height: 260, resizeMode: 'cover' },
@@ -192,4 +203,5 @@ const styles = StyleSheet.create({
   bottomInner: { flexDirection: 'row', gap: Spacing.md, alignItems: 'center', paddingBottom: Spacing.sm },
   bottomLabel: { fontSize: FontSize.xs, color: Colors.textMuted },
   bottomPrice: { fontSize: FontSize.xl, fontWeight: '800', color: Colors.primary },
-});
+  });
+}

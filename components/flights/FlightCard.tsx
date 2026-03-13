@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { Flight } from '../../types/flight.types';
@@ -17,6 +17,8 @@ interface Props {
 }
 
 export function FlightCard({ flight, onPress, isSelected }: Props) {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
   const tagVariant: Record<string, 'primary' | 'success' | 'warning' | 'info'> = {
     cheapest: 'success',
@@ -92,13 +94,22 @@ export function FlightCard({ flight, onPress, isSelected }: Props) {
             <Text style={styles.footerTagText}>{flight.meal ? t('flights.includeMeal') : t('flights.noMeal')}</Text>
           </View>
         </View>
-        <Text style={styles.price}>{formatKRWPrice(flight.price * 1350)}</Text>
+        <Text style={styles.price}>{formatKRWPrice(flight.price)}</Text>
       </View>
+
+      {/* Low seats warning */}
+      {(flight.seatsLeft ?? 99) < 10 && (
+        <View style={styles.seatsAlert}>
+          <Ionicons name="alert-circle" size={12} color={Colors.warning} />
+          <Text style={styles.seatsAlertText}>{t('flights.seatsLeft', { count: flight.seatsLeft })}</Text>
+        </View>
+      )}
     </TouchableOpacity>
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   card: {
     backgroundColor: Colors.surface,
     borderRadius: Radius.xl,
@@ -131,4 +142,7 @@ const styles = StyleSheet.create({
   footerTag: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   footerTagText: { fontSize: FontSize.xs, color: Colors.textMuted },
   price: { fontSize: FontSize.xl, fontWeight: '800', color: Colors.primary },
-});
+  seatsAlert: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#FFF7ED', borderRadius: Radius.md, paddingHorizontal: Spacing.sm, paddingVertical: Spacing.xs },
+  seatsAlertText: { fontSize: FontSize.xs, color: Colors.warning, fontWeight: '700' },
+  });
+}

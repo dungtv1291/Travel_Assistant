@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useMemo} from 'react';
 import {
   View, Text, StyleSheet, FlatList, ScrollView, TouchableOpacity, Image,
 } from 'react-native';
@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { useTripsStore } from '../../store/trips.store';
@@ -14,10 +14,13 @@ import { EmptyState } from '../../components/common/EmptyState';
 import { Button } from '../../components/common/Button';
 import { Trip } from '../../types/trip.types';
 import { useTranslation } from '../../hooks/useTranslation';
+import { formatKRWPrice } from '../../utils/format';
 
 type Tab = 'saved' | 'favorites';
 
 export default function TripsScreen() {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { savedTrips, favorites } = useTripsStore();
   const [activeTab, setActiveTab] = useState<Tab>('saved');
   const { t } = useTranslation();
@@ -36,7 +39,7 @@ export default function TripsScreen() {
             <Ionicons name="sparkles" size={10} color={Colors.primary} />
             <Text style={styles.tripBadgeText}>{t('trips.aiGenerated')}</Text>
           </View>
-          <Text style={styles.tripDuration}>{item.duration}박 {item.duration + 1}일</Text>
+          <Text style={styles.tripDuration}>{item.duration}{t('common.night')} {item.duration + 1}{t('common.day')}</Text>
         </View>
         <Text style={styles.tripTitle}>{item.title}</Text>
         <View style={styles.tripFooter}>
@@ -50,7 +53,7 @@ export default function TripsScreen() {
           </View>
           <View style={styles.tripStat}>
             <Ionicons name="wallet-outline" size={12} color="rgba(255,255,255,0.8)" />
-            <Text style={styles.tripStatText}>₩{((item.totalEstimatedCost) / 10000).toFixed(0)}만</Text>
+            <Text style={styles.tripStatText}>{formatKRWPrice(item.totalEstimatedCost)}</Text>
           </View>
         </View>
       </View>
@@ -116,6 +119,7 @@ export default function TripsScreen() {
       {/* Content */}
       {activeTab === 'saved' ? (
         <FlatList
+          key="saved-list"
           data={savedTrips}
           keyExtractor={i => i.id}
           renderItem={renderTrip}
@@ -134,6 +138,7 @@ export default function TripsScreen() {
         />
       ) : (
         <FlatList
+          key="favorites-list"
           data={favorites}
           keyExtractor={i => i}
           numColumns={2}
@@ -157,7 +162,8 @@ export default function TripsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: Spacing.base, paddingBottom: Spacing.sm },
   headerTitle: { fontSize: FontSize['2xl'], fontWeight: '800', color: Colors.textPrimary },
@@ -190,4 +196,5 @@ const styles = StyleSheet.create({
   favImage: { ...StyleSheet.absoluteFillObject },
   favOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.25)' },
   favContent: { flex: 1, padding: Spacing.sm, alignItems: 'flex-end' },
-});
+  });
+}

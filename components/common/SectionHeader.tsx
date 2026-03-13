@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
-import { Colors } from '../../constants/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 
@@ -18,21 +18,26 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   actionLabel,
   onAction,
   style,
-}) => (
-  <View style={[styles.container, style]}>
-    <View style={styles.left}>
-      <Text style={styles.title}>{title}</Text>
-      {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+}) => {
+  const Colors = useThemeColors();
+  const styles = useMemo(() => makeStyles(Colors), [Colors]);
+  return (
+    <View style={[styles.container, style]}>
+      <View style={styles.left}>
+        <Text style={styles.title}>{title}</Text>
+        {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+      </View>
+      {actionLabel && onAction && (
+        <TouchableOpacity onPress={onAction} activeOpacity={0.7}>
+          <Text style={styles.action}>{actionLabel}</Text>
+        </TouchableOpacity>
+      )}
     </View>
-    {actionLabel && onAction && (
-      <TouchableOpacity onPress={onAction} activeOpacity={0.7}>
-        <Text style={styles.action}>{actionLabel}</Text>
-      </TouchableOpacity>
-    )}
-  </View>
-);
+  );
+};
 
-const styles = StyleSheet.create({
+function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
+  return StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'flex-end',
@@ -57,4 +62,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.primary,
   },
-});
+  });
+}
