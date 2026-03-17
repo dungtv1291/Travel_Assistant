@@ -6,6 +6,7 @@ import { useThemeColors } from '../../hooks/useThemeColors';
 import { Radius, Shadow, Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { useTranslation } from '../../hooks/useTranslation';
+import { formatKRWPrice } from '../../utils/format';
 
 interface FlightDealCardProps {
   flight: Flight;
@@ -46,7 +47,7 @@ export function FlightDealCard({ flight, onPress }: FlightDealCardProps) {
         </View>
         <View style={styles.priceBlock}>
           <Text style={styles.priceFrom}>{t('components.flightDealCard.from')}</Text>
-          <Text style={styles.price}>₩{priceKRW.toLocaleString()}</Text>
+          <Text style={styles.price}>{formatKRWPrice(priceKRW)}</Text>
         </View>
       </View>
 
@@ -123,7 +124,7 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
   price: {
     fontSize: FontSize.lg,
     fontWeight: '800',
-    color: Colors.primary,
+    color: Colors.accent,
     letterSpacing: -0.5,
   },
   divider: { height: 1, backgroundColor: Colors.divider },

@@ -13,6 +13,7 @@ import { Destination } from '../../types/destination.types';
 import { useThemeColors } from '../../hooks/useThemeColors';
 import { Radius, Shadow, Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
+import { formatReviewCount } from '../../utils/format';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.62;
@@ -72,7 +73,7 @@ export const FeaturedDestinationCard: React.FC<FeaturedDestinationCardProps> = (
         <View style={styles.ratingRow}>
           <Ionicons name="star" size={12} color="#FFB800" />
           <Text style={styles.ratingText}>{destination.rating.toFixed(1)}</Text>
-          <Text style={styles.reviewCount}>({destination.reviewCount})</Text>
+          <Text style={styles.reviewCount}>({formatReviewCount(destination.reviewCount)})</Text>
         </View>
         <View style={styles.peopleBadge}>
           <Ionicons name="people-outline" size={11} color="rgba(255,255,255,0.8)" />

@@ -70,12 +70,12 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
     width: 66,
   },
   iconCircle: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
-    ...Shadow.md,
+    ...Shadow.sm,
   },
   label: {
     fontSize: FontSize.xs,

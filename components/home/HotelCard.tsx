@@ -110,7 +110,7 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
   price: {
     fontSize: FontSize.base,
     fontWeight: '700',
-    color: Colors.primary,
+    color: Colors.accent,
   },
   perNight: {
     fontSize: FontSize.xs,

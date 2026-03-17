@@ -54,7 +54,7 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
     marginHorizontal: Spacing.base,
     borderRadius: Radius['2xl'],
     overflow: 'hidden',
-    ...Shadow.card,
+    ...Shadow.md,
   },
   gradient: {
     flexDirection: 'row',
