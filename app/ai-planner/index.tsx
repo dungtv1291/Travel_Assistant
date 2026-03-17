@@ -13,53 +13,19 @@ import { FontSize } from '../../constants/typography';
 import { Button } from '../../components/common/Button';
 import { useTranslation } from '../../hooks/useTranslation';
 
-const DESTINATIONS = ['다낭', '호이안', '하노이', '호치민', '푸꾸옥', '하롱베이', '사파', '나트랑', '후에'];
-
-const TRAVEL_STYLES: { id: string; label: string; icon: string }[] = [
-  { id: 'cultural',   label: '문화 탐방',  icon: '🏛️' },
-  { id: 'beach',      label: '해변 휴양',  icon: '🏖️' },
-  { id: 'adventure',  label: '액티비티',   icon: '🧗' },
-  { id: 'food',       label: '미식 여행',  icon: '🍜' },
-  { id: 'shopping',   label: '쇼핑',       icon: '🛍️' },
-  { id: 'relaxation', label: '휴식/힐링',  icon: '🧘' },
-];
-
-const TRAVELER_TYPES: { id: string; label: string; icon: string }[] = [
-  { id: 'solo',    label: '혼자',   icon: '🧍' },
-  { id: 'couple',  label: '커플',   icon: '👫' },
-  { id: 'family',  label: '가족',   icon: '👨‍👩‍👧' },
-  { id: 'friends', label: '친구들', icon: '👯' },
-];
-
-const BUDGET_OPTIONS = [
-  { id: 'budget',  label: '절약형',   sub: '~₩50만/일',     icon: '💚' },
-  { id: 'medium',  label: '일반',     sub: '₩50~100만/일',  icon: '💛' },
-  { id: 'luxury',  label: '럭셔리',   sub: '₩100만+/일',    icon: '💜' },
-] as const;
-
-const PACE_OPTIONS = [
-  { id: 'relaxed',   icon: '🌿', label: '여유롭게' },
-  { id: 'moderate',  icon: '⚡', label: '알차게' },
-  { id: 'intensive', icon: '🚀', label: '빠르게' },
-] as const;
-
-const INTEREST_OPTIONS: { id: string; icon: string; label: string }[] = [
-  { id: 'history',     icon: '🏛️', label: '역사' },
-  { id: 'nature',      icon: '🌿', label: '자연' },
-  { id: 'nightlife',   icon: '🎶', label: '나이트라이프' },
-  { id: 'art',         icon: '🎨', label: '예술' },
-  { id: 'sports',      icon: '⚽', label: '스포츠' },
-  { id: 'wellness',    icon: '🧘', label: '웰니스' },
-  { id: 'photography', icon: '📷', label: '사진' },
-  { id: 'local',       icon: '🍜', label: '현지 음식' },
-];
+// Canonical Korean destination names for the mock service (DEST_ALIASES lookup)
+const DEST_KO: Record<string, string> = {
+  danang: '다낭', hoian: '호이안', hanoi: '하노이', hochiminh: '호치민',
+  phuquoc: '푸꾸옥', halong: '하롱베이', sapa: '사파', nhatrang: '나트랑', hue: '후에',
+};
+const DESTINATION_KEYS = Object.keys(DEST_KO);
 
 const DAYS_OPTIONS = [3, 5, 7, 10, 14];
 
 export default function AIPlannerScreen() {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
-  const [destination, setDestination] = useState(DESTINATIONS[0]);
+  const [destKey, setDestKey] = useState(DESTINATION_KEYS[0]);
   const [days, setDays] = useState(5);
   const [travelStyle, setTravelStyle] = useState<string[]>([]);
   const [travelerType, setTravelerType] = useState('couple');
@@ -67,6 +33,41 @@ export default function AIPlannerScreen() {
   const [pace, setPace] = useState<'relaxed' | 'moderate' | 'intensive'>('moderate');
   const [interests, setInterests] = useState<string[]>([]);
   const { t } = useTranslation();
+
+  const TRAVEL_STYLES = [
+    { id: 'cultural',   label: t('aiPlanner.styles.cultural'),   icon: '🏛️' },
+    { id: 'beach',      label: t('aiPlanner.styles.beach'),      icon: '🏖️' },
+    { id: 'adventure',  label: t('aiPlanner.styles.adventure'),  icon: '🧗' },
+    { id: 'food',       label: t('aiPlanner.styles.food'),       icon: '🍜' },
+    { id: 'shopping',   label: t('aiPlanner.styles.shopping'),   icon: '🛍️' },
+    { id: 'relaxation', label: t('aiPlanner.styles.relaxation'), icon: '🧘' },
+  ];
+  const TRAVELER_TYPES = [
+    { id: 'solo',    label: t('aiPlanner.travelerTypes.solo'),    icon: '🧍' },
+    { id: 'couple',  label: t('aiPlanner.travelerTypes.couple'),  icon: '👫' },
+    { id: 'family',  label: t('aiPlanner.travelerTypes.family'),  icon: '👨‍👩‍👧' },
+    { id: 'friends', label: t('aiPlanner.travelerTypes.friends'), icon: '👯' },
+  ];
+  const BUDGET_OPTIONS = [
+    { id: 'budget' as const, label: t('aiPlanner.budgets.budget'), sub: t('aiPlanner.budgetDesc.budget'), icon: '💚' },
+    { id: 'medium' as const, label: t('aiPlanner.budgets.medium'), sub: t('aiPlanner.budgetDesc.medium'), icon: '💛' },
+    { id: 'luxury' as const, label: t('aiPlanner.budgets.luxury'), sub: t('aiPlanner.budgetDesc.luxury'), icon: '💜' },
+  ];
+  const PACE_OPTIONS = [
+    { id: 'relaxed'   as const, icon: '🌿', label: t('aiPlanner.paces.relaxed') },
+    { id: 'moderate'  as const, icon: '⚡', label: t('aiPlanner.paces.moderate') },
+    { id: 'intensive' as const, icon: '🚀', label: t('aiPlanner.paces.intensive') },
+  ];
+  const INTEREST_OPTIONS = [
+    { id: 'history',     icon: '🏛️', label: t('aiPlanner.interestsList.history') },
+    { id: 'nature',      icon: '🌿', label: t('aiPlanner.interestsList.nature') },
+    { id: 'nightlife',   icon: '🎶', label: t('aiPlanner.interestsList.nightlife') },
+    { id: 'art',         icon: '🎨', label: t('aiPlanner.interestsList.art') },
+    { id: 'sports',      icon: '⚽', label: t('aiPlanner.interestsList.sports') },
+    { id: 'wellness',    icon: '🧘', label: t('aiPlanner.interestsList.wellness') },
+    { id: 'photography', icon: '📷', label: t('aiPlanner.interestsList.photography') },
+    { id: 'local',       icon: '🍜', label: t('aiPlanner.interestsList.local') },
+  ];
 
   const toggleStyle = (id: string) =>
     setTravelStyle(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
@@ -109,17 +110,17 @@ export default function AIPlannerScreen() {
             {/* 1 · 목적지 */}
             <View style={styles.card}>
               <View style={styles.sectionHead}>
-                <Text style={styles.cardTitle}>목적지 선택</Text>
+                <Text style={styles.cardTitle}>{t('aiPlanner.destination')}</Text>
               </View>
               <View style={styles.chipWrap}>
-                {DESTINATIONS.map(d => (
+                {DESTINATION_KEYS.map(key => (
                   <TouchableOpacity
-                    key={d}
-                    style={[styles.chip, destination === d && styles.chipSel]}
-                    onPress={() => setDestination(d)}
+                    key={key}
+                    style={[styles.chip, destKey === key && styles.chipSel]}
+                    onPress={() => setDestKey(key)}
                     activeOpacity={0.8}
                   >
-                    <Text style={[styles.chipText, destination === d && styles.chipTextSel]}>{d}</Text>
+                    <Text style={[styles.chipText, destKey === key && styles.chipTextSel]}>{t(`aiPlanner.destinations.${key}` as any)}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -128,7 +129,7 @@ export default function AIPlannerScreen() {
             {/* 2 · 여행 기간 */}
             <View style={styles.card}>
               <View style={styles.sectionHead}>
-                <Text style={styles.cardTitle}>여행 기간</Text>
+                <Text style={styles.cardTitle}>{t('aiPlanner.duration')}</Text>
               </View>
               <View style={styles.daysRow}>
                 {DAYS_OPTIONS.map(d => (
@@ -139,7 +140,7 @@ export default function AIPlannerScreen() {
                     activeOpacity={0.8}
                   >
                     <Text style={[styles.daysNum, days === d && styles.daysNumSel]}>{d}</Text>
-                    <Text style={[styles.daysUnit, days === d && styles.daysUnitSel]}>박</Text>
+                    <Text style={[styles.daysUnit, days === d && styles.daysUnitSel]}>{t('common.night')}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -148,8 +149,7 @@ export default function AIPlannerScreen() {
             {/* 3 · 여행 스타일 */}
             <View style={styles.card}>
               <View style={styles.sectionHead}>
-                <Text style={styles.cardTitle}>여행 스타일</Text>
-                <Text style={styles.cardHint}>여러 개 선택 가능</Text>
+                <Text style={styles.cardTitle}>{t('aiPlanner.travelStyle')}</Text>
               </View>
               <View style={styles.chipWrap}>
                 {TRAVEL_STYLES.map(s => (
@@ -169,7 +169,7 @@ export default function AIPlannerScreen() {
             {/* 4 · 여행자 유형 */}
             <View style={styles.card}>
               <View style={styles.sectionHead}>
-                <Text style={styles.cardTitle}>여행자 유형</Text>
+                <Text style={styles.cardTitle}>{t('aiPlanner.travelerType')}</Text>
               </View>
               <View style={styles.selRow}>
                 {TRAVELER_TYPES.map(type => (
@@ -191,7 +191,7 @@ export default function AIPlannerScreen() {
             {/* 5 · 예산 수준 */}
             <View style={styles.card}>
               <View style={styles.sectionHead}>
-                <Text style={styles.cardTitle}>예산 수준</Text>
+                <Text style={styles.cardTitle}>{t('aiPlanner.budget')}</Text>
               </View>
               <View style={styles.selRow}>
                 {BUDGET_OPTIONS.map(b => (
@@ -212,7 +212,7 @@ export default function AIPlannerScreen() {
             {/* 6 · 여행 속도 */}
             <View style={styles.card}>
               <View style={styles.sectionHead}>
-                <Text style={styles.cardTitle}>여행 속도</Text>
+                <Text style={styles.cardTitle}>{t('aiPlanner.pace')}</Text>
               </View>
               <View style={styles.selRow}>
                 {PACE_OPTIONS.map(p => (
@@ -232,8 +232,7 @@ export default function AIPlannerScreen() {
             {/* 7 · 관심사 */}
             <View style={styles.card}>
               <View style={styles.sectionHead}>
-                <Text style={styles.cardTitle}>관심사</Text>
-                <Text style={styles.cardHint}>여러 개 선택 가능</Text>
+                <Text style={styles.cardTitle}>{t('aiPlanner.interests')}</Text>
               </View>
               <View style={styles.chipWrap}>
                 {INTEREST_OPTIONS.map(item => (
@@ -259,16 +258,14 @@ export default function AIPlannerScreen() {
             <View style={styles.notice}>
               <Ionicons name="flash" size={15} color={Colors.primary} />
               <Text style={styles.noticeText}>
-                선택하신 조건으로{' '}
-                <Text style={styles.noticeStrong}>{days}박 {days + 1}일</Text>
-                {' '}최적 일정을 AI가 생성합니다
+                {t('aiPlanner.generateHint', { days, nextDays: days + 1, destination: t(`aiPlanner.destinations.${destKey}` as any) })}
               </Text>
             </View>
             <Button
               title={t('aiPlanner.generate')}
               onPress={() => router.push({
                 pathname: '/ai-planner/results',
-                params: { destination, days, travelStyle: travelStyle.join(','), travelerType, budget, pace, interests: interests.join(',') },
+                params: { destination: DEST_KO[destKey], days, travelStyle: travelStyle.join(','), travelerType, budget, pace, interests: interests.join(',') },
               } as never)}
               fullWidth
               size="lg"

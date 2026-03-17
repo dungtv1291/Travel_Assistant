@@ -14,6 +14,7 @@ import { useThemeColors } from '../../hooks/useThemeColors';
 import { Radius, Shadow, Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { formatReviewCount } from '../../utils/format';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.62;
@@ -36,6 +37,7 @@ export const FeaturedDestinationCard: React.FC<FeaturedDestinationCardProps> = (
 }) => {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
+  const { t } = useTranslation();
   return (
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.92}>
     <Image source={{ uri: destination.imageUrl }} style={styles.image} />
@@ -67,7 +69,7 @@ export const FeaturedDestinationCard: React.FC<FeaturedDestinationCardProps> = (
       <Text style={styles.name}>{destination.nameKo}</Text>
       <View style={styles.locationRow}>
         <Ionicons name="location-outline" size={11} color="rgba(255,255,255,0.85)" />
-        <Text style={styles.location}>{destination.region}, 베트남</Text>
+        <Text style={styles.location}>{destination.region}, {t('common.vietnam')}</Text>
       </View>
       <View style={styles.footer}>
         <View style={styles.ratingRow}>

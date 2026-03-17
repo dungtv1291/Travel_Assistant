@@ -8,6 +8,7 @@ import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { Destination } from '../../types/destination.types';
 import { formatReviewCount } from '../../utils/format';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const { width } = Dimensions.get('window');
 
@@ -41,6 +42,7 @@ export function DestinationCard({ destination, onPress, isFavorite, onFavoriteTo
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const [imgError, setImgError] = useState(false);
+  const { t } = useTranslation();
 
   const categoryEmoji  = CATEGORY_EMOJIS[destination.category] ?? '📍';
   const fallbackColors: [string, string] = FALLBACK_GRADIENTS[destination.category] ?? ['#E4F9FC', '#1BBCD4'];
@@ -87,7 +89,7 @@ export function DestinationCard({ destination, onPress, isFavorite, onFavoriteTo
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={11} color={Colors.star} />
             <Text style={styles.ratingValue}>{destination.rating.toFixed(1)}</Text>
-            <Text style={styles.ratingCount}>· {formatReviewCount(destination.reviewCount)} 리뷰</Text>
+            <Text style={styles.ratingCount}>· {formatReviewCount(destination.reviewCount)} {t('hotels.reviews')}</Text>
           </View>
           <Text style={styles.listDescription} numberOfLines={2}>{destination.descriptionKo}</Text>
           {firstTag && (

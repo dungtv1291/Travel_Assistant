@@ -14,29 +14,31 @@ import { Hotel } from '../../types/hotel.types';
 import { SearchBar } from '../../components/common/SearchBar';
 import { LoadingState } from '../../components/common/LoadingState';
 import HotelCard from '../../components/hotels/HotelCard';
+import { useTranslation } from '../../hooks/useTranslation';
 
-const CITY_FILTERS = [
-  { key: 'all',         label: '전체' },
-  { key: 'Da Nang',     label: '다낭' },
-  { key: 'Hoi An',      label: '호이안' },
-  { key: 'Ho Chi Minh', label: '호치민' },
-  { key: 'Ha Noi',      label: '하노이' },
-  { key: 'Phu Quoc',    label: '푸꾸옥' },
-  { key: 'Nha Trang',   label: '나트랑' },
-];
-
-const SORT_OPTIONS = [
-  { key: 'recommended', label: '추천순' },
-  { key: 'cheapest',    label: '최저가순' },
-  { key: 'rating',      label: '평점순' },
-  { key: 'reviews',     label: '후기순' },
-] as const;
-
-type SortKey = typeof SORT_OPTIONS[number]['key'];
+type SortKey = 'recommended' | 'cheapest' | 'rating' | 'reviews';
 
 export default function HotelListScreen() {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
+  const { t } = useTranslation();
+
+  const CITY_FILTERS = [
+    { key: 'all',         label: t('hotels.cityFilters.all') },
+    { key: 'Da Nang',     label: t('hotels.cityFilters.daNang') },
+    { key: 'Hoi An',      label: t('hotels.cityFilters.hoiAn') },
+    { key: 'Ho Chi Minh', label: t('hotels.cityFilters.hoChiMinh') },
+    { key: 'Ha Noi',      label: t('hotels.cityFilters.haNoi') },
+    { key: 'Phu Quoc',    label: t('hotels.cityFilters.phuQuoc') },
+    { key: 'Nha Trang',   label: t('hotels.cityFilters.nhaTrang') },
+  ];
+
+  const SORT_OPTIONS: { key: SortKey; label: string }[] = [
+    { key: 'recommended', label: t('hotels.sortRecommended') },
+    { key: 'cheapest',    label: t('hotels.sortCheapest') },
+    { key: 'rating',      label: t('hotels.sortRating') },
+    { key: 'reviews',     label: t('hotels.sortReviews') },
+  ];
 
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,7 +71,7 @@ export default function HotelListScreen() {
 
   const currentSort = SORT_OPTIONS.find(o => o.key === sortBy)!;
 
-  if (loading) return <LoadingState message="불러오는 중..." />;
+  if (loading) return <LoadingState message={t('hotels.loading')} />;
 
   return (
     <>
@@ -82,15 +84,15 @@ export default function HotelListScreen() {
             <Ionicons name="arrow-back" size={22} color={Colors.textPrimary} />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>베트남 호텔</Text>
-            <Text style={styles.headerSub}>{filtered.length}개 검색됨</Text>
+            <Text style={styles.headerTitle}>{t('hotels.headerTitle')}</Text>
+            <Text style={styles.headerSub}>{t('hotels.countFound', { count: filtered.length })}</Text>
           </View>
           <View style={{ width: 36 }} />
         </View>
 
         {/* Search */}
         <View style={styles.searchSection}>
-          <SearchBar value={query} onChangeText={setQuery} placeholder="호텔명, 도시로 검색" />
+          <SearchBar value={query} onChangeText={setQuery} placeholder={t('hotels.searchPlaceholder')} />
         </View>
 
         {/* City chips */}
@@ -115,9 +117,7 @@ export default function HotelListScreen() {
 
         {/* Sort row */}
         <View style={styles.sortRow}>
-          <Text style={styles.countText}>
-            <Text style={styles.countNum}>{filtered.length}</Text>개 호텔
-          </Text>
+          <Text style={styles.countText}>{t('hotels.hotelCount', { count: filtered.length })}</Text>
           <TouchableOpacity style={styles.sortBtn} onPress={() => setShowSort(!showSort)}>
             <Ionicons name="funnel-outline" size={13} color={Colors.primary} />
             <Text style={styles.sortBtnText}>{currentSort.label}</Text>

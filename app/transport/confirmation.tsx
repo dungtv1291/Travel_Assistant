@@ -9,6 +9,7 @@ import { Spacing, Radius, Shadow } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { Button } from '../../components/common/Button';
 import { useTranslation } from '../../hooks/useTranslation';
+import { formatKRWPrice } from '../../utils/format';
 
 export default function TransportConfirmationScreen() {
   const Colors = useThemeColors();
@@ -42,7 +43,7 @@ export default function TransportConfirmationScreen() {
   }, []);
 
   const formattedTotal = totalPrice
-    ? `${Number(totalPrice).toLocaleString('ko-KR')}원`
+    ? formatKRWPrice(Number(totalPrice))
     : '';
   const isPerTrip = vehicleType === 'airport_pickup' || vehicleType === 'day_tour';
 

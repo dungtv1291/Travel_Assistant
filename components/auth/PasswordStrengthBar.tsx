@@ -2,27 +2,24 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Colors } from '../../constants/colors';
 import { FontSize } from '../../constants/typography';
-
-interface StrengthResult {
-  level: number;
-  label: string;
-  color: string;
-}
-
-function measure(password: string): StrengthResult {
-  if (!password) return { level: 0, label: '', color: Colors.border };
-  let score = 0;
-  if (password.length >= 8) score++;
-  if (/[A-Z]/.test(password)) score++;
-  if (/[0-9]/.test(password)) score++;
-  if (/[^A-Za-z0-9]/.test(password)) score++;
-  if (score <= 1) return { level: 1, label: '취약', color: Colors.error };
-  if (score === 2) return { level: 2, label: '보통', color: Colors.warning };
-  if (score === 3) return { level: 3, label: '양호', color: '#16A34A' };
-  return { level: 4, label: '강함', color: Colors.success };
-}
+import { useTranslation } from '../../hooks/useTranslation';
 
 export function PasswordStrengthBar({ password }: { password: string }) {
+  const { t } = useTranslation();
+
+  function measure(pwd: string) {
+    if (!pwd) return { level: 0, label: '', color: Colors.border };
+    let score = 0;
+    if (pwd.length >= 8) score++;
+    if (/[A-Z]/.test(pwd)) score++;
+    if (/[0-9]/.test(pwd)) score++;
+    if (/[^A-Za-z0-9]/.test(pwd)) score++;
+    if (score <= 1) return { level: 1, label: t('auth.passwordStrength.weak'), color: Colors.error };
+    if (score === 2) return { level: 2, label: t('auth.passwordStrength.fair'), color: Colors.warning };
+    if (score === 3) return { level: 3, label: t('auth.passwordStrength.good'), color: '#16A34A' };
+    return { level: 4, label: t('auth.passwordStrength.strong'), color: Colors.success };
+  }
+
   const { level, label, color } = measure(password);
   if (!password) return null;
 

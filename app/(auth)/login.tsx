@@ -62,7 +62,7 @@ export default function LoginScreen() {
               <Ionicons name="compass" size={30} color="#FFF" />
             </View>
             <Text style={styles.brandName}>Travenor</Text>
-            <Text style={styles.brandTagline}>베트남 여행</Text>
+            <Text style={styles.brandTagline}>{t('auth.tagline')}</Text>
           </View>
 
           {/* Header */}

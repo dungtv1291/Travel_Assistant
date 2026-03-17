@@ -113,7 +113,7 @@ export function AIAnalysisCard({ analysis }: Props) {
         {/* Insights toggle */}
         <TouchableOpacity style={styles.insightsToggle} onPress={() => setInsightsOpen(v => !v)} activeOpacity={0.8}>
           <Ionicons name="analytics-outline" size={14} color={Colors.primary} />
-          <Text style={styles.insightsToggleText}>{t('flights.aiAnalysis')} 인사이트</Text>
+          <Text style={styles.insightsToggleText}>{t('flights.aiAnalysis')} {t('flights.insights')}</Text>
           <Ionicons name={insightsOpen ? 'chevron-up' : 'chevron-down'} size={14} color={Colors.primary} />
         </TouchableOpacity>
 

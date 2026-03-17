@@ -128,24 +128,24 @@ export default function AIPlannerResultsScreen() {
             </View>
             <View style={styles.aiBadge}>
               <Ionicons name="sparkles" size={10} color="#FFFFFF" />
-              <Text style={styles.aiBadgeText}>AI 생성</Text>
+              <Text style={styles.aiBadgeText}>{t('aiPlanner.results.aiGenerated')}</Text>
             </View>
           </View>
           {/* Stats row */}
           <View style={styles.summaryRow}>
             <View style={styles.summaryStat}>
-              <Text style={styles.summaryStatNum}>{trip.duration}박 {trip.duration + 1}일</Text>
-              <Text style={styles.summaryStatLabel}>여행 기간</Text>
+              <Text style={styles.summaryStatNum}>{t('aiPlanner.results.nightsDays', { days: trip.duration, nextDays: trip.duration + 1 })}</Text>
+              <Text style={styles.summaryStatLabel}>{t('aiPlanner.results.travelPeriod')}</Text>
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryStat}>
               <Text style={styles.summaryStatNum}>{trip.itinerary.reduce((acc, d) => acc + d.activities.length, 0)}</Text>
-              <Text style={styles.summaryStatLabel}>전체 활동</Text>
+              <Text style={styles.summaryStatLabel}>{t('aiPlanner.results.totalActivities')}</Text>
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryStat}>
               <Text style={styles.summaryStatNum}>{formatKRWPrice(trip.totalEstimatedCost)}</Text>
-              <Text style={styles.summaryStatLabel}>예상 원화 경비</Text>
+              <Text style={styles.summaryStatLabel}>{t('aiPlanner.results.estimatedCost')}</Text>
             </View>
           </View>
         </LinearGradient>
@@ -168,10 +168,10 @@ export default function AIPlannerResultsScreen() {
                   activeOpacity={0.8}
                 >
                   <Text style={[styles.dayTabNum, selectedDay === i && styles.dayTabNumActive]}>
-                    DAY {i + 1}
+                    {t('aiPlanner.day', { number: i + 1 })}
                   </Text>
                   <Text style={[styles.dayTabSub, selectedDay === i && styles.dayTabSubActive]}>
-                    {shortDate} · {day.activities.length}개
+                    {shortDate} · {t('aiPlanner.results.dayCount', { count: day.activities.length })}
                   </Text>
                 </TouchableOpacity>
               );
@@ -186,11 +186,11 @@ export default function AIPlannerResultsScreen() {
             <View style={styles.dayHeader}>
               <View style={styles.dayTitleRow}>
                 <View style={styles.dayNumBadge}>
-                  <Text style={styles.dayNumText}>DAY {selectedDay + 1}</Text>
+                  <Text style={styles.dayNumText}>{t('aiPlanner.day', { number: selectedDay + 1 })}</Text>
                 </View>
                 <View style={styles.dayTitleGroup}>
                   <Text style={styles.dayTheme}>
-                    {dayItinerary.title || `${trip.destination} 탐방`}
+                    {dayItinerary.title || t('aiPlanner.results.dayFallback', { destination: trip.destination })}
                   </Text>
                   <View style={styles.dayMetaRow}>
                     {dayItinerary.weatherNote ? (
@@ -226,7 +226,7 @@ export default function AIPlannerResultsScreen() {
                   <View style={styles.warningIconWrap}>
                     <Ionicons name="alert-circle" size={14} color="#D97706" />
                   </View>
-                  <Text style={styles.warningTitle}>사전 예약 필요</Text>
+                  <Text style={styles.warningTitle}>{t('aiPlanner.results.bookingWarning')}</Text>
                   <View style={styles.warningCountBadge}>
                     <Text style={styles.warningCountText}>
                       {dayItinerary.activities.filter(a => a.bookingRequired).length}건
@@ -249,7 +249,7 @@ export default function AIPlannerResultsScreen() {
               <View style={styles.insightsCard}>
                 <View style={styles.insightsHeader}>
                   <Ionicons name="sparkles" size={14} color={Colors.primary} />
-                  <Text style={styles.insightsTitle}>AI 스마트 팁</Text>
+                  <Text style={styles.insightsTitle}>{t('aiPlanner.results.insightsTitle')}</Text>
                 </View>
                 <View style={styles.insightsList}>
                   {trip.aiInsights.map((tip, i) => (

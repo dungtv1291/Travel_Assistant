@@ -15,18 +15,12 @@ import { useBookingsStore } from '../../store/bookings.store';
 import { useTripsStore } from '../../store/trips.store';
 import { useLanguageStore } from '../../store/language.store';
 import { useThemeStore } from '../../store/theme.store';
+import { useTranslation } from '../../hooks/useTranslation';
 
-const TRAVEL_STYLE_LABELS: Record<string, { label: string; icon: string }> = {
-  cultural:    { label: '문화 탐방', icon: 'library-outline' },
-  beach:       { label: '해변·리조트', icon: 'sunny-outline' },
-  adventure:   { label: '액티비티', icon: 'bicycle-outline' },
-  food:        { label: '미식 여행', icon: 'restaurant-outline' },
-  foodie:      { label: '미식 여행', icon: 'restaurant-outline' },
-  shopping:    { label: '쇼핑', icon: 'bag-outline' },
-  relaxation:  { label: '힐링·휴양', icon: 'leaf-outline' },
+const TRAVEL_STYLE_ICONS: Record<string, string> = {
+  cultural: 'library-outline', beach: 'sunny-outline', adventure: 'bicycle-outline',
+  food: 'restaurant-outline', foodie: 'restaurant-outline', shopping: 'bag-outline', relaxation: 'leaf-outline',
 };
-
-const LOCALE_LABELS: Record<string, string> = { ko: '한국어', en: 'English', vi: 'Tiếng Việt' };
 
 export default function ProfileScreen() {
   const Colors = useThemeColors();
@@ -37,22 +31,27 @@ export default function ProfileScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const { locale, setLocale } = useLanguageStore();
   const { isDark, toggleTheme } = useThemeStore();
+  const { t } = useTranslation();
+
+  const LOCALE_LABELS: Record<string, string> = {
+    ko: t('languages.ko'), en: t('languages.en'), vi: t('languages.vi'),
+  };
 
   const totalBookings = hotelBookings.length + transportBookings.length;
 
   const handleLanguagePress = () => {
-    Alert.alert('언어 선택', '', [
-      { text: '한국어',       onPress: () => setLocale('ko') },
-      { text: 'English',     onPress: () => setLocale('en') },
-      { text: 'Tiếng Việt', onPress: () => setLocale('vi') },
-      { text: '취소', style: 'cancel' },
+    Alert.alert(t('profile.selectLanguage'), '', [
+      { text: t('languages.ko'),  onPress: () => setLocale('ko') },
+      { text: t('languages.en'),  onPress: () => setLocale('en') },
+      { text: t('languages.vi'),  onPress: () => setLocale('vi') },
+      { text: t('common.cancel'), style: 'cancel' },
     ]);
   };
 
   const handleLogout = () => {
-    Alert.alert('로그아웃', '정말 로그아웃 하시겠어요?', [
-      { text: '취소', style: 'cancel' },
-      { text: '로그아웃', style: 'destructive', onPress: async () => { await logout(); router.replace('/(auth)/welcome'); } },
+    Alert.alert(t('profile.logout'), t('profile.logoutConfirm'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('profile.logout'), style: 'destructive', onPress: async () => { await logout(); router.replace('/(auth)/welcome'); } },
     ]);
   };
 
@@ -68,7 +67,7 @@ export default function ProfileScreen() {
           style={styles.hero}
         >
           <View style={styles.heroTop}>
-            <Text style={styles.heroTitle}>내 프로필</Text>
+            <Text style={styles.heroTitle}>{t('profile.title')}</Text>
             <TouchableOpacity style={styles.editIconBtn} onPress={() => router.push('/profile-edit' as any)}>
               <Ionicons name="pencil-outline" size={17} color="#FFF" />
             </TouchableOpacity>
@@ -88,11 +87,11 @@ export default function ProfileScreen() {
               </View>
             </View>
             <View style={styles.heroInfo}>
-              <Text style={styles.heroName}>{user?.name ?? '여행자'}</Text>
+              <Text style={styles.heroName}>{user?.name ?? t('home.traveler')}</Text>
               <Text style={styles.heroEmail}>{user?.email ?? 'traveler@korea.com'}</Text>
               <TouchableOpacity style={styles.editBadge} onPress={() => router.push('/profile-edit' as any)}>
                 <Ionicons name="pencil-outline" size={12} color={Colors.primary} />
-                <Text style={styles.editBadgeText}>프로필 편집</Text>
+                <Text style={styles.editBadgeText}>{t('profile.editBadge')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -105,7 +104,7 @@ export default function ProfileScreen() {
               <Ionicons name="map-outline" size={18} color={Colors.primary} />
             </View>
             <Text style={styles.statValue}>{savedTrips.length}</Text>
-            <Text style={styles.statLabel}>여행 계획</Text>
+            <Text style={styles.statLabel}>{t('profile.tripCount')}</Text>
           </TouchableOpacity>
           <View style={styles.statDivider} />
           <TouchableOpacity style={styles.statItem} onPress={() => router.push('/(tabs)/bookings')}>
@@ -113,7 +112,7 @@ export default function ProfileScreen() {
               <Ionicons name="receipt-outline" size={18} color={Colors.accent} />
             </View>
             <Text style={[styles.statValue, { color: Colors.accent }]}>{totalBookings}</Text>
-            <Text style={styles.statLabel}>예약 내역</Text>
+            <Text style={styles.statLabel}>{t('profile.bookingCount')}</Text>
           </TouchableOpacity>
           <View style={styles.statDivider} />
           <TouchableOpacity style={styles.statItem} onPress={() => router.push('/(tabs)/trips')}>
@@ -121,13 +120,13 @@ export default function ProfileScreen() {
               <Ionicons name="heart-outline" size={18} color="#D97706" />
             </View>
             <Text style={[styles.statValue, { color: '#D97706' }]}>{favorites.length}</Text>
-            <Text style={styles.statLabel}>찜한 곳</Text>
+            <Text style={styles.statLabel}>{t('profile.favoriteCount')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* ── Quick actions */}
         <View style={styles.sectionBlock}>
-          <Text style={styles.sectionLabel}>나의 여행</Text>
+          <Text style={styles.sectionLabel}>{t('profile.myActivity')}</Text>
           <View style={styles.menuCard}>
             <TouchableOpacity style={[styles.menuRow, styles.menuRowBorder]} onPress={() => router.push('/(tabs)/trips')}>
               <View style={styles.menuLeft}>
@@ -135,8 +134,8 @@ export default function ProfileScreen() {
                   <Ionicons name="calendar-outline" size={18} color={Colors.primary} />
                 </View>
                 <View>
-                  <Text style={styles.menuLabel}>저장된 여행 계획</Text>
-                  <Text style={styles.menuSub}>AI가 만든 일정 · 직접 저장한 플랜</Text>
+                  <Text style={styles.menuLabel}>{t('profile.savedTrips')}</Text>
+                  <Text style={styles.menuSub}>{t('profile.savedTripsSub')}</Text>
                 </View>
               </View>
               <View style={styles.menuRight}>
@@ -150,8 +149,8 @@ export default function ProfileScreen() {
                   <Ionicons name="receipt-outline" size={18} color={Colors.accent} />
                 </View>
                 <View>
-                  <Text style={styles.menuLabel}>예약 내역</Text>
-                  <Text style={styles.menuSub}>호텔 · 항공 · 교통 예약 확인</Text>
+                  <Text style={styles.menuLabel}>{t('profile.bookingHistory')}</Text>
+                  <Text style={styles.menuSub}>{t('profile.bookingHistorySub')}</Text>
                 </View>
               </View>
               <View style={styles.menuRight}>
@@ -165,8 +164,8 @@ export default function ProfileScreen() {
                   <Ionicons name="heart-outline" size={18} color="#D97706" />
                 </View>
                 <View>
-                  <Text style={styles.menuLabel}>찜한 목적지</Text>
-                  <Text style={styles.menuSub}>관심 있는 도시 · 호텔 · 명소</Text>
+                  <Text style={styles.menuLabel}>{t('profile.favoriteDest')}</Text>
+                  <Text style={styles.menuSub}>{t('profile.favoriteDestSub')}</Text>
                 </View>
               </View>
               <View style={styles.menuRight}>
@@ -180,19 +179,20 @@ export default function ProfileScreen() {
         {/* ── Travel identity */}
         {user?.preferences && (user.preferences.travelStyle.length > 0 || user.preferences.interests.length > 0) && (
           <View style={styles.sectionBlock}>
-            <Text style={styles.sectionLabel}>여행 스타일</Text>
+            <Text style={styles.sectionLabel}>{t('profile.travelStyleSection')}</Text>
             <View style={styles.menuCard}>
               {user.preferences.travelStyle.length > 0 && (
                 <View style={[styles.identityRow, styles.menuRowBorder]}>
                   <Ionicons name="compass-outline" size={16} color={Colors.primary} />
-                  <Text style={styles.identityKey}>관심 유형</Text>
+                  <Text style={styles.identityKey}>{t('profile.travelStyleType')}</Text>
                   <View style={styles.chipWrap}>
                     {user.preferences.travelStyle.map(s => {
-                      const meta = TRAVEL_STYLE_LABELS[s];
+                      const icon = TRAVEL_STYLE_ICONS[s] ?? 'compass-outline';
+                      const label = t(`profile.travelStyleLabels.${s}` as any) || s;
                       return (
                         <View key={s} style={styles.styleChip}>
-                          <Ionicons name={(meta?.icon ?? 'compass-outline') as any} size={12} color={Colors.primary} />
-                          <Text style={styles.styleChipText}>{meta?.label ?? s}</Text>
+                          <Ionicons name={icon as any} size={12} color={Colors.primary} />
+                          <Text style={styles.styleChipText}>{label}</Text>
                         </View>
                       );
                     })}
@@ -202,7 +202,7 @@ export default function ProfileScreen() {
               {user.preferences.interests.length > 0 && (
                 <View style={styles.identityRow}>
                   <Ionicons name="heart-outline" size={16} color={Colors.accent} />
-                  <Text style={styles.identityKey}>관심 키워드</Text>
+                  <Text style={styles.identityKey}>{t('profile.travelStyleInterests')}</Text>
                   <View style={styles.chipWrap}>
                     {user.preferences.interests.slice(0, 5).map(int => (
                       <View key={int} style={[styles.styleChip, styles.styleChipAccent]}>
@@ -218,14 +218,14 @@ export default function ProfileScreen() {
 
         {/* ── App settings */}
         <View style={styles.sectionBlock}>
-          <Text style={styles.sectionLabel}>앱 설정</Text>
+          <Text style={styles.sectionLabel}>{t('profile.settings')}</Text>
           <View style={styles.menuCard}>
             <TouchableOpacity style={[styles.menuRow, styles.menuRowBorder]} onPress={handleLanguagePress}>
               <View style={styles.menuLeft}>
                 <View style={[styles.menuIconBox, { backgroundColor: Colors.primaryLight }]}>
                   <Ionicons name="language-outline" size={18} color={Colors.primary} />
                 </View>
-                <Text style={styles.menuLabel}>언어</Text>
+                <Text style={styles.menuLabel}>{t('profile.appLanguage')}</Text>
               </View>
               <View style={styles.menuRight}>
                 <Text style={styles.menuValue}>{LOCALE_LABELS[locale] ?? locale}</Text>
@@ -237,7 +237,7 @@ export default function ProfileScreen() {
                 <View style={[styles.menuIconBox, { backgroundColor: isDark ? '#1E293B' : Colors.primaryLight }]}>
                   <Ionicons name={isDark ? 'moon' : 'moon-outline'} size={18} color={Colors.primary} />
                 </View>
-                <Text style={styles.menuLabel}>다크 모드</Text>
+                <Text style={styles.menuLabel}>{t('profile.darkMode')}</Text>
               </View>
               <Switch
                 value={isDark}
@@ -252,8 +252,8 @@ export default function ProfileScreen() {
                   <Ionicons name="notifications-outline" size={18} color={Colors.primary} />
                 </View>
                 <View>
-                  <Text style={styles.menuLabel}>푸시 알림</Text>
-                  <Text style={styles.menuSub}>특가 · 예약 변경 · 여행 팁</Text>
+                  <Text style={styles.menuLabel}>{t('profile.notifications')}</Text>
+                  <Text style={styles.menuSub}>{t('profile.notificationsSub')}</Text>
                 </View>
               </View>
               <Switch
@@ -268,11 +268,11 @@ export default function ProfileScreen() {
 
         {/* ── Privacy / legal */}
         <View style={styles.sectionBlock}>
-          <Text style={styles.sectionLabel}>약관 및 개인정보</Text>
+          <Text style={styles.sectionLabel}>{t('profile.legalSection')}</Text>
           <View style={styles.menuCard}>
             {[
-              { label: '개인정보 처리방침', icon: 'shield-checkmark-outline' },
-              { label: '서비스 이용약관',   icon: 'document-text-outline' },
+              { label: t('profile.privacyPolicy'),  icon: 'shield-checkmark-outline' },
+              { label: t('profile.serviceTerms'),   icon: 'document-text-outline' },
             ].map((item, i) => (
               <TouchableOpacity
                 key={item.label}
@@ -292,7 +292,7 @@ export default function ProfileScreen() {
 
         {/* ── Support */}
         <View style={styles.sectionBlock}>
-          <Text style={styles.sectionLabel}>고객 지원</Text>
+          <Text style={styles.sectionLabel}>{t('profile.supportSection')}</Text>
           <View style={styles.menuCard}>
             <TouchableOpacity style={[styles.menuRow, styles.menuRowBorder]}>
               <View style={styles.menuLeft}>
@@ -300,8 +300,8 @@ export default function ProfileScreen() {
                   <Ionicons name="chatbubble-ellipses-outline" size={18} color={Colors.primary} />
                 </View>
                 <View>
-                  <Text style={styles.menuLabel}>고객센터 문의</Text>
-                  <Text style={styles.menuSub}>평일 09:00–18:00 · 한국어 지원</Text>
+                  <Text style={styles.menuLabel}>{t('profile.customerService')}</Text>
+                  <Text style={styles.menuSub}>{t('profile.customerServiceSub')}</Text>
                 </View>
               </View>
               <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
@@ -311,7 +311,7 @@ export default function ProfileScreen() {
                 <View style={[styles.menuIconBox, { backgroundColor: Colors.surfaceSecondary }]}>
                   <Ionicons name="information-circle-outline" size={18} color={Colors.textSecondary} />
                 </View>
-                <Text style={styles.menuLabel}>앱 버전</Text>
+                <Text style={styles.menuLabel}>{t('profile.appVersion')}</Text>
               </View>
               <Text style={styles.menuValue}>v1.0.0</Text>
             </View>
@@ -322,14 +322,14 @@ export default function ProfileScreen() {
         <View style={styles.sectionBlock}>
           <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout} activeOpacity={0.8}>
             <Ionicons name="log-out-outline" size={18} color="#EF4444" />
-            <Text style={styles.logoutText}>로그아웃</Text>
+            <Text style={styles.logoutText}>{t('profile.logout')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* ── Footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerFlag}>🇻🇳 베트남 여행 전문 앱</Text>
-          <Text style={styles.footerSub}>한국인 여행자를 위한 올인원 가이드</Text>
+          <Text style={styles.footerFlag}>{t('profile.footer')}</Text>
+          <Text style={styles.footerSub}>{t('profile.footerSub')}</Text>
         </View>
 
       </ScrollView>

@@ -158,7 +158,7 @@ export default function HomeScreen() {
           <TouchableOpacity style={styles.sectionHeader} onPress={() => router.push('/(tabs)/explore')}>
             <View style={styles.sectionTitleBlock}>
               <Text style={styles.sectionTitle}>{t('home.topDestinations')}</Text>
-              <Text style={styles.sectionSub}>베트남 인기 여행지 모음</Text>
+              <Text style={styles.sectionSub}>{t('home.topDestinationsSub')}</Text>
             </View>
             <Text style={styles.sectionAction}>{t('common.viewAll')}</Text>
           </TouchableOpacity>
@@ -190,7 +190,7 @@ export default function HomeScreen() {
           <TouchableOpacity style={styles.sectionHeader} onPress={() => router.push('/hotel')}>
             <View style={styles.sectionTitleBlock}>
               <Text style={styles.sectionTitle}>{t('home.recommendedHotels')}</Text>
-              <Text style={styles.sectionSub}>베트남 최고 인기 숙소</Text>
+              <Text style={styles.sectionSub}>{t('home.recommendedHotelsSub')}</Text>
             </View>
             <Text style={styles.sectionAction}>{t('common.viewAll')}</Text>
           </TouchableOpacity>
@@ -211,7 +211,7 @@ export default function HomeScreen() {
           <TouchableOpacity style={styles.sectionHeader} onPress={() => router.push('/flights')}>
             <View style={styles.sectionTitleBlock}>
               <Text style={styles.sectionTitle}>{t('home.flightDeals')}</Text>
-              <Text style={styles.sectionSub}>인천 출발 최저가 항공권</Text>
+              <Text style={styles.sectionSub}>{t('home.flightDealsSub')}</Text>
             </View>
             <Text style={styles.sectionAction}>{t('common.viewAll')}</Text>
           </TouchableOpacity>

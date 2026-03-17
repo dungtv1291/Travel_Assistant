@@ -7,6 +7,7 @@ import { Spacing, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { ItineraryActivity } from '../../types/trip.types';
 import { formatVNDPrice, formatKRWPrice } from '../../utils/format';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface Props {
   activity: ItineraryActivity;
@@ -27,6 +28,7 @@ const ACTIVITY_ICONS: Record<string, string> = {
 export function TimelineItem({ activity, isLast }: Props) {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
+  const { t } = useTranslation();
 
   const ACTIVITY_COLORS: Record<string, string> = {
     sightseeing:   Colors.primary,
@@ -70,7 +72,7 @@ export function TimelineItem({ activity, isLast }: Props) {
           </View>
           {activity.bookingRequired && (
             <View style={styles.bookingPill}>
-              <Text style={styles.bookingText}>예약 필요</Text>
+              <Text style={styles.bookingText}>{t('aiPlanner.bookingRequired')}</Text>
             </View>
           )}
         </View>

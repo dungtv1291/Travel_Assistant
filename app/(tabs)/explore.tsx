@@ -139,7 +139,7 @@ export default function ExploreScreen() {
       {/* Stats */}
       <View style={styles.statsRow}>
           <Text style={styles.statsText}>
-            총 <Text style={styles.statsCount}>{filtered.length}</Text>개 여행지
+            {t('explore.resultsCount', { count: filtered.length })}
           </Text>
         {selectedCategory !== 'all' && (
           <TouchableOpacity onPress={() => setSelectedCategory('all')}>

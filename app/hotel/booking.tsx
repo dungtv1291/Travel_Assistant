@@ -29,24 +29,25 @@ const bookingSchema = z.object({
 
 type BookingForm = z.infer<typeof bookingSchema>;
 
-const DATE_OPTIONS = [
-  { label: '오늘 ~ 1박', checkIn: '2026-04-10', checkOut: '2026-04-11', nights: 1 },
-  { label: '2박 3일', checkIn: '2026-04-10', checkOut: '2026-04-12', nights: 2 },
-  { label: '3박 4일', checkIn: '2026-04-10', checkOut: '2026-04-13', nights: 3 },
-  { label: '5박 6일', checkIn: '2026-04-10', checkOut: '2026-04-15', nights: 5 },
-];
-
 export default function HotelBookingScreen() {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+
+  const DATE_OPTIONS = [
+    { label: t('hotels.datePresets.oneNight'),    checkIn: '2026-04-10', checkOut: '2026-04-11', nights: 1 },
+    { label: t('hotels.datePresets.twoNights'),   checkIn: '2026-04-10', checkOut: '2026-04-12', nights: 2 },
+    { label: t('hotels.datePresets.threeNights'), checkIn: '2026-04-10', checkOut: '2026-04-13', nights: 3 },
+    { label: t('hotels.datePresets.fiveNights'),  checkIn: '2026-04-10', checkOut: '2026-04-15', nights: 5 },
+  ];
   const { hotelId, roomId, hotelName, roomName, hotelImage, roomPrice } = useLocalSearchParams<{
     hotelId: string; roomId: string; hotelName: string;
     roomName: string; hotelImage: string; roomPrice: string;
   }>();
   const { user } = useAuthStore();
   const { addHotelBooking } = useBookingsStore();
-  const [selectedDates, setSelectedDates] = useState(DATE_OPTIONS[1]);
+  const [selectedDateIndex, setSelectedDateIndex] = useState(1);
+  const selectedDates = DATE_OPTIONS[selectedDateIndex];
   const [loading, setLoading] = useState(false);
 
   const ROOM_PRICE = Number(roomPrice) || 0;
@@ -122,14 +123,14 @@ export default function HotelBookingScreen() {
             <View style={styles.card}>
               <Text style={styles.cardTitle}>{t('hotels.selectDates')}</Text>
               <View style={styles.dateOptions}>
-                {DATE_OPTIONS.map(opt => (
+                {DATE_OPTIONS.map((opt, idx) => (
                   <TouchableOpacity
-                    key={opt.label}
-                    style={[styles.dateOption, selectedDates.label === opt.label && styles.dateOptionActive]}
-                    onPress={() => setSelectedDates(opt)}
+                    key={opt.checkIn + opt.nights}
+                    style={[styles.dateOption, selectedDateIndex === idx && styles.dateOptionActive]}
+                    onPress={() => setSelectedDateIndex(idx)}
                   >
-                    <Text style={[styles.dateOptionLabel, selectedDates.label === opt.label && styles.dateOptionLabelActive]}>{opt.label}</Text>
-                    <Text style={[styles.dateOptionDates, selectedDates.label === opt.label && styles.dateOptionDatesActive]}>
+                    <Text style={[styles.dateOptionLabel, selectedDateIndex === idx && styles.dateOptionLabelActive]}>{opt.label}</Text>
+                    <Text style={[styles.dateOptionDates, selectedDateIndex === idx && styles.dateOptionDatesActive]}>
                       {opt.checkIn} ~ {opt.checkOut}
                     </Text>
                   </TouchableOpacity>

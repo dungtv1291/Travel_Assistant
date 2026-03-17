@@ -25,18 +25,18 @@ import { BackButton } from '../../components/auth/BackButton';
 import { useRegisterForm } from '../../hooks';
 import { useTranslation } from '../../hooks/useTranslation';
 
-const PWD_REQUIREMENTS = [
-  { label: '8자 이상', check: (p: string) => p.length >= 8 },
-  { label: '대문자 포함', check: (p: string) => /[A-Z]/.test(p) },
-  { label: '숫자 포함', check: (p: string) => /[0-9]/.test(p) },
-];
-
 export default function RegisterScreen() {
   const [showPw, setShowPw] = useState(false);
   const { register, isLoading } = useAuthStore();
   const { t } = useTranslation();
   const { control, handleSubmit, formState: { errors } } = useRegisterForm();
   const watchedPassword = useWatch({ control, name: 'password' }) ?? '';
+
+  const PWD_REQUIREMENTS = [
+    { key: 'minLength', label: t('auth.passwordRules.minLength'), check: (p: string) => p.length >= 8 },
+    { key: 'uppercase', label: t('auth.passwordRules.uppercase'), check: (p: string) => /[A-Z]/.test(p) },
+    { key: 'number', label: t('auth.passwordRules.number'), check: (p: string) => /[0-9]/.test(p) },
+  ];
 
   const onSubmit = handleSubmit(async ({ name, email, password, confirmPassword }) => {
     try {
@@ -78,7 +78,7 @@ export default function RegisterScreen() {
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
-                  placeholder="홍길동"
+                  placeholder={t('auth.namePlaceholder')}
                   autoCapitalize="words"
                   error={errors.name?.message}
                 />
@@ -132,7 +132,7 @@ export default function RegisterScreen() {
                     {PWD_REQUIREMENTS.map(req => {
                       const met = req.check(watchedPassword);
                       return (
-                        <View key={req.label} style={styles.reqItem}>
+                        <View key={req.key} style={styles.reqItem}>
                           <Ionicons
                             name={met ? 'checkmark-circle' : 'ellipse-outline'}
                             size={13}
