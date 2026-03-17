@@ -13,13 +13,16 @@ import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 
 import { destinationsService } from '../../services/mock/destinations.service';
+import { hotelsService } from '../../services/mock/hotels.service';
 import { useTripsStore } from '../../store/trips.store';
 import { Destination, Attraction } from '../../types/destination.types';
+import { Hotel } from '../../types/hotel.types';
 import { Rating } from '../../components/common/Rating';
 import { Button } from '../../components/common/Button';
 import { Badge } from '../../components/common/Badge';
 import { LoadingState } from '../../components/common/LoadingState';
 import { useTranslation } from '../../hooks/useTranslation';
+import { formatVNDPrice, formatKRWPrice } from '../../utils/format';
 
 const { width, height } = Dimensions.get('window');
 const HERO_HEIGHT = 320;
@@ -35,6 +38,7 @@ export default function DestinationDetailScreen() {
 
   const [destination, setDestination] = useState<Destination | null>(null);
   const [attractions, setAttractions] = useState<Attraction[]>([]);
+  const [destHotels, setDestHotels] = useState<Hotel[]>([]);
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -43,9 +47,11 @@ export default function DestinationDetailScreen() {
       Promise.all([
         destinationsService.getById(id),
         destinationsService.getAttractionsByDestination(id),
-      ]).then(([dest, attrs]) => {
+        hotelsService.getByDestination(id),
+      ]).then(([dest, attrs, htls]) => {
         setDestination(dest || null);
         setAttractions(attrs);
+        setDestHotels(htls);
         setLoading(false);
       });
     }
@@ -137,7 +143,7 @@ export default function DestinationDetailScreen() {
                 {/* Quick Info */}
                 <View style={styles.infoGrid}>
                   {[
-                    { icon: 'calendar-outline', label: t('destination.bestSeason'), value: destination.bestSeason },
+                    { icon: 'calendar-outline', label: t('destination.bestSeason'), value: destination.bestSeason ?? destination.bestTimeToVisit },
                     { icon: 'thermometer-outline', label: t('destination.avgTemp'), value: `${destination.weather.temperature}°C` },
                     { icon: 'language-outline', label: t('destination.language'), value: t('destination.languageValue') },
                     { icon: 'card-outline', label: t('destination.currency'), value: t('destination.currencyValue') },
@@ -177,7 +183,7 @@ export default function DestinationDetailScreen() {
                         <Text style={styles.attrDescription} numberOfLines={2}>{attr.descriptionKo ?? attr.description}</Text>
                         {attr.ticketPrice && (
                           <Text style={styles.attrPrice}>
-                            {t('destination.entranceFee')}: {attr.ticketPrice.adult.toLocaleString()}₫
+                            {t('destination.entranceFee')}: {formatVNDPrice(attr.ticketPrice.adult)}
                           </Text>
                         )}
                         <View style={styles.attrFooter}>
@@ -194,43 +200,122 @@ export default function DestinationDetailScreen() {
             {/* 호텔 Tab */}
             {activeTab === 2 && (
               <View style={styles.section}>
-                <Text style={styles.description}>
-                  {t('destination.hotelHint', { name: destination.nameKo })}
-                </Text>
-                <Button
-                  title={t('destination.searchHotels', { name: destination.nameKo })}
-                  onPress={() => router.push('/hotel')}
-                  size="lg"
-                  fullWidth
-                />
+                {destHotels.length > 0 ? (
+                  <>
+                    {destHotels.slice(0, 3).map(hotel => (
+                      <TouchableOpacity
+                        key={hotel.id}
+                        style={styles.miniHotelCard}
+                        onPress={() => router.push(`/hotel/${hotel.id}` as never)}
+                        activeOpacity={0.85}
+                      >
+                        <Image source={{ uri: hotel.imageUrl }} style={styles.miniHotelImage} />
+                        <View style={styles.miniHotelInfo}>
+                          <Text style={styles.miniHotelName} numberOfLines={1}>{hotel.nameKo}</Text>
+                          <View style={styles.miniHotelRatingRow}>
+
+                            {[...Array(hotel.starRating ?? 0)].map((_, si) => (
+                              <Ionicons key={si} name="star" size={11} color="#FBBF24" />
+                            ))}
+                            <Text style={styles.miniHotelRating}>{hotel.rating.toFixed(1)}</Text>
+                            <Text style={styles.miniHotelReviews}>({hotel.reviewCount.toLocaleString()})</Text>
+                          </View>
+                          <Text style={styles.miniHotelPrice}>
+                            {formatKRWPrice(hotel.pricePerNight)} <Text style={styles.miniHotelPerNight}>/박</Text>
+                          </Text>
+                        </View>
+                        <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
+                      </TouchableOpacity>
+                    ))}
+                    <Button
+                      title={t('destination.searchHotels', { name: destination.nameKo })}
+                      onPress={() => router.push('/hotel')}
+                      variant="outline"
+                      fullWidth
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.description}>
+                      {t('destination.hotelHint', { name: destination.nameKo })}
+                    </Text>
+                    <Button
+                      title={t('destination.searchHotels', { name: destination.nameKo })}
+                      onPress={() => router.push('/hotel')}
+                      size="lg"
+                      fullWidth
+                    />
+                  </>
+                )}
               </View>
             )}
 
             {/* 날씨 Tab */}
             {activeTab === 3 && (
               <View style={styles.section}>
+                {/* Current Weather Card */}
                 <View style={styles.weatherCard}>
-                  <Text style={styles.weatherTitle}>{t('destination.currentWeather')}</Text>
-                  <View style={styles.weatherMain}>
-                    <Text style={styles.weatherTemp}>{destination.weather.temperature}°C</Text>
-                    <Text style={styles.weatherCondition}>{destination.weather.condition}</Text>
+                  <View style={styles.weatherMainRow}>
+                    <View>
+                      <Text style={styles.weatherTemp}>{destination.weather.temperature}°C</Text>
+                      <Text style={styles.weatherCondition}>{destination.weather.description || destination.weather.condition}</Text>
+                    </View>
+                    <Text style={styles.weatherIcon}>{destination.weather.icon ?? '🌤️'}</Text>
                   </View>
-                  <View style={styles.weatherDetails}>
-                    <View style={styles.weatherItem}>
-                      <Ionicons name="water-outline" size={16} color={Colors.primary} />
-                      <Text style={styles.weatherItemLabel}>{t('destination.humidity')}</Text>
-                      <Text style={styles.weatherItemValue}>{destination.weather.humidity}%</Text>
+                  <View style={styles.weatherStats}>
+                    <View style={styles.weatherStatItem}>
+                      <Ionicons name="water-outline" size={18} color={Colors.primary} />
+                      <Text style={styles.weatherStatValue}>{destination.weather.humidity}%</Text>
+                      <Text style={styles.weatherStatLabel}>{t('destination.humidity')}</Text>
                     </View>
-                    <View style={styles.weatherItem}>
-                      <Ionicons name="umbrella-outline" size={16} color={Colors.primary} />
-                      <Text style={styles.weatherItemLabel}>{t('destination.rainfall')}</Text>
-                      <Text style={styles.weatherItemValue}>{t('destination.precipitation', { amount: destination.weather.rainfall ?? 0 })}</Text>
+                    <View style={styles.weatherStatDivider} />
+                    <View style={styles.weatherStatItem}>
+                      <Ionicons name="umbrella-outline" size={18} color={Colors.primary} />
+                      <Text style={styles.weatherStatValue}>{destination.weather.rainfall ?? 0}mm</Text>
+                      <Text style={styles.weatherStatLabel}>{t('destination.rainfall')}</Text>
                     </View>
-                    <View style={styles.weatherItem}>
-                      <Ionicons name="sunny-outline" size={16} color={Colors.primary} />
-                      <Text style={styles.weatherItemLabel}>{t('destination.bestSeasonLabel')}</Text>
-                      <Text style={styles.weatherItemValue}>{destination.bestSeason}</Text>
+                    <View style={styles.weatherStatDivider} />
+                    <View style={styles.weatherStatItem}>
+                      <Ionicons name="sunny-outline" size={18} color="#F59E0B" />
+                      <Text style={styles.weatherStatValue}>
+                        {destination.weather.temperature >= 32 ? '자외선 강함' : destination.weather.temperature >= 26 ? '자외선 보통' : '자외선 약함'}
+                      </Text>
+                      <Text style={styles.weatherStatLabel}>자외선</Text>
                     </View>
+                  </View>
+                </View>
+
+                {/* Best Time to Visit */}
+                <View style={styles.bestTimeCard}>
+                  <View style={styles.bestTimeHeader}>
+                    <Ionicons name="calendar-outline" size={18} color={Colors.primary} />
+                    <Text style={styles.bestTimeTitle}>{t('destination.bestSeason')}</Text>
+                  </View>
+                  <Text style={styles.bestTimeValue}>
+                    {destination.bestSeason ?? destination.bestTimeToVisit}
+                  </Text>
+                  <Text style={styles.bestTimeHint}>
+                    이 시기에는 날씨가 좋고 여행하기 최적입니다. 성수기에는 사전 예약이 필수입니다.
+                  </Text>
+                </View>
+
+                {/* Season Overview */}
+                <View style={styles.seasonCard}>
+                  <Text style={styles.seasonTitle}>계절 개요</Text>
+                  <View style={styles.seasonRow}>
+                    {[
+                      { label: '봄', months: '3-5월', icon: '🌸', note: '여행 적기' },
+                      { label: '여름', months: '6-8월', icon: '☀️', note: '성수기' },
+                      { label: '가을', months: '9-11월', icon: '🍂', note: '여행 적기' },
+                      { label: '겨울', months: '12-2월', icon: '❄️', note: '건기' },
+                    ].map(season => (
+                      <View key={season.label} style={styles.seasonItem}>
+                        <Text style={styles.seasonIcon}>{season.icon}</Text>
+                        <Text style={styles.seasonLabel}>{season.label}</Text>
+                        <Text style={styles.seasonMonths}>{season.months}</Text>
+                        <Text style={styles.seasonNote}>{season.note}</Text>
+                      </View>
+                    ))}
                   </View>
                 </View>
               </View>
@@ -399,18 +484,71 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
     ...Shadow.sm,
     gap: Spacing.md,
   },
-  weatherTitle: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.textPrimary },
-  weatherMain: { alignItems: 'center', gap: Spacing.xs },
-  weatherTemp: { fontSize: 56, fontWeight: '800', color: Colors.primary },
-  weatherCondition: { fontSize: FontSize.lg, color: Colors.textSecondary },
-  weatherDetails: {
+  weatherMainRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  weatherTemp: { fontSize: 52, fontWeight: '800', color: Colors.primary },
+  weatherCondition: { fontSize: FontSize.base, color: Colors.textSecondary, marginTop: 2 },
+  weatherIcon: { fontSize: 56 },
+  weatherStats: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: Spacing.md,
+    backgroundColor: Colors.surfaceSecondary,
+    borderRadius: Radius.lg,
+    padding: Spacing.md,
   },
-  weatherItem: { alignItems: 'center', gap: Spacing.xs },
-  weatherItemLabel: { fontSize: FontSize.xs, color: Colors.textMuted },
-  weatherItemValue: { fontSize: FontSize.sm, fontWeight: '700', color: Colors.textPrimary },
+  weatherStatItem: { alignItems: 'center', gap: Spacing.xs },
+  weatherStatValue: { fontSize: FontSize.sm, fontWeight: '700', color: Colors.textPrimary },
+  weatherStatLabel: { fontSize: FontSize.xs, color: Colors.textMuted },
+  weatherStatDivider: { width: 1, height: '60%', backgroundColor: Colors.border, alignSelf: 'center' },
+
+  bestTimeCard: {
+    backgroundColor: Colors.primaryLight,
+    borderRadius: Radius.xl,
+    padding: Spacing.base,
+    gap: Spacing.xs,
+    borderWidth: 1,
+    borderColor: Colors.primary + '33',
+  },
+  bestTimeHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.xs },
+  bestTimeTitle: { fontSize: FontSize.base, fontWeight: '700', color: Colors.primary },
+  bestTimeValue: { fontSize: FontSize.lg, fontWeight: '800', color: Colors.textPrimary },
+  bestTimeHint: { fontSize: FontSize.xs, color: Colors.textSecondary, lineHeight: 18 },
+
+  seasonCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.xl,
+    padding: Spacing.base,
+    ...Shadow.sm,
+    gap: Spacing.md,
+  },
+  seasonTitle: { fontSize: FontSize.base, fontWeight: '700', color: Colors.textPrimary },
+  seasonRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  seasonItem: { flex: 1, alignItems: 'center', gap: 3 },
+  seasonIcon: { fontSize: 24 },
+  seasonLabel: { fontSize: FontSize.sm, fontWeight: '700', color: Colors.textPrimary },
+  seasonMonths: { fontSize: FontSize.xs, color: Colors.textMuted },
+  seasonNote: { fontSize: FontSize.xs, color: Colors.primary, fontWeight: '600' },
+
+  miniHotelCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.xl,
+    overflow: 'hidden',
+    ...Shadow.sm,
+    gap: Spacing.md,
+  },
+  miniHotelImage: { width: 88, height: 80 },
+  miniHotelInfo: { flex: 1, gap: 3, paddingVertical: Spacing.sm },
+  miniHotelName: { fontSize: FontSize.base, fontWeight: '700', color: Colors.textPrimary },
+  miniHotelRatingRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  miniHotelRating: { fontSize: FontSize.xs, fontWeight: '600', color: Colors.textSecondary },
+  miniHotelReviews: { fontSize: FontSize.xs, color: Colors.textMuted },
+  miniHotelPrice: { fontSize: FontSize.sm, fontWeight: '800', color: Colors.accent },
+  miniHotelPerNight: { fontSize: FontSize.xs, fontWeight: '400', color: Colors.textMuted },
 
   tipItem: {
     flexDirection: 'row',

@@ -120,6 +120,15 @@ export default {
     topDestinations: '최고의 목적지',
     recommendedHotels: '추천 호텔',
     flightDeals: '항공 특가',
+    transportRental: '교통 & 렌트',
+    transportAirport: '공항 픽업',
+    transportAirportSub: '전용 기사',
+    transportPrivate: '전용 차량',
+    transportPrivateSub: '하루 종일',
+    transportScooter: '스쿠터',
+    transportScooterSub: '자유 여행',
+    transportDayTour: '데이 투어',
+    transportDayTourSub: '가이드 포함',
   },
 
   // ── Categories (home + explore) ──
@@ -213,6 +222,9 @@ export default {
     emailPlaceholder: '이메일을 입력하세요',
     phonePlaceholder: '전화번호를 입력하세요',
     saveSuccess: '프로필이 업데이트되었습니다!',
+    travelIdentity: '여행 스타일',
+    travelStyle: '스타일',
+    interests: '관심사',
   },
 
   // ── Flights ──

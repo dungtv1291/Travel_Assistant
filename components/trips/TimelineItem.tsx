@@ -7,6 +7,7 @@ import { Spacing, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { ItineraryActivity } from '../../types/trip.types';
 import { useTranslation } from '../../hooks/useTranslation';
+import { formatVNDPrice, formatKRWPrice } from '../../utils/format';
 
 interface Props {
   activity: ItineraryActivity;
@@ -66,7 +67,9 @@ export function TimelineItem({ activity, isLast }: Props) {
             <View style={styles.costRow}>
               <Ionicons name="card-outline" size={12} color={Colors.textMuted} />
               <Text style={styles.costText}>
-                {t('components.timelineItem.estimatedCost', { cost: (activity.estimatedCost! * 1350).toLocaleString() })}
+                {activity.currency === 'KRW'
+                  ? formatKRWPrice(activity.estimatedCost!)
+                  : formatVNDPrice(activity.estimatedCost!)}
               </Text>
             </View>
           )}

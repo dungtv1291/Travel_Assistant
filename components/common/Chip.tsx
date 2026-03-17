@@ -68,6 +68,8 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
   },
   unselected: {
     backgroundColor: Colors.surfaceSecondary,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   label: { fontWeight: '600' },
   labelMd: { fontSize: FontSize.sm },

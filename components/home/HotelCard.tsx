@@ -14,6 +14,7 @@ import { FontSize } from '../../constants/typography';
 import { Rating } from '../common/Rating';
 import { Badge } from '../common/Badge';
 import { useTranslation } from '../../hooks/useTranslation';
+import { formatKRWPrice } from '../../utils/format';
 
 interface HotelCardProps {
   hotel: Hotel;
@@ -45,8 +46,7 @@ export function HotelCard({ hotel, onPress, compact = false }: HotelCardProps) {
       <View style={styles.footer}>
         <Rating value={hotel.rating} reviewCount={hotel.reviewCount} size="sm" />
         <View style={styles.priceContainer}>
-          <Text style={styles.priceLabel}>₩</Text>
-          <Text style={styles.price}>{(hotel.pricePerNight * 1350).toLocaleString()}</Text>
+          <Text style={styles.price}>{formatKRWPrice(hotel.pricePerNight)}</Text>
           <Text style={styles.perNight}>{t('common.perNight')}</Text>
         </View>
       </View>

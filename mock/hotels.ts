@@ -366,7 +366,7 @@ export const mockHotels: Hotel[] = [
   },
   {
     id: 'hotel-7', name: 'InterContinental Saigon', nameKo: '인터컨티넨탈 사이공',
-    destinationId: 'dest-2', city: 'Ho Chi Minh', location: '1군 CBD, 호치민 도심',
+    destinationId: 'dest-7', city: 'Ho Chi Minh', location: '1군 CBD, 호치민 도심',
     address: 'Corner Hai Ba Trung & Le Lai, District 1, Ho Chi Minh City',
     imageUrl: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
     images: [
@@ -387,7 +387,7 @@ export const mockHotels: Hotel[] = [
   },
   {
     id: 'hotel-8', name: 'Vinpearl Resort & Spa Nha Trang', nameKo: '빈펄 리조트 & 스파 나트랑',
-    destinationId: 'dest-6', city: 'Nha Trang', location: '혼 트레 섬, 나트랑',
+    destinationId: 'dest-9', city: 'Nha Trang', location: '혼 트레 섬, 나트랑',
     address: 'Hon Tre Island, Nha Trang, Khanh Hoa',
     imageUrl: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800',
     images: [

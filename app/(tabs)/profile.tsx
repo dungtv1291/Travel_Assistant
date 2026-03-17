@@ -16,6 +16,16 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { useLanguageStore } from '../../store/language.store';
 import { useThemeStore } from '../../store/theme.store';
 
+const TRAVEL_STYLE_LABELS: Record<string, string> = {
+  cultural: '🏛️ 문화 탐방',
+  beach: '🏖️ 해변',
+  adventure: '🧗 액티비티',
+  food: '🍜 미식',
+  foodie: '🍜 미식',
+  shopping: '🛍️ 쇼핑',
+  relaxation: '🧘 힐링',
+};
+
 export default function ProfileScreen() {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
@@ -136,6 +146,43 @@ export default function ProfileScreen() {
             <Text style={styles.statLabel}>{t('profile.favoriteCount')}</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Travel Identity */}
+        {user?.preferences && (user.preferences.travelStyle.length > 0 || user.preferences.interests.length > 0) && (
+          <View style={styles.identitySection}>
+            <Text style={styles.identitySectionTitle}>{t('profile.travelIdentity')}</Text>
+            <View style={styles.identityCard}>
+              {user.preferences.travelStyle.length > 0 && (
+                <View style={styles.identityRow}>
+                  <Ionicons name="compass-outline" size={16} color={Colors.primary} />
+                  <Text style={styles.identityRowLabel}>{t('profile.travelStyle')}</Text>
+                  <View style={styles.identityChips}>
+                    {user.preferences.travelStyle.map(style => (
+                      <View key={style} style={styles.identityChip}>
+                        <Text style={styles.identityChipText}>
+                          {TRAVEL_STYLE_LABELS[style] ?? style}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+              {user.preferences.interests.length > 0 && (
+                <View style={[styles.identityRow, styles.identityRowBorder]}>
+                  <Ionicons name="heart-outline" size={16} color={Colors.accent} />
+                  <Text style={styles.identityRowLabel}>{t('profile.interests')}</Text>
+                  <View style={styles.identityChips}>
+                    {user.preferences.interests.slice(0, 4).map(interest => (
+                      <View key={interest} style={[styles.identityChip, styles.identityChipAccent]}>
+                        <Text style={[styles.identityChipText, styles.identityChipTextAccent]}>{interest}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+            </View>
+          </View>
+        )}
 
         {/* Menu Sections */}
         {menuSections.map(section => (
@@ -258,5 +305,18 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
   footer: { alignItems: 'center', paddingVertical: Spacing.lg, gap: 4 },
   footerText: { fontSize: FontSize.xs, color: Colors.textMuted },
   footerVersion: { fontSize: 11, color: Colors.border },
+
+  // Travel Identity
+  identitySection: { marginBottom: Spacing.xl, paddingHorizontal: Spacing.base },
+  identitySectionTitle: { fontSize: FontSize.sm, fontWeight: '700', color: Colors.textMuted, marginBottom: Spacing.sm, textTransform: 'uppercase', letterSpacing: 0.5 },
+  identityCard: { backgroundColor: Colors.surface, borderRadius: Radius.xl, overflow: 'hidden', ...Shadow.sm },
+  identityRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', paddingHorizontal: Spacing.base, paddingVertical: Spacing.md, gap: Spacing.sm },
+  identityRowBorder: { borderTopWidth: 1, borderTopColor: Colors.border },
+  identityRowLabel: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.textSecondary },
+  identityChips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.xs, flex: 1 },
+  identityChip: { paddingHorizontal: Spacing.sm + 2, paddingVertical: 4, backgroundColor: Colors.primaryLight, borderRadius: Radius.full },
+  identityChipAccent: { backgroundColor: Colors.accentLight },
+  identityChipText: { fontSize: FontSize.xs, fontWeight: '600', color: Colors.primary },
+  identityChipTextAccent: { color: Colors.accent },
   });
 }

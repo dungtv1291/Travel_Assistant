@@ -76,7 +76,7 @@ export default function BookingsScreen() {
         </View>
         <View style={styles.cardRight}>
           <Text style={styles.priceLabel}>{t('bookings.totalAmount')}</Text>
-          <Text style={styles.price}>{formatKRWPrice(item.totalPrice * 1350)}</Text>
+          <Text style={styles.price}>{formatKRWPrice(item.totalPrice)}</Text>
           <Text style={styles.bookingId}>{item.confirmationCode}</Text>
         </View>
       </View>

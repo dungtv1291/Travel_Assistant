@@ -119,8 +119,15 @@ export default {
     confirmed: 'Đã xác nhận',
     topDestinations: 'Điểm đến hàng đầu',
     recommendedHotels: 'Khách sạn đề xuất',
-    flightDeals: 'Vé máy bay ưu đãi',
-  },
+    flightDeals: 'Vé máy bay ưu đãi',    transportRental: 'Vận chuyển & Thuê xe',
+    transportAirport: 'Đón sân bay',
+    transportAirportSub: 'Tài xế riêng',
+    transportPrivate: 'Xe riêng',
+    transportPrivateSub: 'Cả ngày',
+    transportScooter: 'Xe máy',
+    transportScooterSub: 'Tự do khám phá',
+    transportDayTour: 'Tour trong ngày',
+    transportDayTourSub: 'Có hướng dẫn',  },
 
   // ── Categories ──
   categories: {
@@ -213,6 +220,9 @@ export default {
     emailPlaceholder: 'Nhập địa chỉ email',
     phonePlaceholder: 'Nhập số điện thoại',
     saveSuccess: 'Cập nhật hồ sơ thành công!',
+    travelIdentity: 'Phong cách du lịch',
+    travelStyle: 'Phong cách',
+    interests: 'Sở thích',
   },
 
   // ── Flights ──

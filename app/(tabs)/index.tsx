@@ -192,6 +192,11 @@ export default function HomeScreen() {
           />
         </View>
 
+        {/* -- AI Planner Banner -- */}
+        <View style={styles.sectionWrap}>
+          <AIPlannerBanner onPress={() => router.push('/ai-planner')} />
+        </View>
+
         {/* -- Best Flight Deals -- */}
         <View style={styles.sectionWrap}>
           <TouchableOpacity style={styles.sectionHeader} onPress={() => router.push('/flights')}>
@@ -213,16 +218,11 @@ export default function HomeScreen() {
           />
         </View>
 
-        {/* -- AI Planner Banner -- */}
-        <View style={styles.sectionWrap}>
-          <AIPlannerBanner onPress={() => router.push('/ai-planner')} />
-        </View>
-
         {/* ── Transport Quick Links ── */}
         <View style={styles.sectionWrap}>
           <TouchableOpacity style={styles.sectionHeader} onPress={() => router.push('/transport')}>
-            <Text style={styles.sectionTitle}>교통 & 렌트</Text>
-            <Text style={styles.sectionAction}>더 보기</Text>
+            <Text style={styles.sectionTitle}>{t('home.transportRental')}</Text>
+            <Text style={styles.sectionAction}>{t('common.viewAll')}</Text>
           </TouchableOpacity>
           <ScrollView
             horizontal
@@ -230,20 +230,20 @@ export default function HomeScreen() {
             contentContainerStyle={styles.hListPad}
           >
             {[
-              { icon: '🛬', title: '공항 픽업', sub: '전용 기사', bg: Colors.primaryLight },
-              { icon: '🚗', title: '전용 차량', sub: '하루 종일', bg: '#DCFCE7' },
-              { icon: '🛵', title: '스쿠터', sub: '자유 여행', bg: '#FEF3C7' },
-              { icon: '🚌', title: '데이 투어', sub: '가이드 포함', bg: Colors.accentLight },
+              { icon: '🛬', titleKey: 'home.transportAirport', subKey: 'home.transportAirportSub', bg: Colors.primaryLight },
+              { icon: '🚗', titleKey: 'home.transportPrivate', subKey: 'home.transportPrivateSub', bg: '#DCFCE7' },
+              { icon: '🛵', titleKey: 'home.transportScooter', subKey: 'home.transportScooterSub', bg: '#FEF3C7' },
+              { icon: '🚌', titleKey: 'home.transportDayTour', subKey: 'home.transportDayTourSub', bg: Colors.accentLight },
             ].map(item => (
               <TouchableOpacity
-                key={item.title}
+                key={item.titleKey}
                 style={[styles.transportCard, { backgroundColor: item.bg }]}
                 onPress={() => router.push('/transport')}
                 activeOpacity={0.8}
               >
                 <Text style={styles.transportIcon}>{item.icon}</Text>
-                <Text style={styles.transportTitle}>{item.title}</Text>
-                <Text style={styles.transportSub}>{item.sub}</Text>
+                <Text style={styles.transportTitle}>{t(item.titleKey as any)}</Text>
+                <Text style={styles.transportSub}>{t(item.subKey as any)}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -379,7 +379,7 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
     marginBottom: Spacing.md,
   },
   sectionTitle: { fontSize: FontSize.lg, fontWeight: '700', color: Colors.textPrimary },
-  sectionAction: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.accent },
+  sectionAction: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.primary },
   hListPad: { paddingHorizontal: Spacing.base, gap: Spacing.md },
 
   // ── AI Banner ──

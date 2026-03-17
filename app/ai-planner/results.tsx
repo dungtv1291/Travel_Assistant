@@ -18,6 +18,7 @@ import { LoadingState } from '../../components/common/LoadingState';
 import { Button } from '../../components/common/Button';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useLanguageStore } from '../../store/language.store';
+import { formatKRWPrice, formatVNDPrice } from '../../utils/format';
 
 export default function AIPlannerResultsScreen() {
   const Colors = useThemeColors();
@@ -126,7 +127,7 @@ export default function AIPlannerResultsScreen() {
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryStat}>
-              <Text style={styles.summaryStatNum}>₩{(trip.totalEstimatedCost / 10000).toFixed(0)}만</Text>
+              <Text style={styles.summaryStatNum}>{formatKRWPrice(trip.totalEstimatedCost)}</Text>
               <Text style={styles.summaryStatLabel}>{t('aiPlanner.estimatedCost')}</Text>
             </View>
           </View>
@@ -145,7 +146,7 @@ export default function AIPlannerResultsScreen() {
                 style={[styles.dayTab, selectedDay === i && styles.dayTabActive]}
                 onPress={() => setSelectedDay(i)}
               >
-                <Text style={[styles.dayTabLabel, selectedDay === i && styles.dayTabLabelActive]}>DAY {i + 1}</Text>
+                <Text style={[styles.dayTabLabel, selectedDay === i && styles.dayTabLabelActive]}>{t('aiPlanner.day', { number: i + 1 })}</Text>
                 <Text style={[styles.dayTabDate, selectedDay === i && styles.dayTabDateActive]}>
                   {t('aiPlanner.activities', { count: day.activities.length })}
                 </Text>
@@ -186,7 +187,7 @@ export default function AIPlannerResultsScreen() {
                 <Ionicons name="wallet-outline" size={16} color={Colors.primary} />
                 <Text style={styles.dayCostLabel}>{t('aiPlanner.estimatedCost')}</Text>
                 <Text style={styles.dayCostValue}>
-                  {dayItinerary.estimatedCost.toLocaleString()}₫
+                  {formatVNDPrice(dayItinerary.estimatedCost)}
                 </Text>
               </View>
             )}
@@ -259,7 +260,7 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
   headerSub: { fontSize: FontSize.xs, color: Colors.textMuted },
   saveBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center', ...Shadow.sm },
   saveBtnSaved: { backgroundColor: Colors.primaryLight },
-  summaryCard: { marginHorizontal: Spacing.base, borderRadius: Radius.xl, padding: Spacing.sm, marginBottom: Spacing.sm },
+  summaryCard: { marginHorizontal: Spacing.base, borderRadius: Radius.xl, padding: Spacing.base, marginBottom: Spacing.sm },
   summaryRow: { flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center' },
   summaryStat: { alignItems: 'center', gap: 2 },
   summaryStatNum: { fontSize: FontSize.xl, fontWeight: '800', color: '#FFF' },
@@ -275,8 +276,8 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
   dayTabDate: { fontSize: 9, color: Colors.textMuted, lineHeight: 12 },
   dayTabDateActive: { color: Colors.primary },
   scroll: { flex: 1 },
-  dayContent: { padding: Spacing.base, paddingBottom: 100 },
-  dayHeader: { marginBottom: Spacing.lg, gap: Spacing.xs },
+  dayContent: { padding: Spacing.base, paddingBottom: 120 },
+  dayHeader: { marginBottom: Spacing.xl, gap: Spacing.xs, paddingBottom: Spacing.md, borderBottomWidth: 1, borderBottomColor: Colors.border },
   dayTitle: { fontSize: FontSize.lg, fontWeight: '800', color: Colors.textPrimary },
   dayTheme: { fontSize: FontSize.base, color: Colors.textMuted, fontStyle: 'italic' },
   dayCostCard: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, backgroundColor: Colors.primaryLight, borderRadius: Radius.lg, padding: Spacing.md, marginTop: Spacing.md },

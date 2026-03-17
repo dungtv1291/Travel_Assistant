@@ -9,6 +9,7 @@ import { Spacing, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { Button } from '../../components/common/Button';
 import { useTranslation } from '../../hooks/useTranslation';
+import { formatKRWPrice } from '../../utils/format';
 
 export default function HotelConfirmationScreen() {
   const Colors = useThemeColors();
@@ -61,7 +62,7 @@ export default function HotelConfirmationScreen() {
                 { label: t('hotels.checkOut'), value: checkOut ?? '' },
                 { label: t('hotels.duration'), value: `${nights ?? ''}${t('common.nights')}` },
                 { label: t('hotels.roomInfo'), value: roomName ?? '' },
-                { label: t('common.total'), value: totalPrice ? `${Number(totalPrice).toLocaleString('ko-KR')}\uC6D0` : '' },
+                { label: t('common.total'), value: totalPrice ? formatKRWPrice(Number(totalPrice)) : '' },
               ].map(row => (
                 <View key={row.label} style={styles.row}>
                   <Text style={styles.rowLabel}>{row.label}</Text>

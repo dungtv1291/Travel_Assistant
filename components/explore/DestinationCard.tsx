@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -22,10 +22,27 @@ export function DestinationCard({ destination, onPress, isFavorite, onFavoriteTo
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const [imgError, setImgError] = useState(false);
+
+  const CATEGORY_EMOJIS: Record<string, string> = {
+    beach: '🏖️', city: '🏙️', mountain: '⛰️', culture: '🏛️', family: '👨‍👩‍👧', food: '🍜',
+  };
+
+  const categoryEmoji = CATEGORY_EMOJIS[destination.category] ?? '📍';
   if (variant === 'list') {
     return (
       <TouchableOpacity style={styles.listCard} onPress={onPress} activeOpacity={0.9}>
-        <Image source={{ uri: destination.imageUrl }} style={styles.listImage} />
+        {imgError ? (
+          <View style={[styles.listImage, styles.imgFallback]}>
+            <Text style={styles.imgFallbackEmoji}>{categoryEmoji}</Text>
+          </View>
+        ) : (
+          <Image
+            source={{ uri: destination.imageUrl }}
+            style={styles.listImage}
+            onError={() => setImgError(true)}
+          />
+        )}
         <View style={styles.listContent}>
           <View style={styles.listHeader}>
             <View>
@@ -70,7 +87,17 @@ export function DestinationCard({ destination, onPress, isFavorite, onFavoriteTo
 
   return (
     <TouchableOpacity style={styles.gridCard} onPress={onPress} activeOpacity={0.9}>
-      <Image source={{ uri: destination.imageUrl }} style={styles.gridImage} />
+      {imgError ? (
+        <View style={[styles.gridImage, styles.imgFallback]}>
+          <Text style={styles.imgFallbackEmoji}>{categoryEmoji}</Text>
+        </View>
+      ) : (
+        <Image
+          source={{ uri: destination.imageUrl }}
+          style={styles.gridImage}
+          onError={() => setImgError(true)}
+        />
+      )}
       <TouchableOpacity
         style={styles.heartBtn}
         onPress={onFavoriteToggle}
@@ -111,6 +138,14 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
   gridImage: {
     width: '100%',
     height: 120,
+  },
+  imgFallback: {
+    backgroundColor: Colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imgFallbackEmoji: {
+    fontSize: 36,
   },
   heartBtn: {
     position: 'absolute',

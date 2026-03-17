@@ -120,6 +120,15 @@ export default {
     topDestinations: 'Top Destinations',
     recommendedHotels: 'Recommended Hotels',
     flightDeals: 'Flight Deals',
+    transportRental: 'Transport & Rental',
+    transportAirport: 'Airport Pickup',
+    transportAirportSub: 'Private driver',
+    transportPrivate: 'Private Car',
+    transportPrivateSub: 'All day',
+    transportScooter: 'Scooter',
+    transportScooterSub: 'Free travel',
+    transportDayTour: 'Day Tour',
+    transportDayTourSub: 'Guide included',
   },
 
   // ── Categories ──
@@ -213,6 +222,9 @@ export default {
     emailPlaceholder: 'Enter your email',
     phonePlaceholder: 'Enter your phone number',
     saveSuccess: 'Profile updated successfully!',
+    travelIdentity: 'Travel Identity',
+    travelStyle: 'Style',
+    interests: 'Interests',
   },
 
   // ── Flights ──
