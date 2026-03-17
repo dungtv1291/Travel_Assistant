@@ -138,7 +138,9 @@ export default function ExploreScreen() {
 
       {/* Stats */}
       <View style={styles.statsRow}>
-          <Text style={styles.statsText}>{t('explore.resultsCount', { count: filtered.length })}</Text>
+          <Text style={styles.statsText}>
+            총 <Text style={styles.statsCount}>{filtered.length}</Text>개 여행지
+          </Text>
         {selectedCategory !== 'all' && (
           <TouchableOpacity onPress={() => setSelectedCategory('all')}>
             <Text style={styles.clearFilter}>{t('explore.resetFilter')}</Text>
@@ -217,6 +219,8 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
   },
   viewToggleActive: {
     backgroundColor: Colors.primaryLight,
+    borderWidth: 1,
+    borderColor: Colors.primary,
   },
   searchSection: {
     paddingHorizontal: Spacing.base,
@@ -271,11 +275,12 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
   },
   clearFilter: {
     fontSize: FontSize.sm,
-    color: Colors.accent,
+    color: Colors.primary,
     fontWeight: '600',
   },
   listContent: {
     paddingHorizontal: Spacing.base,
+    paddingTop: Spacing.sm,
     paddingBottom: Spacing['3xl'],
   },
   gridContent: {},

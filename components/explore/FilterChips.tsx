@@ -39,7 +39,7 @@ export function FilterChips({ selected, onSelect }: Props) {
 
 function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
   return StyleSheet.create({
-  wrapper: { height: 40, justifyContent: 'center', marginBottom: Spacing.md },
+  wrapper: { height: 44, justifyContent: 'center', marginBottom: Spacing.base },
   scroll: { marginBottom: Spacing.md },
   content: {
     paddingHorizontal: Spacing.base,

@@ -5,7 +5,7 @@ export const mockDestinations: Destination[] = [
     id: 'dest-1',
     name: 'Hội An',
     nameKo: '호이안',
-    region: 'Central Vietnam',
+    region: '베트남 중부',
     country: 'Vietnam',
     imageUrl: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800',
     images: [
@@ -30,7 +30,7 @@ export const mockDestinations: Destination[] = [
     id: 'dest-2',
     name: 'Hạ Long Bay',
     nameKo: '하롱베이',
-    region: 'Northern Vietnam',
+    region: '베트남 북부',
     country: 'Vietnam',
     imageUrl: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800',
     images: [
@@ -54,7 +54,7 @@ export const mockDestinations: Destination[] = [
     id: 'dest-3',
     name: 'Đà Nẵng',
     nameKo: '다낭',
-    region: 'Central Vietnam',
+    region: '베트남 중부',
     country: 'Vietnam',
     imageUrl: 'https://images.unsplash.com/photo-1552201133-08fd8e8c0fd6?w=800',
     images: [
@@ -78,7 +78,7 @@ export const mockDestinations: Destination[] = [
     id: 'dest-4',
     name: 'Hà Nội',
     nameKo: '하노이',
-    region: 'Northern Vietnam',
+    region: '베트남 북부',
     country: 'Vietnam',
     imageUrl: 'https://images.unsplash.com/photo-1509030450996-dd1a26dda07a?w=800',
     images: [
@@ -101,7 +101,7 @@ export const mockDestinations: Destination[] = [
     id: 'dest-5',
     name: 'Phú Quốc',
     nameKo: '푸꾸옥',
-    region: 'Southern Vietnam',
+    region: '베트남 남부',
     country: 'Vietnam',
     imageUrl: 'https://images.unsplash.com/photo-1483683804023-6ccdb62f86ef?w=800',
     images: [
@@ -124,7 +124,7 @@ export const mockDestinations: Destination[] = [
     id: 'dest-6',
     name: 'Sa Pa',
     nameKo: '사파',
-    region: 'Northwest Vietnam',
+    region: '베트남 서북부',
     country: 'Vietnam',
     imageUrl: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800',
     images: [
@@ -147,7 +147,7 @@ export const mockDestinations: Destination[] = [
     id: 'dest-7',
     name: 'Hồ Chí Minh',
     nameKo: '호치민',
-    region: 'Southern Vietnam',
+    region: '베트남 남부',
     country: 'Vietnam',
     imageUrl: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800',
     images: [
@@ -170,7 +170,7 @@ export const mockDestinations: Destination[] = [
     id: 'dest-8',
     name: 'Huế',
     nameKo: '후에',
-    region: 'Central Vietnam',
+    region: '베트남 중부',
     country: 'Vietnam',
     imageUrl: 'https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800',
     images: [
@@ -193,7 +193,7 @@ export const mockDestinations: Destination[] = [
     id: 'dest-9',
     name: 'Nha Trang',
     nameKo: '나트랑',
-    region: 'South Central Vietnam',
+    region: '베트남 남중부',
     country: 'Vietnam',
     imageUrl: 'https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?w=800',
     images: [

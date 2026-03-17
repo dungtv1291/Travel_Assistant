@@ -31,7 +31,7 @@ export const Chip: React.FC<ChipProps> = ({
         styles.base,
         size === 'sm' ? styles.small : styles.medium,
         selected
-          ? { backgroundColor: color ?? Colors.primary, borderColor: color ?? Colors.primary }
+          ? { backgroundColor: color ?? Colors.primary, borderColor: color ?? Colors.primary, borderWidth: 1 }
           : styles.unselected,
         style,
       ]}
