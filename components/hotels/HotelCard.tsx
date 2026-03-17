@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Hotel } from '../../types/hotel.types';
 import { useThemeColors } from '../../hooks/useThemeColors';
+import { useTranslation } from '../../hooks/useTranslation';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { HOTEL_CATEGORY, ratingLabel } from '../../constants/categoryMeta';
@@ -20,6 +21,7 @@ interface HotelCardProps {
 export default function HotelCard({ hotel, onPress }: HotelCardProps) {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
+  const { t } = useTranslation();
   const cat = HOTEL_CATEGORY[hotel.category] ?? { label: hotel.category, color: Colors.primary };
   const topAmenities = hotel.amenities.slice(0, 3);
   const ratingDesc = ratingLabel(hotel.rating);
@@ -82,14 +84,14 @@ export default function HotelCard({ hotel, onPress }: HotelCardProps) {
 
         {/* Footer: price + rating */}
         <View style={styles.footer}>
-          <PriceBlock label="최저가" amount={hotel.pricePerNight} unit="/박" />
+          <PriceBlock label={t('hotels.lowestPrice')} amount={hotel.pricePerNight} unit={t('common.perNight')} />
           <View style={styles.reviewBlock}>
             <View style={styles.reviewRatingRow}>
               <Ionicons name="star" size={12} color="#F59E0B" />
               <Text style={styles.reviewRating}>{hotel.rating.toFixed(1)}</Text>
               <Text style={styles.reviewRatingDesc}>{ratingDesc}</Text>
             </View>
-            <Text style={styles.reviewCount}>후기 {hotel.reviewCount.toLocaleString()}개</Text>
+            <Text style={styles.reviewCount}>{t('hotels.reviewCount', { count: hotel.reviewCount.toLocaleString() })}</Text>
           </View>
         </View>
       </View>

@@ -29,19 +29,18 @@ const HERO_HEIGHT = 320;
 
 const SECTION_TAB_KEYS = ['overview', 'attractions', 'hotels', 'weather', 'tips'] as const;
 
-const ATTR_CAT: Record<string, string> = {
-  heritage: '문화유산', nature: '자연', beach: '해변', temple: '사원',
-  market: '시장', museum: '박물관', food: '음식', entertainment: '엔터테인먼트',
+const ATTR_CAT_KEYS: Record<string, string> = {
+  heritage: 'destination.attrCat.heritage',
+  nature: 'destination.attrCat.nature',
+  beach: 'destination.attrCat.beach',
+  temple: 'destination.attrCat.temple',
+  market: 'destination.attrCat.market',
+  museum: 'destination.attrCat.museum',
+  food: 'destination.attrCat.food',
+  entertainment: 'destination.attrCat.entertainment',
 };
 
-const PACK_ITEMS = [
-  { icon: '🧴', label: '자외선차단제' },
-  { icon: '💊', label: '상비약' },
-  { icon: '🔌', label: '어댑터' },
-  { icon: '💵', label: '현지 현금' },
-  { icon: '🧢', label: '모자' },
-  { icon: '💧', label: '생수' },
-];
+const PACK_ICONS = ['🧴', '💊', '🔌', '💵', '🧢', '💧'];
 
 export default function DestinationDetailScreen() {
   const Colors = useThemeColors();
@@ -149,10 +148,10 @@ export default function DestinationDetailScreen() {
                         />
                       ))}
                     </View>
-                    <Text style={styles.ratingCount}>리뷰 {destination.reviewCount.toLocaleString()}개</Text>
+                    <Text style={styles.ratingCount}>{t('destination.reviewsTotal', { count: destination.reviewCount.toLocaleString() })}</Text>
                   </View>
                   <View style={styles.ratingStripRight}>
-                    <Text style={styles.popularityLabel}>인기도</Text>
+                    <Text style={styles.popularityLabel}>{t('destination.popularity')}</Text>
                     <View style={styles.barTrack}>
                       <View style={[styles.barFill, { width: `${destination.popularityScore}%` }]} />
                     </View>
@@ -167,13 +166,13 @@ export default function DestinationDetailScreen() {
                 )}
 
                 {/* Quick Info grid */}
-                <Text style={styles.sectionHead}>기본 정보</Text>
+                <Text style={styles.sectionHead}>{t('destination.basicInfo')}</Text>
                 <View style={styles.infoGrid}>
                   {[
-                    { icon: 'calendar-outline', label: '최적 여행 시기', value: destination.bestSeason ?? destination.bestTimeToVisit, color: Colors.primary },
-                    { icon: 'thermometer-outline', label: '평균 기온', value: `${destination.weather.temperature}°C`, color: '#EF4444' },
-                    { icon: 'language-outline', label: '공용어', value: '베트남어', color: '#8B5CF6' },
-                    { icon: 'card-outline', label: '통화', value: 'VND (동)', color: Colors.accent },
+                    { icon: 'calendar-outline', label: t('destination.bestSeason'), value: destination.bestSeason ?? destination.bestTimeToVisit, color: Colors.primary },
+                    { icon: 'thermometer-outline', label: t('destination.avgTemp'), value: `${destination.weather.temperature}°C`, color: '#EF4444' },
+                    { icon: 'language-outline', label: t('destination.language'), value: t('destination.languageValue'), color: '#8B5CF6' },
+                    { icon: 'card-outline', label: t('destination.currency'), value: t('destination.currencyValue'), color: Colors.accent },
                   ].map(info => (
                     <View key={info.label} style={styles.infoCard}>
                       <View style={[styles.infoIconWrap, { backgroundColor: (info.color as string) + '18' }]}>
@@ -186,7 +185,7 @@ export default function DestinationDetailScreen() {
                 </View>
 
                 {/* Tags */}
-                <Text style={styles.sectionHead}>추천 활동 & 특징</Text>
+                <Text style={styles.sectionHead}>{t('destination.recommendedTags')}</Text>
                 <View style={styles.tagList}>
                   {destination.tags.map(tag => (
                     <View key={tag} style={styles.tagChip}>
@@ -212,11 +211,11 @@ export default function DestinationDetailScreen() {
                         {/* Category + Korean popular badge */}
                         <View style={styles.attrTopRow}>
                           <View style={styles.attrCatPill}>
-                            <Text style={styles.attrCatText}>{ATTR_CAT[attr.category] ?? attr.category}</Text>
+                            <Text style={styles.attrCatText}>{ATTR_CAT_KEYS[attr.category] ? t(ATTR_CAT_KEYS[attr.category] as any) : attr.category}</Text>
                           </View>
                           {attr.isPopularWithKoreans && (
                             <View style={styles.koreanBadge}>
-                              <Text style={styles.koreanBadgeText}>🇰🇷 인기</Text>
+                              <Text style={styles.koreanBadgeText}>{t('destination.koreanPopular')}</Text>
                             </View>
                           )}
                         </View>
@@ -248,7 +247,7 @@ export default function DestinationDetailScreen() {
                             </View>
                           ) : (
                             <View style={styles.attrFreePill}>
-                              <Text style={styles.attrFreeText}>무료 입장</Text>
+                              <Text style={styles.attrFreeText}>{t('destination.freeEntry')}</Text>
                             </View>
                           )}
                         </View>
@@ -267,9 +266,9 @@ export default function DestinationDetailScreen() {
                   <>
                     {/* Section header */}
                     <View style={styles.hotelSectionHead}>
-                      <Text style={styles.hotelSectionTitle}>{destination.nameKo} 추천 숙소</Text>
+                      <Text style={styles.hotelSectionTitle}>{t('destination.hotelCountSection', { name: destination.nameKo })}</Text>
                       <View style={styles.hotelCountBadge}>
-                        <Text style={styles.hotelCountText}>{destHotels.length}개</Text>
+                        <Text style={styles.hotelCountText}>{t('destination.hotelCountBadge', { count: destHotels.length })}</Text>
                       </View>
                     </View>
 
@@ -293,13 +292,13 @@ export default function DestinationDetailScreen() {
                               <Text style={styles.hotelRatingNum}>{hotel.rating.toFixed(1)}</Text>
                             </View>
                             <Text style={styles.hotelRatingDesc}>
-                              {hotel.rating >= 4.7 ? '최고' : hotel.rating >= 4.3 ? '훌륭함' : '좋음'}
+                              {hotel.rating >= 4.7 ? t('destination.ratingExcellent') : hotel.rating >= 4.3 ? t('destination.ratingGreat') : t('destination.ratingGood')}
                             </Text>
-                            <Text style={styles.hotelReviews}>· {hotel.reviewCount.toLocaleString()}개 후기</Text>
+                            <Text style={styles.hotelReviews}>· {t('destination.hotelReviews', { count: hotel.reviewCount.toLocaleString() })}</Text>
                           </View>
                           <View style={styles.hotelPriceRow}>
                             <Text style={styles.hotelPrice}>{formatKRWPrice(hotel.pricePerNight)}</Text>
-                            <Text style={styles.hotelPerNight}>/박</Text>
+                            <Text style={styles.hotelPerNight}>{t('destination.perNight')}</Text>
                           </View>
                         </View>
                         <Ionicons
@@ -312,7 +311,7 @@ export default function DestinationDetailScreen() {
                     ))}
 
                     <Button
-                      title={`${destination.nameKo} 전체 호텔 검색`}
+                      title={t('destination.allHotels', { name: destination.nameKo })}
                       onPress={() => router.push('/hotel')}
                       variant="outline"
                       fullWidth
@@ -344,7 +343,7 @@ export default function DestinationDetailScreen() {
                   end={{ x: 1, y: 1 }}
                   style={styles.weatherHeroCard}
                 >
-                  <Text style={styles.weatherDestLabel}>{destination.nameKo} 현재 날씨</Text>
+                  <Text style={styles.weatherDestLabel}>{t('destination.currentWeather')} — {destination.nameKo}</Text>
                   <View style={styles.weatherHeroTop}>
                     <View>
                       <Text style={styles.weatherTempHero}>{destination.weather.temperature}°C</Text>
@@ -357,19 +356,19 @@ export default function DestinationDetailScreen() {
                   <View style={styles.weatherHeroStats}>
                     <View style={styles.weatherHeroStat}>
                       <Text style={styles.weatherHeroStatNum}>{destination.weather.humidity}%</Text>
-                      <Text style={styles.weatherHeroStatLabel}>습도</Text>
+                      <Text style={styles.weatherHeroStatLabel}>{t('destination.humidity')}</Text>
                     </View>
                     <View style={styles.weatherHeroStatDivider} />
                     <View style={styles.weatherHeroStat}>
-                      <Text style={styles.weatherHeroStatNum}>{destination.weather.rainfall ?? 0}mm</Text>
-                      <Text style={styles.weatherHeroStatLabel}>강수량</Text>
+                      <Text style={styles.weatherHeroStatNum}>{t('destination.rainfallAmount', { amount: destination.weather.rainfall ?? 0 })}</Text>
+                      <Text style={styles.weatherHeroStatLabel}>{t('destination.rainfall')}</Text>
                     </View>
                     <View style={styles.weatherHeroStatDivider} />
                     <View style={styles.weatherHeroStat}>
                       <Text style={styles.weatherHeroStatNum}>
-                        {destination.weather.temperature >= 32 ? '강함' : destination.weather.temperature >= 26 ? '보통' : '약함'}
+                        {destination.weather.temperature >= 32 ? t('destination.uvStrong') : destination.weather.temperature >= 26 ? t('destination.uvMedium') : t('destination.uvWeak')}
                       </Text>
-                      <Text style={styles.weatherHeroStatLabel}>자외선</Text>
+                      <Text style={styles.weatherHeroStatLabel}>{t('destination.uvIndex')}</Text>
                     </View>
                   </View>
                 </LinearGradient>
@@ -378,31 +377,26 @@ export default function DestinationDetailScreen() {
                 <View style={styles.bestTimeCard}>
                   <View style={styles.bestTimeHeader}>
                     <Ionicons name="calendar-outline" size={18} color={Colors.primary} />
-                    <Text style={styles.bestTimeTitle}>최적 여행 시기</Text>
+                    <Text style={styles.bestTimeTitle}>{t('destination.bestSeasonTitle')}</Text>
                   </View>
                   <Text style={styles.bestTimeValue}>
                     {destination.bestSeason ?? destination.bestTimeToVisit}
                   </Text>
                   <Text style={styles.bestTimeHint}>
-                    이 시기에는 날씨가 좋고 여행하기 최적입니다. 성수기에는 사전 예약이 필수입니다.
+                    {t('destination.bestTimeHint')}
                   </Text>
                 </View>
 
                 {/* Season Overview */}
                 <View style={styles.seasonCard}>
-                  <Text style={styles.seasonTitle}>계절 개요</Text>
+                  <Text style={styles.seasonTitle}>{t('destination.seasons.title')}</Text>
                   <View style={styles.seasonRow}>
-                    {[
-                      { label: '봄', months: '3-5월', icon: '🌸', note: '여행 적기' },
-                      { label: '여름', months: '6-8월', icon: '☀️', note: '성수기' },
-                      { label: '가을', months: '9-11월', icon: '🍂', note: '여행 적기' },
-                      { label: '겨울', months: '12-2월', icon: '❄️', note: '건기' },
-                    ].map(season => (
-                      <View key={season.label} style={styles.seasonItem}>
-                        <Text style={styles.seasonIcon}>{season.icon}</Text>
-                        <Text style={styles.seasonLabel}>{season.label}</Text>
-                        <Text style={styles.seasonMonths}>{season.months}</Text>
-                        <Text style={styles.seasonNote}>{season.note}</Text>
+                    {(['spring', 'summer', 'autumn', 'winter'] as const).map((sk, i) => (
+                      <View key={sk} style={styles.seasonItem}>
+                        <Text style={styles.seasonIcon}>{['🌸', '☀️', '🍂', '❄️'][i]}</Text>
+                        <Text style={styles.seasonLabel}>{t(`destination.seasons.${sk}.label` as any)}</Text>
+                        <Text style={styles.seasonMonths}>{t(`destination.seasons.${sk}.months` as any)}</Text>
+                        <Text style={styles.seasonNote}>{t(`destination.seasons.${sk}.note` as any)}</Text>
                       </View>
                     ))}
                   </View>
@@ -412,13 +406,13 @@ export default function DestinationDetailScreen() {
                 <View style={styles.packCard}>
                   <View style={styles.packHeader}>
                     <Ionicons name="bag-outline" size={16} color={Colors.primary} />
-                    <Text style={styles.packTitle}>여행 필수 준비물</Text>
+                    <Text style={styles.packTitle}>{t('destination.pack.title')}</Text>
                   </View>
                   <View style={styles.packGrid}>
-                    {PACK_ITEMS.map(item => (
-                      <View key={item.label} style={styles.packItem}>
-                        <Text style={styles.packEmoji}>{item.icon}</Text>
-                        <Text style={styles.packLabel}>{item.label}</Text>
+                    {PACK_ICONS.map((icon, i) => (
+                      <View key={i} style={styles.packItem}>
+                        <Text style={styles.packEmoji}>{icon}</Text>
+                        <Text style={styles.packLabel}>{t(`destination.pack.item${i + 1}` as any)}</Text>
                       </View>
                     ))}
                   </View>
@@ -433,12 +427,12 @@ export default function DestinationDetailScreen() {
 
                 {/* Tips list */}
                 {(destination.travelTipsKo ?? [
-                  '현금을 충분히 준비하세요. ATM 수수료가 높을 수 있습니다.',
-                  '영어보다 베트남어 기본 인사(씬짜오)로 현지인에게 친근감을 표하세요.',
-                  '스마트폰에 오프라인 지도를 미리 다운로드하세요.',
-                  '물은 반드시 생수를 구입하세요. 수돗물은 식수로 부적합합니다.',
-                  '그랩(Grab) 앱을 설치하면 미터기 걱정 없이 이동할 수 있습니다.',
-                  '자외선이 강하니 선크림, 모자, 선글라스를 필수로 챙기세요.',
+                  t('destination.tipDefault1'),
+                  t('destination.tipDefault2'),
+                  t('destination.tipDefault3'),
+                  t('destination.tipDefault4'),
+                  t('destination.tipDefault5'),
+                  t('destination.tipDefault6'),
                 ]).map((tip: string, i: number) => (
                   <View key={i} style={styles.tipCard}>
                     <View style={styles.tipNumBadge}>
@@ -449,18 +443,18 @@ export default function DestinationDetailScreen() {
                 ))}
 
                 {/* Essential apps */}
-                <Text style={styles.sectionHead}>필수 앱</Text>
+                <Text style={styles.sectionHead}>{t('destination.apps.title')}</Text>
                 <View style={styles.appsGrid}>
                   {[
-                    { icon: '🚗', name: 'Grab', desc: '교통/배달' },
-                    { icon: '🗺️', name: 'Google Maps', desc: '지도/탐색' },
-                    { icon: '🌐', name: 'Papago', desc: '번역' },
-                    { icon: '🏨', name: 'Agoda', desc: '숙소 예약' },
+                    { icon: '🚗', name: 'Grab', descKey: 'destination.apps.grab' },
+                    { icon: '🗺️', name: 'Google Maps', descKey: 'destination.apps.googleMaps' },
+                    { icon: '🌐', name: 'DeepL', descKey: 'destination.apps.deepl' },
+                    { icon: '💱', name: 'XE Money', descKey: 'destination.apps.xeMoney' },
                   ].map(app => (
                     <View key={app.name} style={styles.appItem}>
                       <Text style={styles.appIcon}>{app.icon}</Text>
                       <Text style={styles.appName}>{app.name}</Text>
-                      <Text style={styles.appDesc}>{app.desc}</Text>
+                      <Text style={styles.appDesc}>{t(app.descKey as any)}</Text>
                     </View>
                   ))}
                 </View>
@@ -469,19 +463,22 @@ export default function DestinationDetailScreen() {
                 <View style={styles.emergencyCard}>
                   <View style={styles.emergencyHeader}>
                     <Ionicons name="call-outline" size={15} color="#EF4444" />
-                    <Text style={styles.emergencyTitle}>베트남 긴급 연락처</Text>
+                    <Text style={styles.emergencyTitle}>{t('destination.emergency.title')}</Text>
                   </View>
                   <View style={styles.emergencyList}>
                     {[
-                      { label: '경찰', number: '113' },
-                      { label: '구급·소방', number: '114 / 115' },
-                      { label: '관광 긴급', number: '1800 599 899' },
-                    ].map(contact => (
-                      <View key={contact.label} style={styles.emergencyRow}>
-                        <Text style={styles.emergencyLabel}>{contact.label}</Text>
-                        <Text style={styles.emergencyNumber}>{contact.number}</Text>
-                      </View>
-                    ))}
+                      t('destination.emergency.police'),
+                      t('destination.emergency.ambulance'),
+                      t('destination.emergency.touristHotline'),
+                    ].map((contact: string) => {
+                      const [label, number] = contact.split(': ');
+                      return (
+                        <View key={contact} style={styles.emergencyRow}>
+                          <Text style={styles.emergencyLabel}>{label}</Text>
+                          <Text style={styles.emergencyNumber}>{number}</Text>
+                        </View>
+                      );
+                    })}
                   </View>
                 </View>
 
@@ -494,7 +491,7 @@ export default function DestinationDetailScreen() {
         <SafeAreaView edges={['bottom']} style={styles.bottomBar}>
           <View style={styles.bottomBarInner}>
             <Button
-              title="AI 일정 생성"
+              title={t('destination.aiItineraryCta')}
               onPress={() => router.push('/ai-planner')}
               variant="outline"
               style={{ flex: 1 }}
@@ -502,7 +499,7 @@ export default function DestinationDetailScreen() {
               iconPosition="left"
             />
             <Button
-              title={`${destination.nameKo} 호텔 예약`}
+              title={t('destination.bookHotelDest', { name: destination.nameKo })}
               onPress={() => router.push('/hotel')}
               style={{ flex: 2 }}
               icon={<Ionicons name="bed-outline" size={15} color="#FFFFFF" />}

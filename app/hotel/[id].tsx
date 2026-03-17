@@ -6,6 +6,7 @@ import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors } from '../../hooks/useThemeColors';
+import { useTranslation } from '../../hooks/useTranslation';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { hotelsService } from '../../services/mock/hotels.service';
@@ -48,11 +49,10 @@ const AVATAR_COLORS = [
   '#F59E0B', '#EF4444', '#3B82F6', '#D97706',
 ];
 
-const TABS = ['객실 선택', '시설/어메니티', '숙박 정책', '후기'];
-
 export default function HotelDetailScreen() {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [hotel, setHotel] = useState<Hotel | null>(null);
   const [rooms, setRooms] = useState<RoomType[]>([]);
@@ -71,8 +71,8 @@ export default function HotelDetailScreen() {
     }
   }, [id]);
 
-  if (loading) return <LoadingState message="불러오는 중..." />;
-  if (!hotel)  return <LoadingState message="호텔 정보를 찾을 수 없습니다." />;
+  if (loading) return <LoadingState message={t('hotels.loading')} />;
+  if (!hotel)  return <LoadingState message={t('hotels.notFound')} />;
 
   const selectedRoomData = rooms.find(r => r.id === selectedRoom);
   const ratingDesc = ratingLabel(hotel.rating);
@@ -108,7 +108,7 @@ export default function HotelDetailScreen() {
                 {hotel.isRecommended && (
                   <View style={styles.heroRecBadge}>
                     <Ionicons name="sparkles" size={10} color={Colors.primary} />
-                    <Text style={styles.heroRecText}>편집자 추천</Text>
+                    <Text style={styles.heroRecText}>{t('hotels.editorPick')}</Text>
                   </View>
                 )}
               </View>
@@ -131,20 +131,24 @@ export default function HotelDetailScreen() {
                   <Text style={styles.heroRatingNum}>{hotel.rating.toFixed(1)}</Text>
                 </View>
                 <Text style={styles.heroRatingDesc}>{ratingDesc}</Text>
-                <Text style={styles.heroReviewCount}>후기 {hotel.reviewCount.toLocaleString()}개</Text>
+                <Text style={styles.heroReviewCount}>{t('hotels.reviewCount', { count: hotel.reviewCount.toLocaleString() })}</Text>
               </View>
             </View>
           </HeroImage>
 
           {/* ── Tabs ── */}
-          <DetailTabBar tabs={TABS} activeIndex={activeTab} onChange={setActiveTab} />
+          <DetailTabBar
+            tabs={[t('hotels.tabs.rooms'), t('hotels.tabs.amenities'), t('hotels.tabs.policy'), t('hotels.tabs.reviews')]}
+            activeIndex={activeTab}
+            onChange={setActiveTab}
+          />
 
           <View style={styles.content}>
 
             {/* ── 객실 선택 Tab ── */}
             {activeTab === 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>객실을 선택하세요</Text>
+                <Text style={styles.sectionTitle}>{t('hotels.selectRoomPrompt')}</Text>
                 {rooms.map(room => (
                   <RoomCard
                     key={room.id}
@@ -159,7 +163,7 @@ export default function HotelDetailScreen() {
             {/* ── 시설/어메니티 Tab ── */}
             {activeTab === 1 && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>주요 시설</Text>
+                <Text style={styles.sectionTitle}>{t('hotels.mainAmenities')}</Text>
                 <View style={styles.amenityGrid}>
                   {hotel.amenities.map(am => (
                     <View key={am} style={styles.amenityItem}>
@@ -176,7 +180,7 @@ export default function HotelDetailScreen() {
                 </View>
                 {hotel.descriptionKo && (
                   <>
-                    <Text style={styles.sectionTitle}>호텔 소개</Text>
+                    <Text style={styles.sectionTitle}>{t('hotels.hotelIntro')}</Text>
                     <View style={styles.descCard}>
                       <Text style={styles.descText}>{hotel.descriptionKo}</Text>
                     </View>
@@ -188,14 +192,14 @@ export default function HotelDetailScreen() {
             {/* ── 숙박 정책 Tab ── */}
             {activeTab === 2 && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>숙박 정책</Text>
+                <Text style={styles.sectionTitle}>{t('hotels.policy')}</Text>
                 <View style={styles.policyCard}>
                   {[
-                    { icon: 'enter-outline',         label: '체크인',   value: hotel.policies?.checkIn ?? '14:00' },
-                    { icon: 'exit-outline',          label: '체크아웃', value: hotel.policies?.checkOut ?? '12:00' },
-                    { icon: 'close-circle-outline',  label: '취소 정책', value: hotel.policies?.cancellation ?? '체크인 24시간 전 무료 취소', accent: true },
-                    { icon: 'paw-outline',           label: '반려동물', value: hotel.policies?.pets === false ? '반려동물 불가' : '반려동물 가능' },
-                    { icon: 'ban-outline',           label: '흡연',     value: hotel.policies?.smoking === false ? '전 구역 금연' : '흡연 구역 별도' },
+                    { icon: 'enter-outline',         label: t('hotels.checkIn'),   value: hotel.policies?.checkIn ?? t('hotels.checkInTime') },
+                    { icon: 'exit-outline',          label: t('hotels.checkOut'), value: hotel.policies?.checkOut ?? t('hotels.checkOutTime') },
+                    { icon: 'close-circle-outline',  label: t('hotels.cancelPolicy'), value: hotel.policies?.cancellation ?? t('hotels.freeCancelBefore24'), accent: true },
+                    { icon: 'paw-outline',           label: t('hotels.pets'), value: hotel.policies?.pets === false ? t('hotels.petsNo') : t('hotels.petsYes') },
+                    { icon: 'ban-outline',           label: t('hotels.smoking'),     value: hotel.policies?.smoking === false ? t('hotels.noSmokingAll') : t('hotels.smokingZone') },
                   ].map((p, idx, arr) => (
                     <View
                       key={p.label}
@@ -215,9 +219,7 @@ export default function HotelDetailScreen() {
                 </View>
                 <View style={styles.policyNoticeCard}>
                   <Ionicons name="information-circle-outline" size={16} color={Colors.primary} />
-                  <Text style={styles.policyNoticeText}>
-                    예약 전 최신 정책을 반드시 확인하세요. 성수기에는 취소 정책이 달라질 수 있습니다.
-                  </Text>
+                  <Text style={styles.policyNoticeText}>{t('hotels.policyNotice')}</Text>
                 </View>
               </View>
             )}
@@ -242,8 +244,8 @@ export default function HotelDetailScreen() {
                     </View>
                   </View>
                   <View style={styles.reviewHeroRight}>
-                    <Text style={styles.reviewTotalCount}>후기 {hotel.reviewCount.toLocaleString()}개</Text>
-                    <Text style={styles.reviewHeroSub}>실제 투숙객 후기</Text>
+                    <Text style={styles.reviewTotalCount}>{t('hotels.reviewCount', { count: hotel.reviewCount.toLocaleString() })}</Text>
+                    <Text style={styles.reviewHeroSub}>{t('hotels.guestReviews')}</Text>
                   </View>
                 </View>
 
@@ -274,7 +276,7 @@ export default function HotelDetailScreen() {
                   </View>
                 ))}
                 {(!hotel.reviews || hotel.reviews.length === 0) && (
-                  <Text style={styles.noReviewText}>아직 후기가 없습니다.</Text>
+                  <Text style={styles.noReviewText}>{t('hotels.noReviews')}</Text>
                 )}
               </View>
             )}
@@ -286,8 +288,8 @@ export default function HotelDetailScreen() {
         <StickyBottomBar
           label={selectedRoomData?.nameKo ?? hotel.nameKo}
           price={selectedRoomData?.pricePerNight ?? hotel.pricePerNight}
-          priceUnit="/박"
-          buttonTitle="지금 예약하기"
+          priceUnit={t('hotels.perNightBasis')}
+          buttonTitle={t('hotels.bookNow')}
           buttonIcon={{ name: 'calendar-outline' }}
           onPress={() => router.push({ pathname: '/hotel/booking', params: {
             hotelId: hotel.id,

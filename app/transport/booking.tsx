@@ -15,11 +15,11 @@ import { formatKRWPrice } from '../../utils/format';
 import { useTranslation } from '../../hooks/useTranslation';
 import { TransportType } from '../../types/transport.types';
 
-const DATE_OPTIONS = [
-  { label: 'ì˜¤ëŠ˜ 1ì¼', pickupDate: '2026-04-10', returnDate: '2026-04-11', days: 1 },
-  { label: '2ì¼ ì´ìš©', pickupDate: '2026-04-10', returnDate: '2026-04-12', days: 2 },
-  { label: '3ì¼ ì´ìš©', pickupDate: '2026-04-10', returnDate: '2026-04-13', days: 3 },
-  { label: '5ì¼ ì´ìš©', pickupDate: '2026-04-10', returnDate: '2026-04-15', days: 5 },
+const DATE_OPTION_DEFAULTS = [
+  { pickupDate: '2026-04-10', returnDate: '2026-04-11', days: 1 },
+  { pickupDate: '2026-04-10', returnDate: '2026-04-12', days: 2 },
+  { pickupDate: '2026-04-10', returnDate: '2026-04-13', days: 3 },
+  { pickupDate: '2026-04-10', returnDate: '2026-04-15', days: 5 },
 ];
 
 export default function TransportBookingScreen() {
@@ -36,7 +36,16 @@ export default function TransportBookingScreen() {
   const { addTransportBooking } = useBookingsStore();
   const [loading, setLoading] = useState(false);
   const [pickupOption, setPickupOption] = useState(0);
-  const [selectedDate, setSelectedDate] = useState(DATE_OPTIONS[1]);
+  const [selectedDateIdx, setSelectedDateIdx] = useState(1);
+
+  const DATE_OPTIONS = [
+    { label: t('transport.dateToday'), ...DATE_OPTION_DEFAULTS[0] },
+    { label: t('transport.date2Days'), ...DATE_OPTION_DEFAULTS[1] },
+    { label: t('transport.date3Days'), ...DATE_OPTION_DEFAULTS[2] },
+    { label: t('transport.date5Days'), ...DATE_OPTION_DEFAULTS[3] },
+  ];
+
+  const selectedDate = DATE_OPTIONS[selectedDateIdx];
 
   const PRICE_PER_UNIT = Number(vehiclePrice) || 0;
   const isPerTrip = vehicleType === 'airport_pickup' || vehicleType === 'day_tour';
@@ -49,8 +58,8 @@ export default function TransportBookingScreen() {
   const GRAND_TOTAL = SUBTOTAL + TAX;
 
   const PICKUPS = [
-    { label: t('transport.directAirport'), detail: 'ë‹¤ë‚™ êµ­ì œê³µí•­ ì§ì ‘ í”½ì—…', extra: 0 },
-    { label: t('transport.hotelPickup'), detail: 'ìˆ™ì†Œ ì•ž í”½ì—…', extra: PICKUP_EXTRA },
+    { label: t('transport.directAirport'), detail: t('transport.airportPickupDetail'), extra: 0 },
+    { label: t('transport.hotelPickup'), detail: t('transport.hotelPickupDetail'), extra: PICKUP_EXTRA },
   ];
 
   const onConfirm = async () => {
@@ -62,7 +71,7 @@ export default function TransportBookingScreen() {
         vehicleImage: String(vehicleImage ?? ''),
         type: (vehicleType ?? 'private_car') as TransportType,
         pickupLocation: PICKUPS[pickupOption].label,
-        dropoffLocation: 'ìˆ™ì†Œ',
+        dropoffLocation: t('transport.dropoffLocation'),
         pickupDate: selectedDate.pickupDate,
         returnDate: isPerTrip ? selectedDate.pickupDate : selectedDate.returnDate,
         days: isPerTrip ? 1 : numDays,
@@ -128,12 +137,12 @@ export default function TransportBookingScreen() {
                     styles.vehicleMetaText,
                     { color: driverIncluded === '1' ? Colors.success : Colors.warning },
                   ]}>
-                    {driverIncluded === '1' ? 'ê¸°ì‚¬ í¬í•¨' : 'ì…”í”„ ë“œë¼ì´ë¸Œ'}
+                    {driverIncluded === '1' ? t('transport.withDriver') : t('transport.selfDriveMode')}
                   </Text>
                 </View>
               </View>
               <View style={styles.vehiclePriceBlock}>
-                <Text style={styles.vehiclePriceLabel}>{isPerTrip ? '1íšŒ' : '1ì¼'}</Text>
+                <Text style={styles.vehiclePriceLabel}>{isPerTrip ? t('transport.priceOnce') : t('transport.priceDay')}</Text>
                 <Text style={styles.vehiclePriceValue}>{formatKRWPrice(PRICE_PER_UNIT)}</Text>
               </View>
             </View>
@@ -143,16 +152,16 @@ export default function TransportBookingScreen() {
               <View style={styles.card}>
                 <Text style={styles.cardTitle}>{t('transport.selectDays')}</Text>
                 <View style={styles.dateGrid}>
-                  {DATE_OPTIONS.map(opt => (
+                  {DATE_OPTIONS.map((opt, idx) => (
                     <TouchableOpacity
-                      key={opt.label}
-                      style={[styles.dateOption, selectedDate.label === opt.label && styles.dateOptionActive]}
-                      onPress={() => setSelectedDate(opt)}
+                      key={idx}
+                      style={[styles.dateOption, selectedDateIdx === idx && styles.dateOptionActive]}
+                      onPress={() => setSelectedDateIdx(idx)}
                     >
-                      <Text style={[styles.dateOptionLabel, selectedDate.label === opt.label && styles.dateOptionLabelActive]}>
+                      <Text style={[styles.dateOptionLabel, selectedDateIdx === idx && styles.dateOptionLabelActive]}>
                         {opt.label}
                       </Text>
-                      <Text style={[styles.dateOptionSub, selectedDate.label === opt.label && styles.dateOptionSubActive]}>
+                      <Text style={[styles.dateOptionSub, selectedDateIdx === idx && styles.dateOptionSubActive]}>
                         {opt.pickupDate} ~
                       </Text>
                     </TouchableOpacity>
@@ -195,7 +204,7 @@ export default function TransportBookingScreen() {
                   label: t('transport.usagePeriod'),
                   value: isPerTrip
                     ? selectedDate.pickupDate
-                    : `${selectedDate.pickupDate} ~ ${selectedDate.returnDate} (${numDays}ì¼)`,
+                    : `${selectedDate.pickupDate} ~ ${selectedDate.returnDate} (${numDays}${t('common.day')})`,
                 },
                 {
                   icon: 'car-outline' as const,
@@ -229,7 +238,7 @@ export default function TransportBookingScreen() {
               <View style={styles.priceRow}>
                 <Text style={styles.priceLabel}>
                   {isPerTrip
-                    ? `${String(vehicleName ?? '')} (1íšŒ)`
+                    ? `${String(vehicleName ?? '')} (${t('transport.priceOnce')})`
                     : t('transport.vehicleFee', { days: numDays })}
                 </Text>
                 <Text style={styles.priceValue}>{formatKRWPrice(VEHICLE_TOTAL)}</Text>
@@ -252,18 +261,18 @@ export default function TransportBookingScreen() {
 
             {/* Guest info */}
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>ì˜ˆì•½ìž ì •ë³´</Text>
+              <Text style={styles.cardTitle}>{t('transport.guestInfo')}</Text>
               <View style={styles.guestRow}>
                 <View style={styles.guestAvatar}>
                   <Text style={styles.guestAvatarText}>{user?.name?.[0] ?? 'K'}</Text>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.guestName}>{user?.name ?? 'ê¹€ì—¬í–‰'}</Text>
+                  <Text style={styles.guestName}>{user?.name ?? ''}</Text>
                   <Text style={styles.guestEmail}>{user?.email ?? ''}</Text>
                 </View>
                 <View style={styles.verifiedBadge}>
                   <Ionicons name="checkmark-circle" size={14} color={Colors.success} />
-                  <Text style={styles.verifiedText}>ì¸ì¦ë¨</Text>
+                  <Text style={styles.verifiedText}>{t('hotels.verified')}</Text>
                 </View>
               </View>
             </View>

@@ -8,6 +8,7 @@ import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize, Typography } from '../../constants/typography';
 import { TRANSPORT_TYPE } from '../../constants/categoryMeta';
+import { useTranslation } from '../../hooks/useTranslation';
 import { MetaRow, MetaItem } from '../ui/MetaRow';
 import { FeatureChips } from '../ui/FeatureChips';
 import { PriceBlock } from '../ui/PriceBlock';
@@ -19,23 +20,24 @@ interface VehicleCardProps {
 
 export default function VehicleCard({ vehicle, onPress }: VehicleCardProps) {
   const Colors = useThemeColors();
+  const { t } = useTranslation();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const price = vehicle.pricePerDay ?? vehicle.pricePerTrip ?? 0;
-  const priceUnit = vehicle.pricePerDay ? '1일' : '1회';
+  const priceUnitLabel = vehicle.pricePerDay ? t('transport.perDay') : t('transport.perTrip');
   const typeMeta = TRANSPORT_TYPE[vehicle.type];
   const typeColor = typeMeta?.color ?? Colors.primary;
   const typeLabel = typeMeta?.label ?? vehicle.type;
   const topFeatures = vehicle.features.slice(0, 3);
 
   const metaItems: MetaItem[] = [
-    { icon: 'people-outline', text: `최대 ${vehicle.capacity}인` },
+    { icon: 'people-outline', text: t('transport.capacity', { count: vehicle.capacity }) },
     {
       icon: vehicle.driverIncluded ? 'person-circle-outline' : 'key-outline',
-      text: vehicle.driverIncluded ? '기사 포함' : '셀프 드라이브',
+      text: vehicle.driverIncluded ? t('transport.withDriver') : t('transport.selfDriveMode'),
       color: vehicle.driverIncluded ? Colors.success : Colors.warning,
     },
     ...(vehicle.luggageCapacity !== undefined
-      ? [{ icon: 'briefcase-outline', text: `짐 ${vehicle.luggageCapacity}개` }]
+      ? [{ icon: 'briefcase-outline', text: t('transport.luggageItems', { count: vehicle.luggageCapacity }) }]
       : []),
   ];
 
@@ -60,7 +62,7 @@ export default function VehicleCard({ vehicle, onPress }: VehicleCardProps) {
         {vehicle.isPopular && (
           <View style={styles.popularBadge}>
             <Ionicons name="flame" size={10} color="#FF6B35" />
-            <Text style={styles.popularText}>인기</Text>
+            <Text style={styles.popularText}>{t('transport.popular')}</Text>
           </View>
         )}
         {/* Rating pill — bottom-right */}
@@ -86,11 +88,11 @@ export default function VehicleCard({ vehicle, onPress }: VehicleCardProps) {
 
         {/* Price footer */}
         <View style={styles.footer}>
-          <PriceBlock label={`${priceUnit} 요금`} amount={price} />
+          <PriceBlock label={priceUnitLabel} amount={price} />
           <View style={styles.reviewRow}>
             <Ionicons name="chatbubble-outline" size={12} color={Colors.textMuted} />
             <Text style={styles.reviewCount}>
-              {vehicle.reviewCount.toLocaleString()}개 리뷰
+              {t('hotels.reviewCount', { count: vehicle.reviewCount.toLocaleString() })}
             </Text>
           </View>
         </View>

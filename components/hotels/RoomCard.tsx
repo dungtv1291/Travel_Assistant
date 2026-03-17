@@ -5,6 +5,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { RoomType } from '../../types/hotel.types';
 import { useThemeColors } from '../../hooks/useThemeColors';
+import { useTranslation } from '../../hooks/useTranslation';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize, Typography } from '../../constants/typography';
 import { MetaRow } from '../ui/MetaRow';
@@ -20,11 +21,12 @@ interface RoomCardProps {
 export default function RoomCard({ room, selected, onSelect }: RoomCardProps) {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
+  const { t } = useTranslation();
 
   const metaItems = [
     { icon: 'bed-outline', text: room.bedType },
     { icon: 'expand-outline', text: `${room.size}㎡` },
-    { icon: 'people-outline', text: `최대 ${room.maxOccupancy ?? room.maxGuests}명` },
+    { icon: 'people-outline', text: t('hotels.maxOccupancy', { count: room.maxOccupancy ?? room.maxGuests }) },
   ];
 
   return (
@@ -39,13 +41,13 @@ export default function RoomCard({ room, selected, onSelect }: RoomCardProps) {
         {room.breakfastIncluded && (
           <View style={styles.breakfastBadge}>
             <Ionicons name="restaurant-outline" size={10} color="#FFFFFF" />
-            <Text style={styles.breakfastText}>조식 포함</Text>
+            <Text style={styles.breakfastText}>{t('hotels.breakfastIncluded')}</Text>
           </View>
         )}
         {selected && (
           <View style={styles.selectedOverlay}>
             <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
-            <Text style={styles.selectedOverlayText}>선택됨</Text>
+            <Text style={styles.selectedOverlayText}>{t('common.selected')}</Text>
           </View>
         )}
       </View>
@@ -62,13 +64,13 @@ export default function RoomCard({ room, selected, onSelect }: RoomCardProps) {
 
         {/* Footer: price + select button */}
         <View style={styles.footer}>
-          <PriceBlock label="1박 기준" amount={room.pricePerNight} size="md" />
+          <PriceBlock label={t('hotels.perNightBasis')} amount={room.pricePerNight} size="md" />
           <View style={[styles.selectBtn, selected && styles.selectBtnActive]}>
             {selected && (
               <Ionicons name="checkmark-circle" size={14} color="#FFFFFF" />
             )}
             <Text style={[styles.selectText, selected && styles.selectTextActive]}>
-              {selected ? '선택됨' : '선택'}
+              {selected ? t('common.selected') : t('common.select')}
             </Text>
           </View>
         </View>

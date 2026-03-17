@@ -7,42 +7,33 @@ import { router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useThemeColors } from '../../hooks/useThemeColors';
+import { useTranslation } from '../../hooks/useTranslation';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 
-// ── City metadata ─────────────────────────────────────────────────────────────
-type CityMeta = { code: string; city: string; airport: string };
+// ── City metadata (keyed by IATA code) ────────────────────────────────────────
+type CityMeta = { cityKey: string; airportKey: string };
 const CITY_META: Record<string, CityMeta> = {
-  '서울 인천 (ICN)': { code: 'ICN', city: '서울',   airport: '인천국제공항' },
-  '서울 김포 (GMP)': { code: 'GMP', city: '서울',   airport: '김포국제공항' },
-  '부산 (PUS)':      { code: 'PUS', city: '부산',   airport: '김해국제공항' },
-  '제주 (CJU)':      { code: 'CJU', city: '제주',   airport: '제주국제공항' },
-  '하노이 (HAN)':    { code: 'HAN', city: '하노이', airport: '노이바이국제공항' },
-  '다낭 (DAD)':      { code: 'DAD', city: '다낭',   airport: '다낭국제공항' },
-  '호치민 (SGN)':    { code: 'SGN', city: '호치민', airport: '탄손녓국제공항' },
-  '푸꾸옥 (PQC)':    { code: 'PQC', city: '푸꾸옥', airport: '푸꾸옥국제공항' },
-  '나트랑 (CXR)':    { code: 'CXR', city: '나트랑', airport: '캄란국제공항' },
-  '후에 (HUI)':      { code: 'HUI', city: '후에',   airport: '푸바이국제공항' },
+  ICN: { cityKey: 'flights.citySeoul',   airportKey: 'flights.airportIncheon' },
+  GMP: { cityKey: 'flights.citySeoul',   airportKey: 'flights.airportGimpo' },
+  PUS: { cityKey: 'flights.cityBusan',   airportKey: 'flights.airportGimhae' },
+  CJU: { cityKey: 'flights.cityJeju',    airportKey: 'flights.airportJeju' },
+  HAN: { cityKey: 'aiPlanner.destinations.hanoi',   airportKey: 'flights.airportNoiBai' },
+  DAD: { cityKey: 'aiPlanner.destinations.danang',  airportKey: 'flights.airportDanang' },
+  SGN: { cityKey: 'aiPlanner.destinations.hochiminh', airportKey: 'flights.airportTanSonNhat' },
+  PQC: { cityKey: 'aiPlanner.destinations.phuquoc', airportKey: 'flights.airportPhuQuoc' },
+  CXR: { cityKey: 'aiPlanner.destinations.nhatrang', airportKey: 'flights.airportCamRanh' },
+  HUI: { cityKey: 'aiPlanner.destinations.hue',     airportKey: 'flights.airportPhuBai' },
 };
 
-const VIETNAM_CITIES = ['하노이 (HAN)', '다낭 (DAD)', '호치민 (SGN)', '푸꾸옥 (PQC)', '나트랑 (CXR)', '후에 (HUI)'];
-const KOREAN_CITIES  = ['서울 인천 (ICN)', '서울 김포 (GMP)', '부산 (PUS)', '제주 (CJU)'];
+const VIETNAM_CODES = ['HAN', 'DAD', 'SGN', 'PQC', 'CXR', 'HUI'];
+const KOREAN_CODES  = ['ICN', 'GMP', 'PUS', 'CJU'];
 
-const CLASS_OPTIONS: { key: 'economy' | 'business' | 'first'; label: string }[] = [
-  { key: 'economy',  label: '일반석' },
-  { key: 'business', label: '비즈니스' },
-  { key: 'first',    label: '일등석' },
+const CLASS_KEYS: { key: 'economy' | 'business' | 'first'; tKey: string }[] = [
+  { key: 'economy',  tKey: 'flights.classEconomy' },
+  { key: 'business', tKey: 'flights.classBusiness' },
+  { key: 'first',    tKey: 'flights.classFirst' },
 ];
-
-const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
-
-function formatDate(dateStr: string) {
-  const d = new Date(dateStr);
-  return {
-    date: `${d.getMonth() + 1}월 ${d.getDate()}일`,
-    day:  `(${DAY_NAMES[d.getDay()]})`,
-  };
-}
 
 function addDays(dateStr: string, days: number): string {
   const d = new Date(dateStr);
@@ -52,10 +43,11 @@ function addDays(dateStr: string, days: number): string {
 
 export default function FlightSearchScreen() {
   const Colors = useThemeColors();
+  const { t } = useTranslation();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
 
-  const [origin,      setOrigin]      = useState(KOREAN_CITIES[0]);
-  const [destination, setDestination] = useState(VIETNAM_CITIES[1]);
+  const [origin,      setOrigin]      = useState(KOREAN_CODES[0]);
+  const [destination, setDestination] = useState(VIETNAM_CODES[1]);
   const [flightClass, setFlightClass] = useState<'economy' | 'business' | 'first'>('economy');
   const [passengers,  setPassengers]  = useState(2);
   const [tripType,    setTripType]    = useState<'round' | 'one'>('round');
@@ -65,10 +57,25 @@ export default function FlightSearchScreen() {
 
   const swap = () => { const tmp = origin; setOrigin(destination); setDestination(tmp); };
 
-  const originMeta = CITY_META[origin]      ?? { code: '???', city: origin,      airport: '' };
-  const destMeta   = CITY_META[destination] ?? { code: '???', city: destination, airport: '' };
+  function formatDate(dateStr: string) {
+    const d = new Date(dateStr);
+    return {
+      date: t('flights.dateFormat', { month: d.getMonth() + 1, day: d.getDate() }),
+      day:  `(${t(`flights.days.${d.getDay()}` as any)})`,
+    };
+  }
+
+  const originMeta = CITY_META[origin];
+  const destMeta   = CITY_META[destination];
   const depart     = formatDate(departDate);
   const ret        = formatDate(returnDate);
+
+  const QUICK_OPTIONS = [
+    { label: t('flights.nightsQuick', { n: 3 }), n: 4 },
+    { label: t('flights.nightsQuick', { n: 5 }), n: 6 },
+    { label: t('flights.nightsQuick', { n: 7 }), n: 8 },
+    { label: t('flights.nightsQuick', { n: 14 }), n: 15 },
+  ];
 
   return (
     <>
@@ -81,8 +88,8 @@ export default function FlightSearchScreen() {
             <Ionicons name="arrow-back" size={22} color={Colors.textPrimary} />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
-            <Text style={styles.headerTitle}>항공권 검색</Text>
-            <Text style={styles.headerSub}>베트남 직항 · 8개 도시</Text>
+            <Text style={styles.headerTitle}>{t('flights.title')}</Text>
+            <Text style={styles.headerSub}>{t('flights.headerSub')}</Text>
           </View>
           <View style={{ width: 36 }} />
         </View>
@@ -105,7 +112,7 @@ export default function FlightSearchScreen() {
                     style={{ marginRight: 5 }}
                   />
                   <Text style={[styles.tripBtnText, tripType === tt && styles.tripBtnTextActive]}>
-                    {tt === 'round' ? '왕복' : '편도'}
+                    {tt === 'round' ? t('flights.roundTrip') : t('flights.oneWay')}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -114,9 +121,9 @@ export default function FlightSearchScreen() {
             {/* ── Route block */}
             <View style={styles.routeCard}>
               <View style={styles.routeSide}>
-                <Text style={styles.routeCode}>{originMeta.code}</Text>
-                <Text style={styles.routeCity}>{originMeta.city}</Text>
-                <Text style={styles.routeAirport} numberOfLines={1}>{originMeta.airport}</Text>
+                <Text style={styles.routeCode}>{origin}</Text>
+                <Text style={styles.routeCity}>{originMeta ? t(originMeta.cityKey as any) : origin}</Text>
+                <Text style={styles.routeAirport} numberOfLines={1}>{originMeta ? t(originMeta.airportKey as any) : ''}</Text>
               </View>
               <View style={styles.routeMiddle}>
                 <View style={styles.routeLine} />
@@ -126,9 +133,9 @@ export default function FlightSearchScreen() {
                 <View style={styles.routeLine} />
               </View>
               <View style={[styles.routeSide, { alignItems: 'flex-end' }]}>
-                <Text style={styles.routeCode}>{destMeta.code}</Text>
-                <Text style={styles.routeCity}>{destMeta.city}</Text>
-                <Text style={styles.routeAirport} numberOfLines={1}>{destMeta.airport}</Text>
+                <Text style={styles.routeCode}>{destination}</Text>
+                <Text style={styles.routeCity}>{destMeta ? t(destMeta.cityKey as any) : destination}</Text>
+                <Text style={styles.routeAirport} numberOfLines={1}>{destMeta ? t(destMeta.airportKey as any) : ''}</Text>
               </View>
             </View>
 
@@ -136,23 +143,23 @@ export default function FlightSearchScreen() {
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Ionicons name="location-outline" size={15} color={Colors.primary} />
-                <Text style={styles.sectionTitle}>베트남 목적지</Text>
+                <Text style={styles.sectionTitle}>{t('flights.vietnamDest')}</Text>
               </View>
               <View style={styles.chipGrid}>
-                {VIETNAM_CITIES.map(city => {
-                  const meta = CITY_META[city];
-                  const active = destination === city;
+                {VIETNAM_CODES.map(code => {
+                  const meta = CITY_META[code];
+                  const active = destination === code;
                   return (
                     <TouchableOpacity
-                      key={city}
+                      key={code}
                       style={[styles.cityChip, active && styles.cityChipActive]}
-                      onPress={() => setDestination(city)}
+                      onPress={() => setDestination(code)}
                     >
                       <Text style={[styles.cityChipName, active && styles.cityChipNameActive]}>
-                        {meta?.city ?? city}
+                        {meta ? t(meta.cityKey as any) : code}
                       </Text>
                       <Text style={[styles.cityChipCode, active && styles.cityChipCodeActive]}>
-                        {meta?.code ?? ''}
+                        {code}
                       </Text>
                     </TouchableOpacity>
                   );
@@ -164,23 +171,23 @@ export default function FlightSearchScreen() {
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Ionicons name="airplane-outline" size={15} color={Colors.textMuted} />
-                <Text style={styles.sectionTitle}>출발 공항</Text>
+                <Text style={styles.sectionTitle}>{t('flights.departureAirport')}</Text>
               </View>
               <View style={styles.chipGrid}>
-                {KOREAN_CITIES.map(city => {
-                  const meta = CITY_META[city];
-                  const active = origin === city;
+                {KOREAN_CODES.map(code => {
+                  const meta = CITY_META[code];
+                  const active = origin === code;
                   return (
                     <TouchableOpacity
-                      key={city}
+                      key={code}
                       style={[styles.originChip, active && styles.originChipActive]}
-                      onPress={() => setOrigin(city)}
+                      onPress={() => setOrigin(code)}
                     >
                       <Text style={[styles.cityChipName, active && styles.originChipNameActive]}>
-                        {meta?.city ?? city}
+                        {meta ? t(meta.cityKey as any) : code}
                       </Text>
                       <Text style={[styles.cityChipCode, active && styles.originChipCodeActive]}>
-                        {meta?.code ?? ''}
+                        {code}
                       </Text>
                     </TouchableOpacity>
                   );
@@ -192,11 +199,11 @@ export default function FlightSearchScreen() {
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Ionicons name="calendar-outline" size={15} color={Colors.primary} />
-                <Text style={styles.sectionTitle}>날짜 선택</Text>
+                <Text style={styles.sectionTitle}>{t('flights.selectDate')}</Text>
               </View>
               <View style={styles.dateRow}>
                 <View style={[styles.dateCard, { borderColor: Colors.primary }]}>
-                  <Text style={styles.dateCardLabel}>출발일</Text>
+                  <Text style={styles.dateCardLabel}>{t('flights.departDate')}</Text>
                   <Text style={styles.dateCardDate}>{depart.date}</Text>
                   <Text style={styles.dateCardDay}>{depart.day}</Text>
                 </View>
@@ -205,14 +212,14 @@ export default function FlightSearchScreen() {
                 </View>
                 {tripType === 'round' ? (
                   <View style={[styles.dateCard, { borderColor: Colors.border }]}>
-                    <Text style={styles.dateCardLabel}>귀국일</Text>
+                    <Text style={styles.dateCardLabel}>{t('flights.returnDate')}</Text>
                     <Text style={styles.dateCardDate}>{ret.date}</Text>
                     <Text style={styles.dateCardDay}>{ret.day}</Text>
                   </View>
                 ) : (
                   <View style={[styles.dateCard, styles.dateCardDisabled]}>
-                    <Text style={styles.dateCardLabel}>귀국일</Text>
-                    <Text style={[styles.dateCardDate, { color: Colors.textMuted }]}>편도</Text>
+                    <Text style={styles.dateCardLabel}>{t('flights.returnDate')}</Text>
+                    <Text style={[styles.dateCardDate, { color: Colors.textMuted }]}>{t('flights.oneWay')}</Text>
                     <Text style={styles.dateCardDay}> </Text>
                   </View>
                 )}
@@ -220,11 +227,11 @@ export default function FlightSearchScreen() {
 
               {tripType === 'round' && (
                 <View style={styles.quickRow}>
-                  <Text style={styles.quickLabel}>빠른 선택</Text>
+                  <Text style={styles.quickLabel}>{t('flights.quickSelect')}</Text>
                   <View style={styles.quickChips}>
-                    {[{ label: '3박', n: 4 }, { label: '5박', n: 6 }, { label: '7박', n: 8 }, { label: '14박', n: 15 }].map(({ label, n }) => (
+                    {QUICK_OPTIONS.map(({ label, n }) => (
                       <TouchableOpacity
-                        key={label}
+                        key={n}
                         style={styles.quickChip}
                         onPress={() => setReturnDate(addDays(departDate, n))}
                       >
@@ -240,12 +247,12 @@ export default function FlightSearchScreen() {
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Ionicons name="person-outline" size={15} color={Colors.primary} />
-                <Text style={styles.sectionTitle}>탑승 정보</Text>
+                <Text style={styles.sectionTitle}>{t('flights.boarding')}</Text>
               </View>
 
               {/* Seat class */}
               <View style={styles.classRow}>
-                {CLASS_OPTIONS.map(({ key, label }) => (
+                {CLASS_KEYS.map(({ key, tKey }) => (
                   <TouchableOpacity
                     key={key}
                     style={[styles.classBtn, flightClass === key && styles.classBtnActive]}
@@ -255,7 +262,7 @@ export default function FlightSearchScreen() {
                       <Ionicons name="checkmark" size={13} color="#FFF" style={{ marginRight: 4 }} />
                     )}
                     <Text style={[styles.classBtnText, flightClass === key && styles.classBtnTextActive]}>
-                      {label}
+                      {t(tKey as any)}
                     </Text>
                   </TouchableOpacity>
                 ))}
@@ -264,8 +271,8 @@ export default function FlightSearchScreen() {
               {/* Passenger stepper */}
               <View style={styles.passengerRow}>
                 <View>
-                  <Text style={styles.passengerLabel}>인원</Text>
-                  <Text style={styles.passengerSub}>성인 기준</Text>
+                  <Text style={styles.passengerLabel}>{t('flights.passengers')}</Text>
+                  <Text style={styles.passengerSub}>{t('flights.adultsOnly')}</Text>
                 </View>
                 <View style={styles.stepper}>
                   <TouchableOpacity
@@ -277,7 +284,7 @@ export default function FlightSearchScreen() {
                   </TouchableOpacity>
                   <View style={styles.stepCountWrap}>
                     <Text style={styles.stepCount}>{passengers}</Text>
-                    <Text style={styles.stepUnit}>명</Text>
+                    <Text style={styles.stepUnit}>{t('common.person')}</Text>
                   </View>
                   <TouchableOpacity
                     style={[styles.stepBtn, passengers >= 9 && styles.stepBtnDisabled]}
@@ -301,9 +308,9 @@ export default function FlightSearchScreen() {
                 />
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.flexCheckText, isFlexible && styles.flexCheckTextActive]}>
-                    날짜 유연하게 검색 (±3일)
+                    {t('flights.flexibleSearch')}
                   </Text>
-                  <Text style={styles.flexCheckSub}>더 저렴한 항공권을 놓치지 마세요</Text>
+                  <Text style={styles.flexCheckSub}>{t('flights.flexibleHint')}</Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -312,11 +319,9 @@ export default function FlightSearchScreen() {
             <View style={styles.aiCard}>
               <View style={styles.aiTop}>
                 <Ionicons name="sparkles" size={16} color={Colors.primary} />
-                <Text style={styles.aiTitle}>AI 최적화 검색</Text>
+                <Text style={styles.aiTitle}>{t('flights.aiCardTitle')}</Text>
               </View>
-              <Text style={styles.aiBody}>
-                실시간 가격 데이터와 AI 분석으로 최적의 항공권을 추천합니다. 최저가 · 최단시간 · 최고 가성비 순으로 결과를 제공합니다.
-              </Text>
+              <Text style={styles.aiBody}>{t('flights.aiCardBody')}</Text>
             </View>
 
             {/* ── CTA */}
@@ -333,10 +338,10 @@ export default function FlightSearchScreen() {
               } as never)}
             >
               <Ionicons name="airplane" size={20} color="#FFF" />
-              <Text style={styles.ctaText}>항공권 검색</Text>
+              <Text style={styles.ctaText}>{t('flights.search')}</Text>
             </TouchableOpacity>
             <Text style={styles.ctaSummary}>
-              {originMeta.city} → {destMeta.city} · {depart.date} · {passengers}명 · {CLASS_OPTIONS.find(c => c.key === flightClass)?.label}
+              {originMeta ? t(originMeta.cityKey as any) : origin} → {destMeta ? t(destMeta.cityKey as any) : destination} · {depart.date} · {passengers}{t('common.person')} · {t(CLASS_KEYS.find(c => c.key === flightClass)?.tKey as any)}
             </Text>
 
           </View>
