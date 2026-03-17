@@ -16,11 +16,11 @@ export const formatKRWPrice = (amount: number): string => {
   return `${amount.toLocaleString('ko-KR')}원`;
 };
 
-/** Short form: 285,000 → "₩285,000" for list cards & badges */
+/** Short form: 285,000 → "₩28.5만" | 62,000 → "₩6.2만" | for list cards & badges */
 export const formatKRWShort = (amount: number): string => {
   if (amount <= 0) return '무료';
-  if (amount >= 10_000_000) return `₩${(amount / 10_000_000).toFixed(0)}천만`;
-  if (amount >= 100_000) return `₩${(amount / 10_000).toFixed(0)}만`;
+  if (amount >= 100_000_000) return `₩${(amount / 100_000_000).toFixed(1).replace(/\.0$/, '')}억`;
+  if (amount >= 10_000) return `₩${(amount / 10_000).toFixed(1).replace(/\.0$/, '')}만`;
   return `₩${amount.toLocaleString('ko-KR')}`;
 };
 
