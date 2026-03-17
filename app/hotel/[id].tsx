@@ -1,31 +1,21 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import {
-  View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Dimensions,
+  View, Text, ScrollView, StyleSheet,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 
 import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { hotelsService } from '../../services/mock/hotels.service';
 import { Hotel, RoomType } from '../../types/hotel.types';
-import { Button } from '../../components/common/Button';
 import { LoadingState } from '../../components/common/LoadingState';
-import { formatKRWPrice } from '../../utils/format';
+import { HOTEL_CATEGORY, ratingLabel } from '../../constants/categoryMeta';
+import { HeroImage, HeroButton, DetailTabBar, StickyBottomBar } from '../../components/ui';
+import RoomCard from '../../components/hotels/RoomCard';
 
-const { width } = Dimensions.get('window');
 const HERO_HEIGHT = 320;
-
-const CATEGORY_LABELS: Record<string, string> = {
-  luxury:   '럭셔리',
-  boutique: '부티크',
-  resort:   '리조트',
-  business: '비즈니스',
-  budget:   '가성비',
-};
 
 const AMENITY_ICONS: Record<string, string> = {
   '수영장':          'water-outline',
@@ -85,10 +75,7 @@ export default function HotelDetailScreen() {
   if (!hotel)  return <LoadingState message="호텔 정보를 찾을 수 없습니다." />;
 
   const selectedRoomData = rooms.find(r => r.id === selectedRoom);
-  const ratingDesc =
-    hotel.rating >= 4.8 ? '최고' :
-    hotel.rating >= 4.5 ? '훌륭함' :
-    hotel.rating >= 4.2 ? '좋음' : '보통';
+  const ratingDesc = ratingLabel(hotel.rating);
 
   return (
     <>
@@ -97,32 +84,26 @@ export default function HotelDetailScreen() {
         <ScrollView showsVerticalScrollIndicator={false}>
 
           {/* ── Hero ── */}
-          <View style={styles.hero}>
-            <Image source={{ uri: hotel.imageUrl }} style={styles.heroImage} />
-            <LinearGradient
-              colors={['transparent', 'rgba(0,0,0,0.72)']}
-              style={styles.heroGrad}
-            />
-            <SafeAreaView edges={['top']} style={styles.heroSafe}>
-              <View style={styles.heroActs}>
-                <TouchableOpacity style={styles.heroBtn} onPress={() => router.back()}>
-                  <Ionicons name="arrow-back" size={20} color="#FFF" />
-                </TouchableOpacity>
-                <View style={styles.heroActsRight}>
-                  <TouchableOpacity style={styles.heroBtn}>
-                    <Ionicons name="heart-outline" size={20} color="#FFF" />
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.heroBtn}>
-                    <Ionicons name="share-outline" size={20} color="#FFF" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </SafeAreaView>
+          <HeroImage
+            imageUrl={hotel.imageUrl}
+            height={HERO_HEIGHT}
+            onBack={() => router.back()}
+            rightActions={
+              <>
+                <HeroButton>
+                  <Ionicons name="heart-outline" size={20} color="#FFF" />
+                </HeroButton>
+                <HeroButton>
+                  <Ionicons name="share-outline" size={20} color="#FFF" />
+                </HeroButton>
+              </>
+            }
+          >
             <View style={styles.heroInfo}>
               {/* Badges row */}
               <View style={styles.heroBadgesRow}>
                 <View style={styles.heroCatBadge}>
-                  <Text style={styles.heroCatText}>{CATEGORY_LABELS[hotel.category] ?? hotel.category}</Text>
+                  <Text style={styles.heroCatText}>{HOTEL_CATEGORY[hotel.category]?.label ?? hotel.category}</Text>
                 </View>
                 {hotel.isRecommended && (
                   <View style={styles.heroRecBadge}>
@@ -153,20 +134,10 @@ export default function HotelDetailScreen() {
                 <Text style={styles.heroReviewCount}>후기 {hotel.reviewCount.toLocaleString()}개</Text>
               </View>
             </View>
-          </View>
+          </HeroImage>
 
           {/* ── Tabs ── */}
-          <View style={styles.tabsRow}>
-            {TABS.map((tab, i) => (
-              <TouchableOpacity
-                key={tab}
-                style={[styles.tab, activeTab === i && styles.tabActive]}
-                onPress={() => setActiveTab(i)}
-              >
-                <Text style={[styles.tabText, activeTab === i && styles.tabTextActive]}>{tab}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <DetailTabBar tabs={TABS} activeIndex={activeTab} onChange={setActiveTab} />
 
           <View style={styles.content}>
 
@@ -174,75 +145,14 @@ export default function HotelDetailScreen() {
             {activeTab === 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>객실을 선택하세요</Text>
-                {rooms.map(room => {
-                  const isSelected = selectedRoom === room.id;
-                  return (
-                    <TouchableOpacity
-                      key={room.id}
-                      style={[styles.roomCard, isSelected && styles.roomCardSelected]}
-                      onPress={() => setSelectedRoom(room.id)}
-                      activeOpacity={0.85}
-                    >
-                      {/* Image */}
-                      <View style={styles.roomImageWrap}>
-                        <Image source={{ uri: room.imageUrl }} style={styles.roomImage} />
-                        {isSelected && (
-                          <View style={styles.roomSelectedOverlay}>
-                            <Text style={styles.roomSelectedLabel}>선택됨</Text>
-                          </View>
-                        )}
-                      </View>
-                      {/* Body */}
-                      <View style={styles.roomBody}>
-                        <View style={styles.roomHeaderRow}>
-                          <Text style={styles.roomName}>{room.nameKo}</Text>
-                          {isSelected && (
-                            <Ionicons name="checkmark-circle" size={20} color={Colors.primary} />
-                          )}
-                        </View>
-                        {/* Meta pills */}
-                        <View style={styles.roomMetaRow}>
-                          <View style={styles.roomMetaPill}>
-                            <Ionicons name="bed-outline" size={11} color={Colors.textMuted} />
-                            <Text style={styles.roomMetaText}>{room.bedType}</Text>
-                          </View>
-                          <View style={styles.roomMetaPill}>
-                            <Ionicons name="people-outline" size={11} color={Colors.textMuted} />
-                            <Text style={styles.roomMetaText}>최대 {room.maxOccupancy ?? room.maxGuests}인</Text>
-                          </View>
-                          <View style={styles.roomMetaPill}>
-                            <Text style={styles.roomMetaText}>{room.size}㎡</Text>
-                          </View>
-                        </View>
-                        {/* Features */}
-                        <View style={styles.roomFeatures}>
-                          {(room.features ?? []).slice(0, 3).map(f => (
-                            <View key={f} style={styles.roomFeature}>
-                              <Ionicons name="checkmark" size={12} color={Colors.success} />
-                              <Text style={styles.roomFeatureText}>{f}</Text>
-                            </View>
-                          ))}
-                        </View>
-                        {/* Price + breakfast */}
-                        <View style={styles.roomFooter}>
-                          <View>
-                            <Text style={styles.roomPriceLabel}>1박 요금</Text>
-                            <View style={styles.roomPriceRow}>
-                              <Text style={styles.roomPrice}>{formatKRWPrice(room.pricePerNight)}</Text>
-                              <Text style={styles.roomPerNight}>/박</Text>
-                            </View>
-                          </View>
-                          {room.breakfastIncluded && (
-                            <View style={styles.breakfastBadge}>
-                              <Ionicons name="cafe-outline" size={12} color={Colors.success} />
-                              <Text style={styles.breakfastText}>조식 포함</Text>
-                            </View>
-                          )}
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  );
-                })}
+                {rooms.map(room => (
+                  <RoomCard
+                    key={room.id}
+                    room={room}
+                    selected={selectedRoom === room.id}
+                    onSelect={r => setSelectedRoom(r.id)}
+                  />
+                ))}
               </View>
             )}
 
@@ -373,37 +283,21 @@ export default function HotelDetailScreen() {
         </ScrollView>
 
         {/* ── Sticky booking bar ── */}
-        <SafeAreaView edges={['bottom']} style={styles.bottomBar}>
-          <View style={styles.bottomInner}>
-            <View style={styles.bottomPriceBlock}>
-              <Text style={styles.bottomRoomName} numberOfLines={1}>
-                {selectedRoomData?.nameKo ?? hotel.nameKo}
-              </Text>
-              <View style={styles.bottomPriceRow}>
-                <Text style={styles.bottomPrice}>
-                  {selectedRoomData
-                    ? formatKRWPrice(selectedRoomData.pricePerNight)
-                    : formatKRWPrice(hotel.pricePerNight)}
-                </Text>
-                <Text style={styles.bottomPerNight}>/박</Text>
-              </View>
-            </View>
-            <Button
-              title="지금 예약하기"
-              onPress={() => router.push({ pathname: '/hotel/booking', params: {
-                hotelId: hotel.id,
-                roomId: selectedRoom ?? '',
-                hotelName: hotel.nameKo,
-                roomName: selectedRoomData?.nameKo ?? '',
-                hotelImage: hotel.imageUrl,
-                roomPrice: String(selectedRoomData?.pricePerNight ?? hotel.pricePerNight),
-              } } as never)}
-              style={{ flex: 1.5 }}
-              icon={<Ionicons name="calendar-outline" size={16} color="#FFFFFF" />}
-              iconPosition="left"
-            />
-          </View>
-        </SafeAreaView>
+        <StickyBottomBar
+          label={selectedRoomData?.nameKo ?? hotel.nameKo}
+          price={selectedRoomData?.pricePerNight ?? hotel.pricePerNight}
+          priceUnit="/박"
+          buttonTitle="지금 예약하기"
+          buttonIcon={{ name: 'calendar-outline' }}
+          onPress={() => router.push({ pathname: '/hotel/booking', params: {
+            hotelId: hotel.id,
+            roomId: selectedRoom ?? '',
+            hotelName: hotel.nameKo,
+            roomName: selectedRoomData?.nameKo ?? '',
+            hotelImage: hotel.imageUrl,
+            roomPrice: String(selectedRoomData?.pricePerNight ?? hotel.pricePerNight),
+          } } as never)}
+        />
 
       </View>
     </>
@@ -414,14 +308,7 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
   return StyleSheet.create({
     container:       { flex: 1, backgroundColor: Colors.background },
 
-    // ── Hero ──
-    hero:            { height: HERO_HEIGHT, position: 'relative' },
-    heroImage:       { width, height: HERO_HEIGHT, resizeMode: 'cover' },
-    heroGrad:        { position: 'absolute', bottom: 0, left: 0, right: 0, height: 220 },
-    heroSafe:        { position: 'absolute', top: 0, left: 0, right: 0 },
-    heroActs:        { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: Spacing.base, paddingTop: Spacing.sm },
-    heroActsRight:   { flexDirection: 'row', gap: Spacing.sm },
-    heroBtn:         { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(0,0,0,0.38)', alignItems: 'center', justifyContent: 'center' },
+    // ── Hero overlay (anchored to HeroImage bottom) ──
     heroInfo:        { position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing.base, gap: 6 },
     heroBadgesRow:   { flexDirection: 'row', gap: Spacing.sm, marginBottom: 2 },
     heroCatBadge:    { backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: Radius.full, paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, borderColor: 'rgba(255,255,255,0.4)' },
@@ -438,41 +325,10 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
     heroRatingDesc:  { fontSize: FontSize.sm, fontWeight: '700', color: 'rgba(255,255,255,0.95)' },
     heroReviewCount: { fontSize: FontSize.xs, color: 'rgba(255,255,255,0.75)' },
 
-    // ── Tabs ──
-    tabsRow:       { flexDirection: 'row', backgroundColor: Colors.surface, borderBottomWidth: 1, borderColor: Colors.border },
-    tab:           { flex: 1, alignItems: 'center', paddingVertical: Spacing.md, borderBottomWidth: 2, borderBottomColor: 'transparent' },
-    tabActive:     { borderBottomColor: Colors.primary },
-    tabText:       { fontSize: FontSize.xs, fontWeight: '600', color: Colors.textMuted },
-    tabTextActive: { color: Colors.primary },
-
     // ── Content ──
     content:      { padding: Spacing.base, paddingBottom: 120 },
     section:      { gap: Spacing.md },
     sectionTitle: { fontSize: FontSize.base, fontWeight: '700', color: Colors.textPrimary, marginTop: Spacing.xs },
-
-    // ── Room cards ──
-    roomCard:             { backgroundColor: Colors.surface, borderRadius: Radius.xl, overflow: 'hidden', borderWidth: 2, borderColor: 'transparent', ...Shadow.sm },
-    roomCardSelected:     { borderColor: Colors.primary, backgroundColor: Colors.primaryLight + '20' },
-    roomImageWrap:        { position: 'relative' },
-    roomImage:            { width: '100%', height: 150, resizeMode: 'cover' },
-    roomSelectedOverlay:  { position: 'absolute', top: 10, right: 10, backgroundColor: Colors.primary, borderRadius: Radius.full, paddingHorizontal: 10, paddingVertical: 4 },
-    roomSelectedLabel:    { fontSize: FontSize.xs, fontWeight: '700', color: '#FFFFFF' },
-    roomBody:             { padding: Spacing.md, gap: 8 },
-    roomHeaderRow:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-    roomName:             { fontSize: FontSize.base, fontWeight: '800', color: Colors.textPrimary, flex: 1 },
-    roomMetaRow:          { flexDirection: 'row', gap: Spacing.sm, flexWrap: 'wrap' },
-    roomMetaPill:         { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: Colors.surfaceSecondary, borderRadius: Radius.full, paddingHorizontal: 8, paddingVertical: 3 },
-    roomMetaText:         { fontSize: FontSize.xs, color: Colors.textMuted, fontWeight: '500' },
-    roomFeatures:         { gap: 4 },
-    roomFeature:          { flexDirection: 'row', alignItems: 'center', gap: 5 },
-    roomFeatureText:      { fontSize: FontSize.sm, color: Colors.textSecondary },
-    roomFooter:           { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', borderTopWidth: 1, borderTopColor: Colors.border, paddingTop: 8 },
-    roomPriceLabel:       { fontSize: FontSize.xs, color: Colors.textMuted, marginBottom: 2 },
-    roomPriceRow:         { flexDirection: 'row', alignItems: 'baseline', gap: 2 },
-    roomPrice:            { fontSize: FontSize.xl, fontWeight: '800', color: Colors.accent },
-    roomPerNight:         { fontSize: FontSize.xs, color: Colors.textMuted },
-    breakfastBadge:       { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: Colors.success + '18', borderRadius: Radius.full, paddingHorizontal: 10, paddingVertical: 5 },
-    breakfastText:        { fontSize: FontSize.xs, fontWeight: '700', color: Colors.success },
 
     // ── Amenities ──
     amenityGrid:     { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
@@ -512,14 +368,5 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
     revDate:          { fontSize: FontSize.xs, color: Colors.textMuted },
     revText:          { fontSize: FontSize.sm, color: Colors.textSecondary, lineHeight: 20 },
     noReviewText:     { fontSize: FontSize.base, color: Colors.textMuted, textAlign: 'center', paddingVertical: Spacing.xl },
-
-    // ── Bottom bar ──
-    bottomBar:        { backgroundColor: Colors.surface, borderTopWidth: 1, borderTopColor: Colors.border, paddingHorizontal: Spacing.base, paddingTop: Spacing.sm },
-    bottomInner:      { flexDirection: 'row', gap: Spacing.md, alignItems: 'center', paddingBottom: Spacing.sm },
-    bottomPriceBlock: { gap: 2 },
-    bottomRoomName:   { fontSize: FontSize.xs, color: Colors.textMuted, maxWidth: 120 },
-    bottomPriceRow:   { flexDirection: 'row', alignItems: 'baseline', gap: 2 },
-    bottomPrice:      { fontSize: FontSize.xl, fontWeight: '800', color: Colors.accent },
-    bottomPerNight:   { fontSize: FontSize.xs, color: Colors.textMuted },
   });
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState , useMemo} from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
-  Image, Dimensions, Share,
+  Image, Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router, Stack } from 'expo-router';
@@ -23,8 +23,8 @@ import { Badge } from '../../components/common/Badge';
 import { LoadingState } from '../../components/common/LoadingState';
 import { useTranslation } from '../../hooks/useTranslation';
 import { formatVNDPrice, formatKRWPrice } from '../../utils/format';
+import { HeroImage, HeroButton, DetailTabBar } from '../../components/ui';
 
-const { width, height } = Dimensions.get('window');
 const HERO_HEIGHT = 320;
 
 const SECTION_TAB_KEYS = ['overview', 'attractions', 'hotels', 'weather', 'tips'] as const;
@@ -88,28 +88,21 @@ export default function DestinationDetailScreen() {
       <View style={styles.container}>
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Hero */}
-          <View style={styles.heroContainer}>
-            <Image source={{ uri: destination.imageUrl }} style={styles.heroImage} />
-            <LinearGradient
-              colors={['transparent', 'rgba(0,0,0,0.6)']}
-              style={styles.heroGradient}
-            />
-            {/* Back / Actions */}
-            <SafeAreaView edges={['top']} style={styles.heroSafeArea}>
-              <View style={styles.heroActions}>
-                <TouchableOpacity style={styles.heroBtn} onPress={() => router.back()}>
-                  <Ionicons name="arrow-back" size={20} color="#FFFFFF" />
-                </TouchableOpacity>
-                <View style={styles.heroRightBtns}>
-                  <TouchableOpacity style={styles.heroBtn} onPress={handleShare}>
-                    <Ionicons name="share-outline" size={20} color="#FFFFFF" />
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.heroBtn} onPress={() => toggleFavorite(destination.id)}>
-                    <Ionicons name={fav ? 'heart' : 'heart-outline'} size={20} color={fav ? Colors.error : '#FFFFFF'} />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </SafeAreaView>
+          <HeroImage
+            imageUrl={destination.imageUrl}
+            height={HERO_HEIGHT}
+            onBack={() => router.back()}
+            rightActions={
+              <>
+                <HeroButton onPress={handleShare}>
+                  <Ionicons name="share-outline" size={20} color="#FFFFFF" />
+                </HeroButton>
+                <HeroButton onPress={() => toggleFavorite(destination.id)}>
+                  <Ionicons name={fav ? 'heart' : 'heart-outline'} size={20} color={fav ? Colors.error : '#FFFFFF'} />
+                </HeroButton>
+              </>
+            }
+          >
             {/* Hero Info */}
             <View style={styles.heroInfo}>
               <View style={styles.heroBadges}>
@@ -126,22 +119,15 @@ export default function DestinationDetailScreen() {
                 </Text>
               </View>
             </View>
-          </View>
+          </HeroImage>
 
           {/* Section Tabs */}
-          <View style={styles.tabsRow}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsContent}>
-              {SECTION_TAB_KEYS.map((key, i) => (
-                <TouchableOpacity
-                  key={key}
-                  style={[styles.tab, activeTab === i && styles.tabActive]}
-                  onPress={() => setActiveTab(i)}
-                >
-                  <Text style={[styles.tabText, activeTab === i && styles.tabTextActive]}>{t(`destination.${key}`)}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
+          <DetailTabBar
+            tabs={SECTION_TAB_KEYS.map(k => t(`destination.${k}`))}
+            activeIndex={activeTab}
+            onChange={setActiveTab}
+            scrollable
+          />
 
           {/* Content */}
           <View style={styles.content}>
@@ -534,28 +520,13 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
     // ── Layout ──
     container: { flex: 1, backgroundColor: Colors.background },
 
-    // ── Hero ──
-    heroContainer:  { height: HERO_HEIGHT, position: 'relative' },
-    heroImage:      { width, height: HERO_HEIGHT, resizeMode: 'cover' },
-    heroGradient:   { position: 'absolute', bottom: 0, left: 0, right: 0, height: 200 },
-    heroSafeArea:   { position: 'absolute', top: 0, left: 0, right: 0 },
-    heroActions:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: Spacing.base, paddingTop: Spacing.sm },
-    heroBtn:        { width: 38, height: 38, borderRadius: 19, backgroundColor: 'rgba(0,0,0,0.38)', alignItems: 'center', justifyContent: 'center' },
-    heroRightBtns:  { flexDirection: 'row', gap: Spacing.sm },
+    // ── Hero info overlay (positioned inside HeroImage) ──
     heroInfo:       { position: 'absolute', bottom: 0, left: 0, right: 0, padding: Spacing.base, gap: 6 },
     heroBadges:     { flexDirection: 'row', gap: Spacing.sm, marginBottom: 2 },
     heroName:       { fontSize: FontSize['2xl'], fontWeight: '800', color: '#FFFFFF', lineHeight: 34 },
     heroRegion:     { fontSize: FontSize.sm, color: 'rgba(255,255,255,0.82)' },
     heroStats:      { flexDirection: 'row', alignItems: 'center', gap: Spacing.base },
     heroVisitors:   { fontSize: FontSize.sm, color: 'rgba(255,255,255,0.9)' },
-
-    // ── Tabs ──
-    tabsRow:        { backgroundColor: Colors.surface, borderBottomWidth: 1, borderColor: Colors.border },
-    tabsContent:    { paddingHorizontal: Spacing.base, gap: Spacing.xs },
-    tab:            { paddingHorizontal: Spacing.md, paddingVertical: Spacing.md, borderBottomWidth: 2, borderBottomColor: 'transparent' },
-    tabActive:      { borderBottomColor: Colors.primary },
-    tabText:        { fontSize: FontSize.sm, fontWeight: '600', color: Colors.textMuted },
-    tabTextActive:  { color: Colors.primary },
 
     // ── Common ──
     content:     { padding: Spacing.base, paddingBottom: 100 },

@@ -5,33 +5,24 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Hotel } from '../../types/hotel.types';
-import { formatKRWPrice } from '../../utils/format';
 import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
+import { HOTEL_CATEGORY, ratingLabel } from '../../constants/categoryMeta';
+import { FeatureChips } from '../ui/FeatureChips';
+import { PriceBlock } from '../ui/PriceBlock';
 
 interface HotelCardProps {
   hotel: Hotel;
   onPress: (hotel: Hotel) => void;
 }
 
-const CATEGORY_META: Record<string, { label: string; color: string }> = {
-  luxury:   { label: '럭셔리',   color: '#8B5CF6' },
-  boutique: { label: '부티크',   color: '#D97706' },
-  resort:   { label: '리조트',   color: '#1BBCD4' },
-  business: { label: '비즈니스', color: '#3B82F6' },
-  budget:   { label: '가성비',   color: '#10B981' },
-};
-
 export default function HotelCard({ hotel, onPress }: HotelCardProps) {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
-  const cat = CATEGORY_META[hotel.category] ?? { label: hotel.category, color: Colors.primary };
+  const cat = HOTEL_CATEGORY[hotel.category] ?? { label: hotel.category, color: Colors.primary };
   const topAmenities = hotel.amenities.slice(0, 3);
-  const ratingDesc =
-    hotel.rating >= 4.8 ? '최고' :
-    hotel.rating >= 4.5 ? '훌륭함' :
-    hotel.rating >= 4.2 ? '좋음' : '보통';
+  const ratingDesc = ratingLabel(hotel.rating);
 
   return (
     <TouchableOpacity style={styles.card} onPress={() => onPress(hotel)} activeOpacity={0.92}>
@@ -87,23 +78,11 @@ export default function HotelCard({ hotel, onPress }: HotelCardProps) {
         </View>
 
         {/* Amenity chips */}
-        <View style={styles.amenityRow}>
-          {topAmenities.map(a => (
-            <View key={a} style={styles.amenityChip}>
-              <Text style={styles.amenityText}>{a}</Text>
-            </View>
-          ))}
-        </View>
+        <FeatureChips features={topAmenities} variant="tag" />
 
         {/* Footer: price + rating */}
         <View style={styles.footer}>
-          <View>
-            <Text style={styles.priceFrom}>최저가</Text>
-            <View style={styles.priceRow}>
-              <Text style={styles.price}>{formatKRWPrice(hotel.pricePerNight)}</Text>
-              <Text style={styles.perNight}>/박</Text>
-            </View>
-          </View>
+          <PriceBlock label="최저가" amount={hotel.pricePerNight} unit="/박" />
           <View style={styles.reviewBlock}>
             <View style={styles.reviewRatingRow}>
               <Ionicons name="star" size={12} color="#F59E0B" />
@@ -143,14 +122,7 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
     name:         { fontSize: FontSize.lg, fontWeight: '800', color: Colors.textPrimary, lineHeight: 24 },
     locationRow:  { flexDirection: 'row', alignItems: 'center', gap: 3 },
     location:     { fontSize: FontSize.sm, color: Colors.textMuted, flex: 1 },
-    amenityRow:   { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-    amenityChip:  { backgroundColor: Colors.primaryLight, borderRadius: Radius.sm, paddingHorizontal: 8, paddingVertical: 3 },
-    amenityText:  { fontSize: FontSize.xs, color: Colors.primary, fontWeight: '600' },
     footer:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingTop: Spacing.sm, marginTop: 4, borderTopWidth: 1, borderTopColor: Colors.border },
-    priceFrom:    { fontSize: FontSize.xs, color: Colors.textMuted, marginBottom: 1 },
-    priceRow:     { flexDirection: 'row', alignItems: 'baseline', gap: 2 },
-    price:        { fontSize: FontSize.xl, fontWeight: '800', color: Colors.accent },
-    perNight:     { fontSize: FontSize.xs, color: Colors.textMuted, fontWeight: '500' },
     reviewBlock:      { alignItems: 'flex-end', gap: 2 },
     reviewRatingRow:  { flexDirection: 'row', alignItems: 'center', gap: 3 },
     reviewRating:     { fontSize: FontSize.sm, fontWeight: '800', color: Colors.textPrimary },

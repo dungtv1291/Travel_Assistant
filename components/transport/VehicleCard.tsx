@@ -4,39 +4,40 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { TransportVehicle } from '../../types/transport.types';
-import { formatKRWPrice } from '../../utils/format';
 import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize, Typography } from '../../constants/typography';
+import { TRANSPORT_TYPE } from '../../constants/categoryMeta';
+import { MetaRow, MetaItem } from '../ui/MetaRow';
+import { FeatureChips } from '../ui/FeatureChips';
+import { PriceBlock } from '../ui/PriceBlock';
 
 interface VehicleCardProps {
   vehicle: TransportVehicle;
   onPress: (vehicle: TransportVehicle) => void;
 }
 
-const TYPE_LABELS: Record<string, string> = {
-  airport_pickup: '공항 픽업',
-  private_car: '전용 차량',
-  self_drive: '셀프 드라이브',
-  day_tour: '데이 투어',
-  scooter: '스쿠터',
-};
-
 export default function VehicleCard({ vehicle, onPress }: VehicleCardProps) {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
-  const TYPE_COLORS: Record<string, string> = {
-    airport_pickup: Colors.primary,
-    private_car: Colors.accent,
-    self_drive: Colors.success,
-    day_tour: '#7C3AED',
-    scooter: Colors.warning,
-  };
   const price = vehicle.pricePerDay ?? vehicle.pricePerTrip ?? 0;
   const priceUnit = vehicle.pricePerDay ? '1일' : '1회';
-  const typeColor = TYPE_COLORS[vehicle.type] ?? Colors.primary;
-  const typeLabel = TYPE_LABELS[vehicle.type] ?? vehicle.type;
+  const typeMeta = TRANSPORT_TYPE[vehicle.type];
+  const typeColor = typeMeta?.color ?? Colors.primary;
+  const typeLabel = typeMeta?.label ?? vehicle.type;
   const topFeatures = vehicle.features.slice(0, 3);
+
+  const metaItems: MetaItem[] = [
+    { icon: 'people-outline', text: `최대 ${vehicle.capacity}인` },
+    {
+      icon: vehicle.driverIncluded ? 'person-circle-outline' : 'key-outline',
+      text: vehicle.driverIncluded ? '기사 포함' : '셀프 드라이브',
+      color: vehicle.driverIncluded ? Colors.success : Colors.warning,
+    },
+    ...(vehicle.luggageCapacity !== undefined
+      ? [{ icon: 'briefcase-outline', text: `짐 ${vehicle.luggageCapacity}개` }]
+      : []),
+  ];
 
   return (
     <TouchableOpacity
@@ -78,52 +79,14 @@ export default function VehicleCard({ vehicle, onPress }: VehicleCardProps) {
         ) : null}
 
         {/* Meta row: seats · driver mode */}
-        <View style={styles.metaRow}>
-          <View style={styles.metaItem}>
-            <Ionicons name="people-outline" size={13} color={Colors.textMuted} />
-            <Text style={styles.metaText}>최대 {vehicle.capacity}인</Text>
-          </View>
-          <View style={styles.metaDot} />
-          <View style={styles.metaItem}>
-            <Ionicons
-              name={vehicle.driverIncluded ? 'person-circle-outline' : 'key-outline'}
-              size={13}
-              color={vehicle.driverIncluded ? Colors.success : Colors.warning}
-            />
-            <Text style={[
-              styles.metaText,
-              { color: vehicle.driverIncluded ? Colors.success : Colors.warning },
-            ]}>
-              {vehicle.driverIncluded ? '기사 포함' : '셀프 드라이브'}
-            </Text>
-          </View>
-          {vehicle.luggageCapacity !== undefined && (
-            <>
-              <View style={styles.metaDot} />
-              <View style={styles.metaItem}>
-                <Ionicons name="briefcase-outline" size={13} color={Colors.textMuted} />
-                <Text style={styles.metaText}>짐 {vehicle.luggageCapacity}개</Text>
-              </View>
-            </>
-          )}
-        </View>
+        <MetaRow items={metaItems} size="md" />
 
         {/* Feature chips */}
-        <View style={styles.featureRow}>
-          {topFeatures.map(f => (
-            <View key={f} style={styles.featureChip}>
-              <Ionicons name="checkmark-circle" size={10} color={Colors.success} />
-              <Text style={styles.featureText}>{f}</Text>
-            </View>
-          ))}
-        </View>
+        <FeatureChips features={topFeatures} />
 
         {/* Price footer */}
         <View style={styles.footer}>
-          <View>
-            <Text style={styles.priceUnit}>{priceUnit} 요금</Text>
-            <Text style={styles.price}>{formatKRWPrice(price)}</Text>
-          </View>
+          <PriceBlock label={`${priceUnit} 요금`} amount={price} />
           <View style={styles.reviewRow}>
             <Ionicons name="chatbubble-outline" size={12} color={Colors.textMuted} />
             <Text style={styles.reviewCount}>
@@ -185,32 +148,6 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
   body: { padding: Spacing.base, gap: Spacing.xs },
   name: { ...Typography.h5 },
   model: { fontSize: FontSize.sm, color: Colors.textMuted },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: Spacing.sm,
-    marginTop: 2,
-  },
-  metaItem: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  metaDot: { width: 3, height: 3, borderRadius: 2, backgroundColor: Colors.border },
-  metaText: { fontSize: FontSize.sm, color: Colors.textMuted },
-  featureRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 5,
-    marginTop: Spacing.xs,
-  },
-  featureChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-    backgroundColor: Colors.successLight,
-    borderRadius: Radius.xs,
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-  },
-  featureText: { fontSize: FontSize.xs, color: Colors.success },
   footer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
@@ -220,8 +157,6 @@ function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
     paddingTop: Spacing.sm,
     marginTop: Spacing.xs,
   },
-  priceUnit: { fontSize: FontSize.xs, color: Colors.textMuted },
-  price: { fontSize: FontSize.xl, fontWeight: '800', color: Colors.accent },
   reviewRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   reviewCount: { fontSize: FontSize.xs, color: Colors.textMuted },
   });
