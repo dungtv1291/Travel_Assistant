@@ -1,10 +1,11 @@
-import React, { useState , useMemo} from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
@@ -12,19 +13,20 @@ import { FontSize } from '../../constants/typography';
 import { useAuthStore } from '../../store/auth.store';
 import { useBookingsStore } from '../../store/bookings.store';
 import { useTripsStore } from '../../store/trips.store';
-import { useTranslation } from '../../hooks/useTranslation';
 import { useLanguageStore } from '../../store/language.store';
 import { useThemeStore } from '../../store/theme.store';
 
-const TRAVEL_STYLE_LABELS: Record<string, string> = {
-  cultural: '🏛️ 문화 탐방',
-  beach: '🏖️ 해변',
-  adventure: '🧗 액티비티',
-  food: '🍜 미식',
-  foodie: '🍜 미식',
-  shopping: '🛍️ 쇼핑',
-  relaxation: '🧘 힐링',
+const TRAVEL_STYLE_LABELS: Record<string, { label: string; icon: string }> = {
+  cultural:    { label: '문화 탐방', icon: 'library-outline' },
+  beach:       { label: '해변·리조트', icon: 'sunny-outline' },
+  adventure:   { label: '액티비티', icon: 'bicycle-outline' },
+  food:        { label: '미식 여행', icon: 'restaurant-outline' },
+  foodie:      { label: '미식 여행', icon: 'restaurant-outline' },
+  shopping:    { label: '쇼핑', icon: 'bag-outline' },
+  relaxation:  { label: '힐링·휴양', icon: 'leaf-outline' },
 };
+
+const LOCALE_LABELS: Record<string, string> = { ko: '한국어', en: 'English', vi: 'Tiếng Việt' };
 
 export default function ProfileScreen() {
   const Colors = useThemeColors();
@@ -33,148 +35,178 @@ export default function ProfileScreen() {
   const { hotelBookings, transportBookings } = useBookingsStore();
   const { savedTrips, favorites } = useTripsStore();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const { t } = useTranslation();
   const { locale, setLocale } = useLanguageStore();
   const { isDark, toggleTheme } = useThemeStore();
 
+  const totalBookings = hotelBookings.length + transportBookings.length;
+
   const handleLanguagePress = () => {
-    Alert.alert(t('profile.selectLanguage'), '', [
-      { text: '한국어', onPress: () => setLocale('ko') },
-      { text: 'English', onPress: () => setLocale('en') },
+    Alert.alert('언어 선택', '', [
+      { text: '한국어',       onPress: () => setLocale('ko') },
+      { text: 'English',     onPress: () => setLocale('en') },
       { text: 'Tiếng Việt', onPress: () => setLocale('vi') },
-      { text: t('common.cancel'), style: 'cancel' },
+      { text: '취소', style: 'cancel' },
     ]);
   };
 
   const handleLogout = () => {
-    Alert.alert(
-      t('profile.logout'),
-      t('profile.logoutConfirm'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('profile.logout'),
-          style: 'destructive',
-          onPress: async () => {
-            await logout();
-            router.replace('/(auth)/welcome');
-          },
-        },
-      ]
-    );
+    Alert.alert('로그아웃', '정말 로그아웃 하시겠어요?', [
+      { text: '취소', style: 'cancel' },
+      { text: '로그아웃', style: 'destructive', onPress: async () => { await logout(); router.replace('/(auth)/welcome'); } },
+    ]);
   };
-
-  const menuSections = [
-    {
-      title: t('profile.myActivity'),
-      items: [
-        { label: t('profile.savedTrips'), icon: 'calendar-outline', route: '/(tabs)/trips', badge: savedTrips.length },
-        { label: t('profile.bookingHistory'), icon: 'receipt-outline', route: '/(tabs)/bookings', badge: hotelBookings.length + transportBookings.length },
-        { label: t('profile.favoriteDest'), icon: 'heart-outline', route: '/(tabs)/trips', badge: favorites.length },
-      ],
-    },
-    {
-      title: t('profile.settings'),
-      items: [
-        { label: t('profile.appLanguage'), icon: 'language-outline', value: t(`languages.${locale}`), onPress: handleLanguagePress },
-        { label: t('profile.darkMode'), icon: 'moon-outline', value: null, darkToggle: true, route: null },
-        { label: t('profile.notifications'), icon: 'notifications-outline', value: null, toggle: true, route: null },
-        { label: t('profile.privacy'), icon: 'shield-outline', route: null },
-        { label: t('profile.terms'), icon: 'document-text-outline', route: null },
-      ],
-    },
-    {
-      title: t('profile.support'),
-      items: [
-        { label: t('profile.customerService'), icon: 'help-circle-outline', route: null },
-        { label: t('profile.appVersion'), icon: 'information-circle-outline', value: '1.0.0', route: null },
-      ],
-    },
-  ];
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>{t('profile.title')}</Text>
-          <TouchableOpacity style={styles.editIconBtn} onPress={() => router.push('/profile-edit' as any)}>
-            <Ionicons name="pencil-outline" size={18} color={Colors.primary} />
-          </TouchableOpacity>
-        </View>
 
-        {/* Avatar + User Info */}
-        <View style={styles.profileCard}>
-          <View style={styles.avatarWrapper}>
-            {user?.avatar ? (
-              <Image source={{ uri: user.avatar }} style={styles.avatar} />
-            ) : (
-              <View style={styles.avatarPlaceholder}>
-                <Text style={styles.avatarInitial}>
-                  {user?.name?.charAt(0)?.toUpperCase() ?? 'K'}
-                </Text>
-              </View>
-            )}
-            <View style={styles.avatarBadge}>
-              <Text style={styles.avatarBadgeText}>🇰🇷</Text>
-            </View>
+        {/* ── Hero header */}
+        <LinearGradient
+          colors={[Colors.primary, Colors.primary + 'CC']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.hero}
+        >
+          <View style={styles.heroTop}>
+            <Text style={styles.heroTitle}>내 프로필</Text>
+            <TouchableOpacity style={styles.editIconBtn} onPress={() => router.push('/profile-edit' as any)}>
+              <Ionicons name="pencil-outline" size={17} color="#FFF" />
+            </TouchableOpacity>
           </View>
 
-          <Text style={styles.userName}>{user?.name ?? t('home.traveler')}</Text>
-          <Text style={styles.userEmail}>{user?.email ?? 'traveler@korea.com'}</Text>
+          <View style={styles.heroBody}>
+            <View style={styles.avatarWrapper}>
+              {user?.avatar ? (
+                <Image source={{ uri: user.avatar }} style={styles.avatar} />
+              ) : (
+                <View style={styles.avatarPlaceholder}>
+                  <Text style={styles.avatarInitial}>{user?.name?.charAt(0)?.toUpperCase() ?? 'K'}</Text>
+                </View>
+              )}
+              <View style={styles.avatarBadge}>
+                <Text style={{ fontSize: 14 }}>🇰🇷</Text>
+              </View>
+            </View>
+            <View style={styles.heroInfo}>
+              <Text style={styles.heroName}>{user?.name ?? '여행자'}</Text>
+              <Text style={styles.heroEmail}>{user?.email ?? 'traveler@korea.com'}</Text>
+              <TouchableOpacity style={styles.editBadge} onPress={() => router.push('/profile-edit' as any)}>
+                <Ionicons name="pencil-outline" size={12} color={Colors.primary} />
+                <Text style={styles.editBadgeText}>프로필 편집</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </LinearGradient>
 
-          <TouchableOpacity style={styles.editBtn} onPress={() => router.push('/profile-edit' as any)}>
-            <Ionicons name="pencil-outline" size={14} color={Colors.primary} />
-            <Text style={styles.editBtnText}>{t('profile.editProfile')}</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Stats Row — Travenor / reference 3-col style */}
-        <View style={styles.statsRow}>
+        {/* ── Activity stats */}
+        <View style={styles.statsCard}>
           <TouchableOpacity style={styles.statItem} onPress={() => router.push('/(tabs)/trips')}>
+            <View style={[styles.statIcon, { backgroundColor: Colors.primaryLight }]}>
+              <Ionicons name="map-outline" size={18} color={Colors.primary} />
+            </View>
             <Text style={styles.statValue}>{savedTrips.length}</Text>
-            <Text style={styles.statLabel}>{t('profile.tripCount')}</Text>
+            <Text style={styles.statLabel}>여행 계획</Text>
           </TouchableOpacity>
           <View style={styles.statDivider} />
           <TouchableOpacity style={styles.statItem} onPress={() => router.push('/(tabs)/bookings')}>
-            <Text style={styles.statValue}>{hotelBookings.length + transportBookings.length}</Text>
-            <Text style={styles.statLabel}>{t('profile.bookingCount')}</Text>
+            <View style={[styles.statIcon, { backgroundColor: Colors.accentLight }]}>
+              <Ionicons name="receipt-outline" size={18} color={Colors.accent} />
+            </View>
+            <Text style={[styles.statValue, { color: Colors.accent }]}>{totalBookings}</Text>
+            <Text style={styles.statLabel}>예약 내역</Text>
           </TouchableOpacity>
           <View style={styles.statDivider} />
           <TouchableOpacity style={styles.statItem} onPress={() => router.push('/(tabs)/trips')}>
-            <Text style={styles.statValue}>{favorites.length}</Text>
-            <Text style={styles.statLabel}>{t('profile.favoriteCount')}</Text>
+            <View style={[styles.statIcon, { backgroundColor: '#FEF3C7' }]}>
+              <Ionicons name="heart-outline" size={18} color="#D97706" />
+            </View>
+            <Text style={[styles.statValue, { color: '#D97706' }]}>{favorites.length}</Text>
+            <Text style={styles.statLabel}>찜한 곳</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Travel Identity */}
+        {/* ── Quick actions */}
+        <View style={styles.sectionBlock}>
+          <Text style={styles.sectionLabel}>나의 여행</Text>
+          <View style={styles.menuCard}>
+            <TouchableOpacity style={[styles.menuRow, styles.menuRowBorder]} onPress={() => router.push('/(tabs)/trips')}>
+              <View style={styles.menuLeft}>
+                <View style={[styles.menuIconBox, { backgroundColor: Colors.primaryLight }]}>
+                  <Ionicons name="calendar-outline" size={18} color={Colors.primary} />
+                </View>
+                <View>
+                  <Text style={styles.menuLabel}>저장된 여행 계획</Text>
+                  <Text style={styles.menuSub}>AI가 만든 일정 · 직접 저장한 플랜</Text>
+                </View>
+              </View>
+              <View style={styles.menuRight}>
+                {savedTrips.length > 0 && <View style={styles.badgePill}><Text style={styles.badgeText}>{savedTrips.length}</Text></View>}
+                <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.menuRow, styles.menuRowBorder]} onPress={() => router.push('/(tabs)/bookings')}>
+              <View style={styles.menuLeft}>
+                <View style={[styles.menuIconBox, { backgroundColor: Colors.accentLight }]}>
+                  <Ionicons name="receipt-outline" size={18} color={Colors.accent} />
+                </View>
+                <View>
+                  <Text style={styles.menuLabel}>예약 내역</Text>
+                  <Text style={styles.menuSub}>호텔 · 항공 · 교통 예약 확인</Text>
+                </View>
+              </View>
+              <View style={styles.menuRight}>
+                {totalBookings > 0 && <View style={[styles.badgePill, { backgroundColor: Colors.accent }]}><Text style={styles.badgeText}>{totalBookings}</Text></View>}
+                <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuRow} onPress={() => router.push('/(tabs)/trips')}>
+              <View style={styles.menuLeft}>
+                <View style={[styles.menuIconBox, { backgroundColor: '#FEF3C7' }]}>
+                  <Ionicons name="heart-outline" size={18} color="#D97706" />
+                </View>
+                <View>
+                  <Text style={styles.menuLabel}>찜한 목적지</Text>
+                  <Text style={styles.menuSub}>관심 있는 도시 · 호텔 · 명소</Text>
+                </View>
+              </View>
+              <View style={styles.menuRight}>
+                {favorites.length > 0 && <View style={[styles.badgePill, { backgroundColor: '#D97706' }]}><Text style={styles.badgeText}>{favorites.length}</Text></View>}
+                <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* ── Travel identity */}
         {user?.preferences && (user.preferences.travelStyle.length > 0 || user.preferences.interests.length > 0) && (
-          <View style={styles.identitySection}>
-            <Text style={styles.identitySectionTitle}>{t('profile.travelIdentity')}</Text>
-            <View style={styles.identityCard}>
+          <View style={styles.sectionBlock}>
+            <Text style={styles.sectionLabel}>여행 스타일</Text>
+            <View style={styles.menuCard}>
               {user.preferences.travelStyle.length > 0 && (
-                <View style={styles.identityRow}>
+                <View style={[styles.identityRow, styles.menuRowBorder]}>
                   <Ionicons name="compass-outline" size={16} color={Colors.primary} />
-                  <Text style={styles.identityRowLabel}>{t('profile.travelStyle')}</Text>
-                  <View style={styles.identityChips}>
-                    {user.preferences.travelStyle.map(style => (
-                      <View key={style} style={styles.identityChip}>
-                        <Text style={styles.identityChipText}>
-                          {TRAVEL_STYLE_LABELS[style] ?? style}
-                        </Text>
-                      </View>
-                    ))}
+                  <Text style={styles.identityKey}>관심 유형</Text>
+                  <View style={styles.chipWrap}>
+                    {user.preferences.travelStyle.map(s => {
+                      const meta = TRAVEL_STYLE_LABELS[s];
+                      return (
+                        <View key={s} style={styles.styleChip}>
+                          <Ionicons name={(meta?.icon ?? 'compass-outline') as any} size={12} color={Colors.primary} />
+                          <Text style={styles.styleChipText}>{meta?.label ?? s}</Text>
+                        </View>
+                      );
+                    })}
                   </View>
                 </View>
               )}
               {user.preferences.interests.length > 0 && (
-                <View style={[styles.identityRow, styles.identityRowBorder]}>
+                <View style={styles.identityRow}>
                   <Ionicons name="heart-outline" size={16} color={Colors.accent} />
-                  <Text style={styles.identityRowLabel}>{t('profile.interests')}</Text>
-                  <View style={styles.identityChips}>
-                    {user.preferences.interests.slice(0, 4).map(interest => (
-                      <View key={interest} style={[styles.identityChip, styles.identityChipAccent]}>
-                        <Text style={[styles.identityChipText, styles.identityChipTextAccent]}>{interest}</Text>
+                  <Text style={styles.identityKey}>관심 키워드</Text>
+                  <View style={styles.chipWrap}>
+                    {user.preferences.interests.slice(0, 5).map(int => (
+                      <View key={int} style={[styles.styleChip, styles.styleChipAccent]}>
+                        <Text style={[styles.styleChipText, { color: Colors.accent }]}>{int}</Text>
                       </View>
                     ))}
                   </View>
@@ -184,74 +216,122 @@ export default function ProfileScreen() {
           </View>
         )}
 
-        {/* Menu Sections */}
-        {menuSections.map(section => (
-          <View key={section.title} style={styles.menuSection}>
-            <Text style={styles.menuSectionTitle}>{section.title}</Text>
-            <View style={styles.menuCard}>
-              {section.items.map((item, i) => (
-                <TouchableOpacity
-                  key={item.label}
-                  style={[styles.menuRow, i < section.items.length - 1 && styles.menuRowBorder]}
-                  onPress={
-                    (item as any).onPress
-                      ? (item as any).onPress
-                      : item.route
-                      ? () => router.push(item.route as any)
-                      : undefined
-                  }
-                  activeOpacity={(item as any).onPress || item.route ? 0.7 : 1}
-                >
-                  <View style={styles.menuLeft}>
-                    <View style={styles.menuIconBox}>
-                      <Ionicons name={item.icon as any} size={18} color={Colors.primary} />
-                    </View>
-                    <Text style={styles.menuLabel}>{item.label}</Text>
-                  </View>
-                  <View style={styles.menuRight}>
-                    {(item as any).value && !(item as any).toggle && (
-                      <Text style={styles.menuValue}>{(item as any).value}</Text>
-                    )}
-                    {'badge' in item && (item as any).badge > 0 && (
-                      <View style={styles.badgePill}>
-                        <Text style={styles.badgeText}>{(item as any).badge}</Text>
-                      </View>
-                    )}
-                    {(item as any).darkToggle ? (
-                      <Switch
-                        value={isDark}
-                        onValueChange={toggleTheme}
-                        trackColor={{ false: Colors.border, true: Colors.primary + '66' }}
-                        thumbColor={isDark ? Colors.primary : Colors.textMuted}
-                      />
-                    ) : (item as any).toggle ? (
-                      <Switch
-                        value={notificationsEnabled}
-                        onValueChange={setNotificationsEnabled}
-                        trackColor={{ false: Colors.border, true: Colors.primary + '66' }}
-                        thumbColor={notificationsEnabled ? Colors.primary : Colors.textMuted}
-                      />
-                    ) : (item.route || (item as any).onPress) ? (
-                      <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
-                    ) : null}
-                  </View>
-                </TouchableOpacity>
-              ))}
+        {/* ── App settings */}
+        <View style={styles.sectionBlock}>
+          <Text style={styles.sectionLabel}>앱 설정</Text>
+          <View style={styles.menuCard}>
+            <TouchableOpacity style={[styles.menuRow, styles.menuRowBorder]} onPress={handleLanguagePress}>
+              <View style={styles.menuLeft}>
+                <View style={[styles.menuIconBox, { backgroundColor: Colors.primaryLight }]}>
+                  <Ionicons name="language-outline" size={18} color={Colors.primary} />
+                </View>
+                <Text style={styles.menuLabel}>언어</Text>
+              </View>
+              <View style={styles.menuRight}>
+                <Text style={styles.menuValue}>{LOCALE_LABELS[locale] ?? locale}</Text>
+                <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
+              </View>
+            </TouchableOpacity>
+            <View style={[styles.menuRow, styles.menuRowBorder]}>
+              <View style={styles.menuLeft}>
+                <View style={[styles.menuIconBox, { backgroundColor: isDark ? '#1E293B' : Colors.primaryLight }]}>
+                  <Ionicons name={isDark ? 'moon' : 'moon-outline'} size={18} color={Colors.primary} />
+                </View>
+                <Text style={styles.menuLabel}>다크 모드</Text>
+              </View>
+              <Switch
+                value={isDark}
+                onValueChange={toggleTheme}
+                trackColor={{ false: Colors.border, true: Colors.primary + '88' }}
+                thumbColor={isDark ? Colors.primary : '#FFF'}
+              />
+            </View>
+            <View style={styles.menuRow}>
+              <View style={styles.menuLeft}>
+                <View style={[styles.menuIconBox, { backgroundColor: Colors.primaryLight }]}>
+                  <Ionicons name="notifications-outline" size={18} color={Colors.primary} />
+                </View>
+                <View>
+                  <Text style={styles.menuLabel}>푸시 알림</Text>
+                  <Text style={styles.menuSub}>특가 · 예약 변경 · 여행 팁</Text>
+                </View>
+              </View>
+              <Switch
+                value={notificationsEnabled}
+                onValueChange={setNotificationsEnabled}
+                trackColor={{ false: Colors.border, true: Colors.primary + '88' }}
+                thumbColor={notificationsEnabled ? Colors.primary : '#FFF'}
+              />
             </View>
           </View>
-        ))}
-
-        {/* Logout */}
-        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-          <Ionicons name="log-out-outline" size={18} color="#EF4444" />
-          <Text style={styles.logoutText}>{t('profile.logout')}</Text>
-        </TouchableOpacity>
-
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>🇻🇳 Vietnam Travel Assistant for Korean Travelers</Text>
-          <Text style={styles.footerVersion}>Version 1.0.0</Text>
         </View>
+
+        {/* ── Privacy / legal */}
+        <View style={styles.sectionBlock}>
+          <Text style={styles.sectionLabel}>약관 및 개인정보</Text>
+          <View style={styles.menuCard}>
+            {[
+              { label: '개인정보 처리방침', icon: 'shield-checkmark-outline' },
+              { label: '서비스 이용약관',   icon: 'document-text-outline' },
+            ].map((item, i) => (
+              <TouchableOpacity
+                key={item.label}
+                style={[styles.menuRow, i === 0 && styles.menuRowBorder]}
+              >
+                <View style={styles.menuLeft}>
+                  <View style={[styles.menuIconBox, { backgroundColor: Colors.surfaceSecondary }]}>
+                    <Ionicons name={item.icon as any} size={18} color={Colors.textSecondary} />
+                  </View>
+                  <Text style={styles.menuLabel}>{item.label}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* ── Support */}
+        <View style={styles.sectionBlock}>
+          <Text style={styles.sectionLabel}>고객 지원</Text>
+          <View style={styles.menuCard}>
+            <TouchableOpacity style={[styles.menuRow, styles.menuRowBorder]}>
+              <View style={styles.menuLeft}>
+                <View style={[styles.menuIconBox, { backgroundColor: Colors.primaryLight }]}>
+                  <Ionicons name="chatbubble-ellipses-outline" size={18} color={Colors.primary} />
+                </View>
+                <View>
+                  <Text style={styles.menuLabel}>고객센터 문의</Text>
+                  <Text style={styles.menuSub}>평일 09:00–18:00 · 한국어 지원</Text>
+                </View>
+              </View>
+              <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
+            </TouchableOpacity>
+            <View style={styles.menuRow}>
+              <View style={styles.menuLeft}>
+                <View style={[styles.menuIconBox, { backgroundColor: Colors.surfaceSecondary }]}>
+                  <Ionicons name="information-circle-outline" size={18} color={Colors.textSecondary} />
+                </View>
+                <Text style={styles.menuLabel}>앱 버전</Text>
+              </View>
+              <Text style={styles.menuValue}>v1.0.0</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* ── Logout */}
+        <View style={styles.sectionBlock}>
+          <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout} activeOpacity={0.8}>
+            <Ionicons name="log-out-outline" size={18} color="#EF4444" />
+            <Text style={styles.logoutText}>로그아웃</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* ── Footer */}
+        <View style={styles.footer}>
+          <Text style={styles.footerFlag}>🇻🇳 베트남 여행 전문 앱</Text>
+          <Text style={styles.footerSub}>한국인 여행자를 위한 올인원 가이드</Text>
+        </View>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -259,64 +339,67 @@ export default function ProfileScreen() {
 
 function makeStyles(Colors: ReturnType<typeof useThemeColors>) {
   return StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.background },
-  scroll: { paddingBottom: 100 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: Spacing.base, paddingBottom: Spacing.sm },
-  headerTitle: { fontSize: FontSize['2xl'], fontWeight: '800', color: Colors.textPrimary },
-  editIconBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center' },
-  profileCard: { alignItems: 'center', paddingVertical: Spacing.xl, paddingHorizontal: Spacing.base, gap: Spacing.sm },
-  avatarWrapper: { position: 'relative', marginBottom: Spacing.sm },
-  avatar: { width: 90, height: 90, borderRadius: 45, borderWidth: 3, borderColor: Colors.primary },
-  avatarPlaceholder: { width: 90, height: 90, borderRadius: 45, backgroundColor: Colors.primary, alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: Colors.primaryLight },
-  avatarInitial: { fontSize: 36, fontWeight: '800', color: '#FFF' },
-  avatarBadge: { position: 'absolute', bottom: 0, right: 0, width: 28, height: 28, borderRadius: 14, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: Colors.background },
-  avatarBadgeText: { fontSize: 16 },
-  userName: { fontSize: FontSize.xl, fontWeight: '800', color: Colors.textPrimary },
-  userEmail: { fontSize: FontSize.sm, color: Colors.textMuted },
-  editBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: Spacing.md, paddingVertical: Spacing.xs, borderRadius: Radius.xl, borderWidth: 1.5, borderColor: Colors.primary, marginTop: Spacing.xs },
-  editBtnText: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.primary },
-  statsRow: {
-    flexDirection: 'row',
-    backgroundColor: Colors.surface,
-    borderRadius: Radius.xl,
-    padding: Spacing.lg,
-    marginHorizontal: Spacing.base,
-    marginBottom: Spacing.xl,
-    ...Shadow.md,
-  },
-  statItem: { flex: 1, alignItems: 'center', gap: 4 },
-  statValue: { fontSize: 24, fontWeight: '800', color: Colors.accent },
-  statLabel: { fontSize: 11, color: Colors.textMuted, textAlign: 'center' },
-  statDivider: { width: 1, backgroundColor: Colors.border, marginVertical: 4 },
-  menuSection: { marginBottom: Spacing.md, paddingHorizontal: Spacing.base },
-  menuSectionTitle: { fontSize: FontSize.sm, fontWeight: '700', color: Colors.textMuted, marginBottom: Spacing.sm, textTransform: 'uppercase', letterSpacing: 0.5 },
-  menuCard: { backgroundColor: Colors.surface, borderRadius: Radius.xl, overflow: 'hidden', ...Shadow.sm },
-  menuRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Spacing.base, paddingVertical: Spacing.md },
-  menuRowBorder: { borderBottomWidth: 1, borderBottomColor: Colors.border },
-  menuLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  menuIconBox: { width: 34, height: 34, borderRadius: 10, backgroundColor: Colors.primaryLight, alignItems: 'center', justifyContent: 'center' },
-  menuLabel: { fontSize: FontSize.base, fontWeight: '600', color: Colors.textPrimary },
-  menuRight: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
-  menuValue: { fontSize: FontSize.sm, color: Colors.textMuted },
-  badgePill: { backgroundColor: Colors.primary, borderRadius: 10, minWidth: 20, height: 20, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
-  badgeText: { fontSize: 11, fontWeight: '700', color: '#FFF' },
-  logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm, marginHorizontal: Spacing.base, marginVertical: Spacing.md, paddingVertical: Spacing.md, borderRadius: Radius.xl, borderWidth: 1.5, borderColor: '#EF4444' },
-  logoutText: { fontSize: FontSize.base, fontWeight: '700', color: '#EF4444' },
-  footer: { alignItems: 'center', paddingVertical: Spacing.lg, gap: 4 },
-  footerText: { fontSize: FontSize.xs, color: Colors.textMuted },
-  footerVersion: { fontSize: 11, color: Colors.border },
+    safe:   { flex: 1, backgroundColor: Colors.background },
+    scroll: { paddingBottom: 100 },
 
-  // Travel Identity
-  identitySection: { marginBottom: Spacing.xl, paddingHorizontal: Spacing.base },
-  identitySectionTitle: { fontSize: FontSize.sm, fontWeight: '700', color: Colors.textMuted, marginBottom: Spacing.sm, textTransform: 'uppercase', letterSpacing: 0.5 },
-  identityCard: { backgroundColor: Colors.surface, borderRadius: Radius.xl, overflow: 'hidden', ...Shadow.sm },
-  identityRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', paddingHorizontal: Spacing.base, paddingVertical: Spacing.md, gap: Spacing.sm },
-  identityRowBorder: { borderTopWidth: 1, borderTopColor: Colors.border },
-  identityRowLabel: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.textSecondary },
-  identityChips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.xs, flex: 1 },
-  identityChip: { paddingHorizontal: Spacing.sm + 2, paddingVertical: 4, backgroundColor: Colors.primaryLight, borderRadius: Radius.full },
-  identityChipAccent: { backgroundColor: Colors.accentLight },
-  identityChipText: { fontSize: FontSize.xs, fontWeight: '600', color: Colors.primary },
-  identityChipTextAccent: { color: Colors.accent },
+    // Hero
+    hero:      { paddingHorizontal: Spacing.base, paddingTop: Spacing.lg, paddingBottom: Spacing.xl + 4 },
+    heroTop:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: Spacing.lg },
+    heroTitle: { fontSize: FontSize['2xl'], fontWeight: '800', color: '#FFF' },
+    editIconBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
+    heroBody:  { flexDirection: 'row', alignItems: 'center', gap: Spacing.lg },
+    avatarWrapper: { position: 'relative' },
+    avatar:    { width: 80, height: 80, borderRadius: 40, borderWidth: 3, borderColor: '#FFF' },
+    avatarPlaceholder: { width: 80, height: 80, borderRadius: 40, backgroundColor: 'rgba(255,255,255,0.25)', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'rgba(255,255,255,0.6)' },
+    avatarInitial: { fontSize: 32, fontWeight: '800', color: '#FFF' },
+    avatarBadge: { position: 'absolute', bottom: 0, right: 0, width: 26, height: 26, borderRadius: 13, backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: Colors.primary },
+    heroInfo:  { flex: 1, gap: 4 },
+    heroName:  { fontSize: FontSize.xl, fontWeight: '800', color: '#FFF' },
+    heroEmail: { fontSize: FontSize.sm, color: 'rgba(255,255,255,0.75)' },
+    editBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', paddingHorizontal: Spacing.sm + 2, paddingVertical: 4, borderRadius: Radius.full, backgroundColor: '#FFF', marginTop: 4 },
+    editBadgeText: { fontSize: FontSize.xs, fontWeight: '700', color: Colors.primary },
+
+    // Stats
+    statsCard:   { flexDirection: 'row', backgroundColor: Colors.surface, borderRadius: Radius.xl, marginHorizontal: Spacing.base, marginTop: -Spacing.lg, padding: Spacing.lg, ...Shadow.md },
+    statItem:    { flex: 1, alignItems: 'center', gap: 6 },
+    statIcon:    { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center' },
+    statValue:   { fontSize: FontSize.xl, fontWeight: '800', color: Colors.primary },
+    statLabel:   { fontSize: 11, color: Colors.textMuted, textAlign: 'center' },
+    statDivider: { width: 1, backgroundColor: Colors.border, marginVertical: 8 },
+
+    // Sections
+    sectionBlock: { marginTop: Spacing.xl, paddingHorizontal: Spacing.base },
+    sectionLabel: { fontSize: FontSize.xs, fontWeight: '700', color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: Spacing.sm },
+
+    // Menu card shared
+    menuCard:      { backgroundColor: Colors.surface, borderRadius: Radius.xl, overflow: 'hidden', ...Shadow.sm },
+    menuRow:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Spacing.base, paddingVertical: 14 },
+    menuRowBorder: { borderBottomWidth: 1, borderBottomColor: Colors.border },
+    menuLeft:      { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, flex: 1 },
+    menuIconBox:   { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+    menuLabel:     { fontSize: FontSize.base, fontWeight: '600', color: Colors.textPrimary },
+    menuSub:       { fontSize: FontSize.xs, color: Colors.textMuted, marginTop: 1 },
+    menuRight:     { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+    menuValue:     { fontSize: FontSize.sm, color: Colors.textMuted, fontWeight: '500' },
+    badgePill:     { backgroundColor: Colors.primary, borderRadius: 10, minWidth: 22, height: 22, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
+    badgeText:     { fontSize: 11, fontWeight: '700', color: '#FFF' },
+
+    // Identity
+    identityRow:  { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.sm, paddingHorizontal: Spacing.base, paddingVertical: Spacing.md },
+    identityKey:  { fontSize: FontSize.sm, fontWeight: '600', color: Colors.textSecondary, minWidth: 64, marginTop: 1 },
+    chipWrap:     { flex: 1, flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.xs },
+    styleChip:    { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 4, backgroundColor: Colors.primaryLight, borderRadius: Radius.full },
+    styleChipAccent: { backgroundColor: Colors.accentLight },
+    styleChipText:   { fontSize: FontSize.xs, fontWeight: '600', color: Colors.primary },
+
+    // Logout
+    logoutBtn:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.sm, paddingVertical: 15, borderRadius: Radius.xl, borderWidth: 1.5, borderColor: '#EF444466', backgroundColor: '#FEF2F2' },
+    logoutText: { fontSize: FontSize.base, fontWeight: '700', color: '#EF4444' },
+
+    // Footer
+    footer:    { alignItems: 'center', paddingVertical: Spacing.xl, gap: 4 },
+    footerFlag: { fontSize: FontSize.sm, color: Colors.textSecondary, fontWeight: '600' },
+    footerSub:  { fontSize: FontSize.xs, color: Colors.textMuted },
   });
 }
+
