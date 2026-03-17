@@ -93,17 +93,63 @@ export const Typography = StyleSheet.create({
     color: Colors.textSecondary,
     letterSpacing: 0.3,
   },
+  // ── Screen & section structure ──────────────────────────────
+  // screenTitle: top-level screen heading (28px bold)
+  screenTitle: {
+    fontSize: FontSize['5xl'],
+    fontWeight: '800',
+    color: Colors.textPrimary,
+    letterSpacing: -0.5,
+  },
+  // cardTitle: name/title inside a card (16px semibold)
+  cardTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: '700',
+    color: Colors.textPrimary,
+  },
+
+  // ── Buttons ──────────────────────────────────────────────────
+  // Use fontWeight 700 + slight tracking for legibility at small sizes
   button: {
     fontSize: FontSize.base,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.2,
   },
   buttonSmall: {
     fontSize: FontSize.sm,
-    fontWeight: '600',
+    fontWeight: '700',
+  },
+
+  // ── Prices ───────────────────────────────────────────────────
+  // All prices use accent (orange) — NEVER primary (teal)
+  // Always formatted via formatKRWPrice / formatVNDPrice from utils/format.ts
+  priceLg: {
+    fontSize: FontSize['4xl'],   // 24px
+    fontWeight: '800',
+    color: Colors.accent,
   },
   price: {
-    fontSize: FontSize['2xl'],
+    fontSize: FontSize.xl,       // 18px  — card default
+    fontWeight: '800',
+    color: Colors.accent,
+  },
+  priceSm: {
+    fontSize: FontSize.base,     // 14px  — compact badge
     fontWeight: '700',
-    color: Colors.primary,
+    color: Colors.accent,
+  },
+  priceSuffix: {
+    fontSize: FontSize.xs,       // 11px  — "/박", "/일" suffix
+    fontWeight: '400',
+    color: Colors.textMuted,
+  },
+
+  // ── Badges ───────────────────────────────────────────────────
+  // badgeText: inside any colored badge pill
+  badgeText: {
+    fontSize: FontSize.xs,       // 11px
+    fontWeight: '700',
+    letterSpacing: 0.2,
   },
 });
+

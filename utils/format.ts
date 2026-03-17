@@ -69,3 +69,33 @@ export const formatNights = (checkIn: string, checkOut: string): number => {
 export const formatDuration = (days: number): string => {
   return `${days}박 ${days + 1}일`;
 };
+
+/**
+ * Review / popularity count in compact Korean form.
+ *   n < 1,000          → "832"
+ *   1,000 ≤ n < 10,000 → "1.2천"
+ *   n ≥ 10,000         → "2.1만"
+ */
+export const formatReviewCount = (n: number): string => {
+  if (n >= 10_000) return `${(n / 10_000).toFixed(1).replace(/\.0$/, '')}만`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1).replace(/\.0$/, '')}천`;
+  return `${n}`;
+};
+
+/**
+ * Compact dot-separated date for list views.
+ *   "2026-04-15" → "2026.04.15"
+ */
+export const formatDateDot = (dateString: string): string => {
+  return dateString.replace(/-/g, '.');
+};
+
+/**
+ * Korean short month-day for inline display.
+ *   "2026-04-15" → "4월 15일"
+ */
+export const formatDateKo = (dateString: string): string => {
+  const date = new Date(dateString);
+  return `${date.getMonth() + 1}월 ${date.getDate()}일`;
+};
+

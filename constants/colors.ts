@@ -17,6 +17,8 @@ const base = {
   culture: '#E07A5F',
   food: '#F4A261',
   family: '#FF85A1',
+  // Ratings
+  star: '#FBBF24',
   // Card gradient overlay
   cardGradientStart: 'rgba(0,0,0,0)',
   cardGradientEnd: 'rgba(0,0,0,0.65)',

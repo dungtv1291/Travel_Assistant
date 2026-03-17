@@ -11,6 +11,7 @@ export const Spacing = {
   '5xl': 64,
 };
 
+// Semantic aliases for readability in components
 export const Radius = {
   xs: 4,
   sm: 8,
@@ -19,9 +20,23 @@ export const Radius = {
   xl: 20,
   '2xl': 24,
   full: 9999,
-};
+  // ── Semantic names ──────────────────────────────────────────────
+  // Use these names when intent is important for cross-screen consistency.
+  // input  → 12  (Radius.md)   — text inputs, dropdowns
+  // chip   → 9999 (Radius.full) — filter chips, tags
+  // card   → 20  (Radius.xl)   — all cards (hotel, flight, booking)
+  // modal  → 24  (Radius.2xl)  — bottom sheets, modal dialogs
+  // fab    → 9999 (Radius.full) — floating action buttons
+} as const;
+
+// ── Shadow system ─────────────────────────────────────────────────────
+// Rule: use ONLY Shadow.sm and Shadow.md.
+//   Shadow.sm  → default card shadow (lists, small tiles)
+//   Shadow.md  → elevated card / focused element (hero cards, modals)
+// Shadow.lg and Shadow.card are kept for backward compatibility only.
 
 export const Shadow = {
+  /** Default card shadow — use for all list cards and grid cards */
   sm: {
     shadowColor: '#0D1B3E',
     shadowOffset: { width: 0, height: 1 },
@@ -29,6 +44,7 @@ export const Shadow = {
     shadowRadius: 3,
     elevation: 2,
   },
+  /** Elevated shadow — use for hero cards, summary banners, sticky bars */
   md: {
     shadowColor: '#0D1B3E',
     shadowOffset: { width: 0, height: 4 },
@@ -36,6 +52,7 @@ export const Shadow = {
     shadowRadius: 12,
     elevation: 4,
   },
+  /** @deprecated use Shadow.md */
   lg: {
     shadowColor: '#0D1B3E',
     shadowOffset: { width: 0, height: 8 },
@@ -43,6 +60,7 @@ export const Shadow = {
     shadowRadius: 20,
     elevation: 8,
   },
+  /** @deprecated use Shadow.sm */
   card: {
     shadowColor: '#1BBCD4',
     shadowOffset: { width: 0, height: 4 },
@@ -51,3 +69,4 @@ export const Shadow = {
     elevation: 5,
   },
 };
+
