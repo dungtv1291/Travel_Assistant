@@ -16,6 +16,7 @@ import { useTripsStore } from '../../store/trips.store';
 import { useLanguageStore } from '../../store/language.store';
 import { useThemeStore } from '../../store/theme.store';
 import { useTranslation } from '../../hooks/useTranslation';
+import LanguagePickerModal from '../../components/profile/LanguagePickerModal';
 
 const TRAVEL_STYLE_ICONS: Record<string, string> = {
   cultural: 'library-outline', beach: 'sunny-outline', adventure: 'bicycle-outline',
@@ -29,24 +30,17 @@ export default function ProfileScreen() {
   const { hotelBookings, transportBookings } = useBookingsStore();
   const { savedTrips, favorites } = useTripsStore();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const { locale, setLocale } = useLanguageStore();
+  const [showLanguagePicker, setShowLanguagePicker] = useState(false);
+  const { locale } = useLanguageStore();
   const { isDark, toggleTheme } = useThemeStore();
   const { t } = useTranslation();
 
   const LOCALE_LABELS: Record<string, string> = {
     ko: t('languages.ko'), en: t('languages.en'), vi: t('languages.vi'),
   };
+  const LOCALE_FLAGS: Record<string, string> = { ko: '🇰🇷', en: '🇺🇸', vi: '🆻🇳' };
 
   const totalBookings = hotelBookings.length + transportBookings.length;
-
-  const handleLanguagePress = () => {
-    Alert.alert(t('profile.selectLanguage'), '', [
-      { text: t('languages.ko'),  onPress: () => setLocale('ko') },
-      { text: t('languages.en'),  onPress: () => setLocale('en') },
-      { text: t('languages.vi'),  onPress: () => setLocale('vi') },
-      { text: t('common.cancel'), style: 'cancel' },
-    ]);
-  };
 
   const handleLogout = () => {
     Alert.alert(t('profile.logout'), t('profile.logoutConfirm'), [
@@ -83,7 +77,7 @@ export default function ProfileScreen() {
                 </View>
               )}
               <View style={styles.avatarBadge}>
-                <Text style={{ fontSize: 14 }}>🇰🇷</Text>
+                <Text style={{ fontSize: 14 }}>{LOCALE_FLAGS[locale] ?? '🇰🇷'}</Text>
               </View>
             </View>
             <View style={styles.heroInfo}>
@@ -220,7 +214,11 @@ export default function ProfileScreen() {
         <View style={styles.sectionBlock}>
           <Text style={styles.sectionLabel}>{t('profile.settings')}</Text>
           <View style={styles.menuCard}>
-            <TouchableOpacity style={[styles.menuRow, styles.menuRowBorder]} onPress={handleLanguagePress}>
+            <TouchableOpacity
+              style={[styles.menuRow, styles.menuRowBorder]}
+              onPress={() => setShowLanguagePicker(true)}
+              activeOpacity={0.7}
+            >
               <View style={styles.menuLeft}>
                 <View style={[styles.menuIconBox, { backgroundColor: Colors.primaryLight }]}>
                   <Ionicons name="language-outline" size={18} color={Colors.primary} />
@@ -228,7 +226,9 @@ export default function ProfileScreen() {
                 <Text style={styles.menuLabel}>{t('profile.appLanguage')}</Text>
               </View>
               <View style={styles.menuRight}>
-                <Text style={styles.menuValue}>{LOCALE_LABELS[locale] ?? locale}</Text>
+                <Text style={styles.menuValue}>
+                  {LOCALE_FLAGS[locale]} {LOCALE_LABELS[locale] ?? locale}
+                </Text>
                 <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
               </View>
             </TouchableOpacity>
@@ -333,6 +333,11 @@ export default function ProfileScreen() {
         </View>
 
       </ScrollView>
+
+      <LanguagePickerModal
+        visible={showLanguagePicker}
+        onClose={() => setShowLanguagePicker(false)}
+      />
     </SafeAreaView>
   );
 }
