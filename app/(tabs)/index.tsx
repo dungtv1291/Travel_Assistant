@@ -35,7 +35,7 @@ import { HotelCard } from '../../components/home/HotelCard';
 import { CategoryGrid } from '../../components/home/CategoryGrid';
 import { FlightDealCard } from '../../components/home/FlightDealCard';
 import { AIPlannerBanner } from '../../components/home/AIPlannerBanner';
-import { formatDateDot } from '../../utils/format';
+import { useFormatter } from '../../hooks/useFormatter';
 
 const DEAL_BADGES = ['32%', '28%', '35%', '24%', '30%'];
 
@@ -46,6 +46,7 @@ export default function HomeScreen() {
   const { toggleFavorite, isFavorite } = useTripsStore();
   const { hotelBookings } = useBookingsStore();
   const { t } = useTranslation();
+  const { formatDate } = useFormatter();
 
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [hotels, setHotels] = useState<Hotel[]>([]);
@@ -141,7 +142,7 @@ export default function HomeScreen() {
               <Text style={styles.upcomingLabel}>{t('home.upcomingBooking')}</Text>
               <Text style={styles.upcomingName} numberOfLines={1}>{upcomingBooking.hotelName}</Text>
               <Text style={styles.upcomingDate}>
-                {formatDateDot(upcomingBooking.checkIn)} {'→'} {formatDateDot(upcomingBooking.checkOut)}
+                {formatDate(upcomingBooking.checkIn)} {'→'} {formatDate(upcomingBooking.checkOut)}
               </Text>
             </View>
             <View style={styles.upcomingRight}>

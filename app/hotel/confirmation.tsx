@@ -9,12 +9,13 @@ import { Spacing, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { Button } from '../../components/common/Button';
 import { useTranslation } from '../../hooks/useTranslation';
-import { formatKRWPrice } from '../../utils/format';
+import { useFormatter } from '../../hooks/useFormatter';
 
 export default function HotelConfirmationScreen() {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const { formatPrice, formatDate } = useFormatter();
   const {
     confirmationCode, hotelName, roomName,
     checkIn, checkOut, nights, totalPrice,
@@ -58,11 +59,11 @@ export default function HotelConfirmationScreen() {
 
               {[
                 { label: t('bookings.hotel'), value: hotelName ?? '' },
-                { label: t('hotels.checkIn'), value: checkIn ?? '' },
-                { label: t('hotels.checkOut'), value: checkOut ?? '' },
+                { label: t('hotels.checkIn'),  value: checkIn  ? formatDate(checkIn,  'long') : '' },
+                { label: t('hotels.checkOut'), value: checkOut ? formatDate(checkOut, 'long') : '' },
                 { label: t('hotels.duration'), value: `${nights ?? ''}${t('common.nights')}` },
                 { label: t('hotels.roomInfo'), value: roomName ?? '' },
-                { label: t('common.total'), value: totalPrice ? formatKRWPrice(Number(totalPrice)) : '' },
+                { label: t('common.total'), value: totalPrice ? formatPrice(Number(totalPrice)) : '' },
               ].map(row => (
                 <View key={row.label} style={styles.row}>
                   <Text style={styles.rowLabel}>{row.label}</Text>

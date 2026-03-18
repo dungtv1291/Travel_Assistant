@@ -9,12 +9,13 @@ import { Spacing, Radius, Shadow } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { Button } from '../../components/common/Button';
 import { useTranslation } from '../../hooks/useTranslation';
-import { formatKRWPrice } from '../../utils/format';
+import { useFormatter } from '../../hooks/useFormatter';
 
 export default function TransportConfirmationScreen() {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const { formatPrice } = useFormatter();
 
   const getTypeLabel = (type: string) => ({
     airport_pickup: t('transport.airportPickup'),
@@ -43,7 +44,7 @@ export default function TransportConfirmationScreen() {
   }, []);
 
   const formattedTotal = totalPrice
-    ? formatKRWPrice(Number(totalPrice))
+    ? formatPrice(Number(totalPrice))
     : '';
   const isPerTrip = vehicleType === 'airport_pickup' || vehicleType === 'day_tour';
 

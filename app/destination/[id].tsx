@@ -22,7 +22,7 @@ import { Button } from '../../components/common/Button';
 import { Badge } from '../../components/common/Badge';
 import { LoadingState } from '../../components/common/LoadingState';
 import { useTranslation } from '../../hooks/useTranslation';
-import { formatVNDPrice, formatKRWPrice } from '../../utils/format';
+import { useFormatter } from '../../hooks/useFormatter';
 import { HeroImage, HeroButton, DetailTabBar } from '../../components/ui';
 
 const HERO_HEIGHT = 320;
@@ -46,6 +46,7 @@ export default function DestinationDetailScreen() {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const { formatPrice } = useFormatter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { toggleFavorite, isFavorite } = useTripsStore();
 
@@ -243,7 +244,7 @@ export default function DestinationDetailScreen() {
                           </View>
                           {attr.ticketPrice && attr.ticketPrice.adult > 0 ? (
                             <View style={styles.attrPricePill}>
-                              <Text style={styles.attrPriceText}>{formatVNDPrice(attr.ticketPrice.adult)}</Text>
+                              <Text style={styles.attrPriceText}>{formatPrice(attr.ticketPrice.adult, 'VND')}</Text>
                             </View>
                           ) : (
                             <View style={styles.attrFreePill}>
@@ -297,7 +298,7 @@ export default function DestinationDetailScreen() {
                             <Text style={styles.hotelReviews}>· {t('destination.hotelReviews', { count: hotel.reviewCount.toLocaleString() })}</Text>
                           </View>
                           <View style={styles.hotelPriceRow}>
-                            <Text style={styles.hotelPrice}>{formatKRWPrice(hotel.pricePerNight)}</Text>
+                            <Text style={styles.hotelPrice}>{formatPrice(hotel.pricePerNight)}</Text>
                             <Text style={styles.hotelPerNight}>{t('destination.perNight')}</Text>
                           </View>
                         </View>

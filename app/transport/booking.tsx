@@ -11,7 +11,7 @@ import { transportService } from '../../services/mock/transport.service';
 import { useAuthStore } from '../../store/auth.store';
 import { useBookingsStore } from '../../store/bookings.store';
 import { Button } from '../../components/common/Button';
-import { formatKRWPrice } from '../../utils/format';
+import { useFormatter } from '../../hooks/useFormatter';
 import { useTranslation } from '../../hooks/useTranslation';
 import { TransportType } from '../../types/transport.types';
 
@@ -26,6 +26,7 @@ export default function TransportBookingScreen() {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const { formatPrice } = useFormatter();
   const {
     vehicleId, vehicleName, vehicleImage, vehiclePrice, vehicleType, driverIncluded,
   } = useLocalSearchParams<{
@@ -143,7 +144,7 @@ export default function TransportBookingScreen() {
               </View>
               <View style={styles.vehiclePriceBlock}>
                 <Text style={styles.vehiclePriceLabel}>{isPerTrip ? t('transport.priceOnce') : t('transport.priceDay')}</Text>
-                <Text style={styles.vehiclePriceValue}>{formatKRWPrice(PRICE_PER_UNIT)}</Text>
+                <Text style={styles.vehiclePriceValue}>{formatPrice(PRICE_PER_UNIT)}</Text>
               </View>
             </View>
 
@@ -185,7 +186,7 @@ export default function TransportBookingScreen() {
                   </View>
                   <View style={styles.pickupRight}>
                     {p.extra > 0 && (
-                      <Text style={styles.pickupExtra}>+{formatKRWPrice(p.extra)}</Text>
+                      <Text style={styles.pickupExtra}>+{formatPrice(p.extra)}</Text>
                     )}
                     {pickupOption === i && (
                       <Ionicons name="checkmark-circle" size={20} color={Colors.primary} />
@@ -241,21 +242,21 @@ export default function TransportBookingScreen() {
                     ? `${String(vehicleName ?? '')} (${t('transport.priceOnce')})`
                     : t('transport.vehicleFee', { days: numDays })}
                 </Text>
-                <Text style={styles.priceValue}>{formatKRWPrice(VEHICLE_TOTAL)}</Text>
+                <Text style={styles.priceValue}>{formatPrice(VEHICLE_TOTAL)}</Text>
               </View>
               {PICKUP_EXTRA > 0 && (
                 <View style={styles.priceRow}>
                   <Text style={styles.priceLabel}>{t('transport.pickupFee')}</Text>
-                  <Text style={styles.priceValue}>{formatKRWPrice(PICKUP_EXTRA)}</Text>
+                  <Text style={styles.priceValue}>{formatPrice(PICKUP_EXTRA)}</Text>
                 </View>
               )}
               <View style={styles.priceRow}>
                 <Text style={styles.priceLabel}>{t('transport.tax')}</Text>
-                <Text style={styles.priceValue}>{formatKRWPrice(TAX)}</Text>
+                <Text style={styles.priceValue}>{formatPrice(TAX)}</Text>
               </View>
               <View style={[styles.priceRow, styles.totalRow]}>
                 <Text style={styles.totalLabel}>{t('common.total')}</Text>
-                <Text style={styles.totalValue}>{formatKRWPrice(GRAND_TOTAL)}</Text>
+                <Text style={styles.totalValue}>{formatPrice(GRAND_TOTAL)}</Text>
               </View>
             </View>
 
@@ -291,7 +292,7 @@ export default function TransportBookingScreen() {
           <View style={styles.bottomInner}>
             <View>
               <Text style={styles.bottomLabel}>{t('common.total')}</Text>
-              <Text style={styles.bottomTotal}>{formatKRWPrice(GRAND_TOTAL)}</Text>
+              <Text style={styles.bottomTotal}>{formatPrice(GRAND_TOTAL)}</Text>
             </View>
             <Button
               title={t('transport.confirmPayment')}

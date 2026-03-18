@@ -6,7 +6,7 @@ import { useThemeColors } from '../../hooks/useThemeColors';
 import { Radius, Shadow, Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { useTranslation } from '../../hooks/useTranslation';
-import { formatKRWPrice } from '../../utils/format';
+import { useFormatter } from '../../hooks/useFormatter';
 
 interface FlightDealCardProps {
   flight: Flight;
@@ -17,6 +17,7 @@ export function FlightDealCard({ flight, onPress }: FlightDealCardProps) {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const { formatPrice } = useFormatter();
   const TAG_COLORS: Record<string, { color: string; bg: string }> = {
     cheapest:   { color: Colors.success,      bg: '#DCFCE7' },
     fastest:    { color: Colors.primary,      bg: Colors.primaryLight },
@@ -47,7 +48,7 @@ export function FlightDealCard({ flight, onPress }: FlightDealCardProps) {
         </View>
         <View style={styles.priceBlock}>
           <Text style={styles.priceFrom}>{t('components.flightDealCard.from')}</Text>
-          <Text style={styles.price}>{formatKRWPrice(priceKRW)}</Text>
+          <Text style={styles.price}>{formatPrice(priceKRW)}</Text>
         </View>
       </View>
 

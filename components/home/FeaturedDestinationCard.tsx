@@ -13,7 +13,7 @@ import { Destination } from '../../types/destination.types';
 import { useThemeColors } from '../../hooks/useThemeColors';
 import { Radius, Shadow, Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
-import { formatReviewCount } from '../../utils/format';
+import { useFormatter } from '../../hooks/useFormatter';
 import { useTranslation } from '../../hooks/useTranslation';
 
 const { width } = Dimensions.get('window');
@@ -38,6 +38,7 @@ export const FeaturedDestinationCard: React.FC<FeaturedDestinationCardProps> = (
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const { formatReviewCount } = useFormatter();
   return (
     <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.92}>
     <Image source={{ uri: destination.imageUrl }} style={styles.image} />

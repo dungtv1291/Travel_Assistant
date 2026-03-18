@@ -14,7 +14,7 @@ import { EmptyState } from '../../components/common/EmptyState';
 import { Button } from '../../components/common/Button';
 import { Trip } from '../../types/trip.types';
 import { useTranslation } from '../../hooks/useTranslation';
-import { formatKRWPrice } from '../../utils/format';
+import { useFormatter } from '../../hooks/useFormatter';
 
 type Tab = 'saved' | 'favorites';
 
@@ -24,6 +24,7 @@ export default function TripsScreen() {
   const { savedTrips, favorites } = useTripsStore();
   const [activeTab, setActiveTab] = useState<Tab>('saved');
   const { t } = useTranslation();
+  const { formatPrice, formatDate, formatDuration } = useFormatter();
 
   const renderTrip = ({ item }: { item: Trip }) => (
     <TouchableOpacity
@@ -39,13 +40,13 @@ export default function TripsScreen() {
             <Ionicons name="sparkles" size={10} color={Colors.primary} />
             <Text style={styles.tripBadgeText}>{t('trips.aiGenerated')}</Text>
           </View>
-          <Text style={styles.tripDuration}>{item.duration}{t('common.night')} {item.duration + 1}{t('common.day')}</Text>
+          <Text style={styles.tripDuration}>{formatDuration(item.duration)}</Text>
         </View>
         <Text style={styles.tripTitle}>{item.title}</Text>
         <View style={styles.tripFooter}>
           <View style={styles.tripStat}>
             <Ionicons name="calendar-outline" size={12} color="rgba(255,255,255,0.8)" />
-            <Text style={styles.tripStatText}>{item.startDate}</Text>
+            <Text style={styles.tripStatText}>{formatDate(item.startDate)}</Text>
           </View>
           <View style={styles.tripStat}>
             <Ionicons name="map-outline" size={12} color="rgba(255,255,255,0.8)" />
@@ -53,7 +54,7 @@ export default function TripsScreen() {
           </View>
           <View style={styles.tripStat}>
             <Ionicons name="wallet-outline" size={12} color="rgba(255,255,255,0.8)" />
-            <Text style={styles.tripStatText}>{formatKRWPrice(item.totalEstimatedCost)}</Text>
+            <Text style={styles.tripStatText}>{formatPrice(item.totalEstimatedCost)}</Text>
           </View>
         </View>
       </View>

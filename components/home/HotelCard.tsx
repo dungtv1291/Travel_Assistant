@@ -14,7 +14,7 @@ import { FontSize } from '../../constants/typography';
 import { Rating } from '../common/Rating';
 import { Badge } from '../common/Badge';
 import { useTranslation } from '../../hooks/useTranslation';
-import { formatKRWPrice } from '../../utils/format';
+import { useFormatter } from '../../hooks/useFormatter';
 
 interface HotelCardProps {
   hotel: Hotel;
@@ -26,6 +26,7 @@ export function HotelCard({ hotel, onPress, compact = false }: HotelCardProps) {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const { formatPrice } = useFormatter();
   return (
   <TouchableOpacity style={[styles.container, compact && styles.compact]} onPress={onPress} activeOpacity={0.9}>
     <Image source={{ uri: hotel.imageUrl }} style={compact ? styles.imageSm : styles.image} />
@@ -46,7 +47,7 @@ export function HotelCard({ hotel, onPress, compact = false }: HotelCardProps) {
       <View style={styles.footer}>
         <Rating value={hotel.rating} reviewCount={hotel.reviewCount} size="sm" />
         <View style={styles.priceContainer}>
-          <Text style={styles.price}>{formatKRWPrice(hotel.pricePerNight)}</Text>
+          <Text style={styles.price}>{formatPrice(hotel.pricePerNight)}</Text>
           <Text style={styles.perNight}>{t('common.perNight')}</Text>
         </View>
       </View>

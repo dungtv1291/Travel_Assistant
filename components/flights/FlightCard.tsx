@@ -6,9 +6,9 @@ import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { Flight } from '../../types/flight.types';
-import { formatKRWPrice, formatDuration } from '../../utils/format';
 import { Badge } from '../common/Badge';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useFormatter } from '../../hooks/useFormatter';
 
 interface Props {
   flight: Flight;
@@ -20,6 +20,7 @@ export function FlightCard({ flight, onPress, isSelected }: Props) {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const { formatPrice } = useFormatter();
   const tagVariant: Record<string, 'primary' | 'success' | 'warning' | 'info'> = {
     cheapest: 'success',
     fastest: 'primary',
@@ -94,7 +95,7 @@ export function FlightCard({ flight, onPress, isSelected }: Props) {
             <Text style={styles.footerTagText}>{flight.meal ? t('flights.includeMeal') : t('flights.noMeal')}</Text>
           </View>
         </View>
-        <Text style={styles.price}>{formatKRWPrice(flight.price)}</Text>
+        <Text style={styles.price}>{formatPrice(flight.price)}</Text>
       </View>
 
       {/* Low seats warning */}

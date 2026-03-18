@@ -10,11 +10,11 @@ import { Spacing, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { transportService } from '../../services/mock/transport.service';
 import { TransportVehicle } from '../../types/transport.types';
-import { formatKRWPrice } from '../../utils/format';
+import { useTranslation } from '../../hooks/useTranslation';
+import { useFormatter } from '../../hooks/useFormatter';
 import { Rating } from '../../components/common/Rating';
 import { Badge } from '../../components/common/Badge';
 import { LoadingState } from '../../components/common/LoadingState';
-import { useTranslation } from '../../hooks/useTranslation';
 import { HeroImage, StickyBottomBar, InfoCard, FeatureChips, PriceBlock } from '../../components/ui';
 
 const RENTAL_DAYS = [1, 2, 3, 5, 7];
@@ -23,6 +23,7 @@ export default function TransportDetailScreen() {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const { formatPrice } = useFormatter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [vehicle, setVehicle] = useState<TransportVehicle | null>(null);
   const [loading, setLoading] = useState(true);
@@ -109,7 +110,7 @@ export default function TransportDetailScreen() {
               </View>
               <View style={styles.priceSummary}>
                 <Text style={styles.priceSummaryLabel}>{t('transport.totalEstimate', { days: selectedDays })}</Text>
-                <Text style={styles.priceSummaryValue}>{formatKRWPrice(totalPrice)}</Text>
+                <Text style={styles.priceSummaryValue}>{formatPrice(totalPrice)}</Text>
               </View>
             </InfoCard>
 

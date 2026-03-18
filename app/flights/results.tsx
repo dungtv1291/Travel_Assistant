@@ -15,13 +15,14 @@ import { FlightCard } from '../../components/flights/FlightCard';
 import { AIAnalysisCard } from '../../components/flights/AIAnalysisCard';
 import { LoadingState } from '../../components/common/LoadingState';
 import { Button } from '../../components/common/Button';
-import { formatKRWPrice } from '../../utils/format';
+import { useFormatter } from '../../hooks/useFormatter';
 import { useTranslation } from '../../hooks/useTranslation';
 
 export default function FlightResultsScreen() {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const { formatPrice } = useFormatter();
   const SORT_OPTS = [
     { key: 'sortRecommended', label: t('flights.sortRecommended') },
     { key: 'sortCheapest', label: t('flights.sortCheapest') },
@@ -131,7 +132,7 @@ export default function FlightResultsScreen() {
             <View style={styles.bottomInner}>
               <View>
                 <Text style={styles.bottomLabel}>{selectedFlightData.airline} · {selectedFlightData.flightNumber}</Text>
-                <Text style={styles.bottomPrice}>{formatKRWPrice(selectedFlightData.price)}</Text>
+                <Text style={styles.bottomPrice}>{formatPrice(selectedFlightData.price)}</Text>
               </View>
               <Button
                 title={t('common.confirm')}

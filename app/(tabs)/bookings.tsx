@@ -12,10 +12,10 @@ import { FontSize } from '../../constants/typography';
 import { useBookingsStore } from '../../store/bookings.store';
 import { EmptyState } from '../../components/common/EmptyState';
 import { Button } from '../../components/common/Button';
-import { formatKRWPrice } from '../../utils/format';
 import { HotelBooking } from '../../types/hotel.types';
 import { TransportBooking } from '../../types/transport.types';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useFormatter } from '../../hooks/useFormatter';
 
 type FilterTab = 'all' | 'hotel' | 'transport';
 
@@ -32,6 +32,7 @@ export default function BookingsScreen() {
   const { hotelBookings, transportBookings } = useBookingsStore();
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
   const { t } = useTranslation();
+  const { formatPrice, formatDate } = useFormatter();
 
   const allBookings = [
     ...hotelBookings.map(b => ({ ...b, _kind: 'hotel' as const })),
@@ -67,7 +68,7 @@ export default function BookingsScreen() {
           <Text style={styles.cardSub}>{item.roomName}</Text>
           <View style={styles.cardMeta}>
             <Ionicons name="calendar-outline" size={12} color={Colors.textMuted} />
-            <Text style={styles.cardMetaText}>{item.checkIn} → {item.checkOut}</Text>
+            <Text style={styles.cardMetaText}>{formatDate(item.checkIn)} → {formatDate(item.checkOut)}</Text>
           </View>
           <View style={styles.cardMeta}>
             <Ionicons name="people-outline" size={12} color={Colors.textMuted} />
@@ -76,7 +77,7 @@ export default function BookingsScreen() {
         </View>
         <View style={styles.cardRight}>
           <Text style={styles.priceLabel}>{t('bookings.totalAmount')}</Text>
-          <Text style={styles.price}>{formatKRWPrice(item.totalPrice)}</Text>
+          <Text style={styles.price}>{formatPrice(item.totalPrice)}</Text>
           <Text style={styles.bookingId}>{item.confirmationCode}</Text>
         </View>
       </View>
@@ -108,7 +109,7 @@ export default function BookingsScreen() {
           <Text style={styles.cardSub}>{item.type === 'airport_pickup' ? t('bookings.airportPickup') : item.type}</Text>
           <View style={styles.cardMeta}>
             <Ionicons name="calendar-outline" size={12} color={Colors.textMuted} />
-            <Text style={styles.cardMetaText}>{item.pickupDate}</Text>
+            <Text style={styles.cardMetaText}>{formatDate(item.pickupDate)}</Text>
           </View>
           <View style={styles.cardMeta}>
             <Ionicons name="location-outline" size={12} color={Colors.textMuted} />
@@ -117,7 +118,7 @@ export default function BookingsScreen() {
         </View>
         <View style={styles.cardRight}>
           <Text style={styles.priceLabel}>{t('bookings.totalAmount')}</Text>
-          <Text style={styles.price}>{formatKRWPrice(item.totalPrice)}</Text>
+          <Text style={styles.price}>{formatPrice(item.totalPrice)}</Text>
           <Text style={styles.bookingId}>{item.confirmationCode}</Text>
         </View>
       </View>

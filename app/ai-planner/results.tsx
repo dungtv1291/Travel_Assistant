@@ -17,12 +17,13 @@ import { TimelineItem } from '../../components/trips/TimelineItem';
 import { LoadingState } from '../../components/common/LoadingState';
 import { Button } from '../../components/common/Button';
 import { useTranslation } from '../../hooks/useTranslation';
-import { formatKRWPrice, formatVNDPrice } from '../../utils/format';
+import { useFormatter } from '../../hooks/useFormatter';
 
 export default function AIPlannerResultsScreen() {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const { formatPrice } = useFormatter();
   const { destination, days, travelStyle, travelerType, budget, pace, interests } = useLocalSearchParams<Record<string, string>>();
   const { saveTrip } = useTripsStore();
   const [trip, setTrip] = useState<Trip | null>(null);
@@ -142,7 +143,7 @@ export default function AIPlannerResultsScreen() {
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryStat}>
-              <Text style={styles.summaryStatNum}>{formatKRWPrice(trip.totalEstimatedCost)}</Text>
+              <Text style={styles.summaryStatNum}>{formatPrice(trip.totalEstimatedCost)}</Text>
               <Text style={styles.summaryStatLabel}>{t('aiPlanner.results.estimatedCost')}</Text>
             </View>
           </View>
@@ -200,7 +201,7 @@ export default function AIPlannerResultsScreen() {
                     {dayItinerary.estimatedCost > 0 ? (
                       <View style={styles.dayCostPill}>
                         <Ionicons name="wallet-outline" size={11} color={Colors.primary} />
-                        <Text style={styles.dayCostText}>{formatVNDPrice(dayItinerary.estimatedCost)}</Text>
+                        <Text style={styles.dayCostText}>{formatPrice(dayItinerary.estimatedCost, 'VND')}</Text>
                       </View>
                     ) : null}
                   </View>

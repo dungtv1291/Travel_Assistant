@@ -6,8 +6,8 @@ import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { AIFlightAnalysis, Flight } from '../../types/flight.types';
-import { formatKRWPrice } from '../../utils/format';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useFormatter } from '../../hooks/useFormatter';
 
 interface Props {
   analysis: AIFlightAnalysis;
@@ -27,6 +27,7 @@ export function AIAnalysisCard({ analysis }: Props) {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const { formatPrice } = useFormatter();
   const [insightsOpen, setInsightsOpen] = useState(false);
   const OPTIONS: OptionConfig[] = [
     {
@@ -36,7 +37,7 @@ export function AIAnalysisCard({ analysis }: Props) {
       color: Colors.success,
       bgColor: '#ECFDF5',
       badgeColor: '#D1FAE5',
-      subLabel: (f) => formatKRWPrice(f.price),
+      subLabel: (f) => formatPrice(f.price),
     },
     {
       key: 'fastest',
@@ -54,7 +55,7 @@ export function AIAnalysisCard({ analysis }: Props) {
       color: Colors.warning,
       bgColor: '#FFFBEB',
       badgeColor: '#FDE68A',
-      subLabel: (f) => formatKRWPrice(f.price),
+      subLabel: (f) => formatPrice(f.price),
     },
   ];
 

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useThemeColors } from '../../hooks/useThemeColors';
 import { FontSize } from '../../constants/typography';
-import { formatKRWPrice, formatKRWShort } from '../../utils/format';
+import { useFormatter } from '../../hooks/useFormatter';
 
 interface PriceBlockProps {
   amount: number;
@@ -43,9 +43,10 @@ export function PriceBlock({
 }: PriceBlockProps) {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
+  const { formatPrice, formatPriceShort } = useFormatter();
 
   const formatted =
-    format === 'short' ? formatKRWShort(amount) : formatKRWPrice(amount);
+    format === 'short' ? formatPriceShort(amount) : formatPrice(amount);
 
   return (
     <View style={[styles.container, align === 'right' && styles.right]}>

@@ -7,8 +7,8 @@ import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Shadow, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { Destination } from '../../types/destination.types';
-import { formatReviewCount } from '../../utils/format';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useFormatter } from '../../hooks/useFormatter';
 
 const { width } = Dimensions.get('window');
 
@@ -43,6 +43,7 @@ export function DestinationCard({ destination, onPress, isFavorite, onFavoriteTo
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const [imgError, setImgError] = useState(false);
   const { t } = useTranslation();
+  const { formatReviewCount } = useFormatter();
 
   const categoryEmoji  = CATEGORY_EMOJIS[destination.category] ?? '📍';
   const fallbackColors: [string, string] = FALLBACK_GRADIENTS[destination.category] ?? ['#E4F9FC', '#1BBCD4'];

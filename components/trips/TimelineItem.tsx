@@ -6,8 +6,8 @@ import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing, Radius } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { ItineraryActivity } from '../../types/trip.types';
-import { formatVNDPrice, formatKRWPrice } from '../../utils/format';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useFormatter } from '../../hooks/useFormatter';
 
 interface Props {
   activity: ItineraryActivity;
@@ -29,6 +29,7 @@ export function TimelineItem({ activity, isLast }: Props) {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const { formatPrice } = useFormatter();
 
   const ACTIVITY_COLORS: Record<string, string> = {
     sightseeing:   Colors.primary,
@@ -45,9 +46,7 @@ export function TimelineItem({ activity, isLast }: Props) {
   const icon  = ACTIVITY_ICONS[activity.type]  ?? 'ellipse-outline';
 
   const costLabel = (activity.estimatedCost ?? 0) > 0
-    ? (activity.currency === 'KRW'
-        ? formatKRWPrice(activity.estimatedCost)
-        : formatVNDPrice(activity.estimatedCost))
+    ? formatPrice(activity.estimatedCost, (activity.currency as 'KRW' | 'VND') ?? 'VND')
     : null;
 
   return (

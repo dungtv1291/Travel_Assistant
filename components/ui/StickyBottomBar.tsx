@@ -6,7 +6,7 @@ import { useThemeColors } from '../../hooks/useThemeColors';
 import { Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 import { Button } from '../common/Button';
-import { formatKRWPrice } from '../../utils/format';
+import { useFormatter } from '../../hooks/useFormatter';
 
 interface StickyBottomBarProps {
   /**
@@ -43,6 +43,7 @@ export function StickyBottomBar({
 }: StickyBottomBarProps) {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
+  const { formatPrice } = useFormatter();
 
   return (
     <SafeAreaView edges={['bottom']} style={styles.container}>
@@ -55,7 +56,7 @@ export function StickyBottomBar({
               </Text>
             )}
             <View style={styles.priceRow}>
-              <Text style={styles.price}>{formatKRWPrice(price)}</Text>
+              <Text style={styles.price}>{formatPrice(price)}</Text>
               {priceUnit && <Text style={styles.priceUnit}>{priceUnit}</Text>}
             </View>
           </View>

@@ -16,8 +16,8 @@ import { hotelsService } from '../../services/mock/hotels.service';
 import { useAuthStore } from '../../store/auth.store';
 import { useBookingsStore } from '../../store/bookings.store';
 import { Button } from '../../components/common/Button';
-import { formatKRWPrice, formatDateShort } from '../../utils/format';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useFormatter } from '../../hooks/useFormatter';
 
 const bookingSchema = z.object({
   checkIn: z.string().min(1),
@@ -33,6 +33,7 @@ export default function HotelBookingScreen() {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
+  const { formatPrice } = useFormatter();
 
   const DATE_OPTIONS = [
     { label: t('hotels.datePresets.oneNight'),    checkIn: '2026-04-10', checkOut: '2026-04-11', nights: 1 },
@@ -179,8 +180,8 @@ export default function HotelBookingScreen() {
             <View style={styles.card}>
               <Text style={styles.cardTitle}>{t('hotels.feeBreakdown')}</Text>
               {[
-                { label: t('hotels.roomFeeNights', { nights: selectedDates.nights }), value: formatKRWPrice(TOTAL) },
-                { label: t('hotels.taxFee'), value: formatKRWPrice(TAX) },
+                { label: t('hotels.roomFeeNights', { nights: selectedDates.nights }), value: formatPrice(TOTAL) },
+                { label: t('hotels.taxFee'), value: formatPrice(TAX) },
               ].map(p => (
                 <View key={p.label} style={styles.priceRow}>
                   <Text style={styles.priceLabel}>{p.label}</Text>
@@ -189,7 +190,7 @@ export default function HotelBookingScreen() {
               ))}
               <View style={[styles.priceRow, styles.totalRow]}>
                 <Text style={styles.totalLabel}>{t('common.total')}</Text>
-                <Text style={styles.totalValue}>{formatKRWPrice(GRAND_TOTAL)}</Text>
+                <Text style={styles.totalValue}>{formatPrice(GRAND_TOTAL)}</Text>
               </View>
             </View>
 
@@ -216,7 +217,7 @@ export default function HotelBookingScreen() {
           <View style={styles.bottomInner}>
             <View>
               <Text style={styles.bottomLabel}>{t('common.total')}</Text>
-              <Text style={styles.bottomTotal}>{formatKRWPrice(GRAND_TOTAL)}</Text>
+              <Text style={styles.bottomTotal}>{formatPrice(GRAND_TOTAL)}</Text>
             </View>
             <Button
               title={t('common.book')}
