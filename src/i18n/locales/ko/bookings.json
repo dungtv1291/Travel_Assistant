@@ -1,0 +1,16 @@
+{
+  "title": "예약 내역",
+  "countLabel": "{{count}}건",
+  "hotels": "호텔",
+  "transport": "교통편",
+  "hotel": "호텔",
+  "confirmed": "예약 확정",
+  "pending": "대기 중",
+  "cancelled": "취소됨",
+  "completed": "완료",
+  "adultsNights": "성인 · {{nights}}박",
+  "totalAmount": "총 금액",
+  "airportPickup": "공항 픽업",
+  "noBookings": "예약 내역이 없습니다",
+  "filteredCount": "{{count}} 예약 건수"
+}

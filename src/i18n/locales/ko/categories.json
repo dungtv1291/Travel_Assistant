@@ -1,0 +1,14 @@
+{
+  "flights": "항공",
+  "hotels": "호텔",
+  "transport": "렌트카",
+  "tours": "투어",
+  "ai": "AI 플랜",
+  "food": "맛집",
+  "beach": "🏖️ 해변",
+  "city": "🌆 도시",
+  "mountain": "⛰️ 산악",
+  "culture": "🏛️ 문화",
+  "family": "👨‍👩‍👧 가족",
+  "foodFilter": "🍜 미식"
+}

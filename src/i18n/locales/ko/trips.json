@@ -1,0 +1,14 @@
+{
+  "title": "내 여행",
+  "newTrip": "새 일정 만들기",
+  "savedTrips": "저장된 일정",
+  "favorites": "찜한 여행지",
+  "noSavedTrips": "저장된 여행 일정이 없습니다",
+  "noSavedTripsHint": "AI 플래너로 나만의 베트남 여행을 계획해 보세요!",
+  "createAITrip": "AI 일정 만들기",
+  "noFavorites": "찜한 여행지가 없습니다",
+  "noFavoritesHint": "탐색 화면에서 마음에 드는 여행지를 찜해 보세요!",
+  "exploreDest": "여행지 탐색",
+  "aiGenerated": "AI 생성 일정",
+  "activities": "개 활동"
+}

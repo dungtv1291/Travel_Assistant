@@ -1,0 +1,34 @@
+{
+  "searchBarPlaceholder": "Tìm điểm đến, khách sạn, địa điểm...",
+  "aiBanner": {
+    "tag": "✨ Lập kế hoạch AI",
+    "title": "Tạo lịch trình\nhoàn hảo",
+    "subtitle": "AI phân tích thời tiết, mật độ, tuyến đường\nđể tạo kế hoạch tối ưu cho bạn",
+    "cta": "Bắt đầu ngay",
+    "badge": "Tự động tạo\nlịch trình 5 ngày"
+  },
+  "hotelCard": {
+    "recommended": "Đề xuất"
+  },
+  "flightDealCard": {
+    "from": "Từ",
+    "directFlight": "Thẳng",
+    "stopover": "{{count}} điểm dừng",
+    "cheapest": "Rẻ nhất",
+    "fastest": "Nhanh nhất",
+    "bestValue": "Tốt nhất",
+    "popular": "Phổ biến"
+  },
+  "timelineItem": {
+    "estimatedCost": "Ước tính ₩{{cost}}"
+  },
+  "filterChips": {
+    "all": "Tất cả",
+    "beach": "🏖️ Biển",
+    "city": "🌆 Thành phố",
+    "mountain": "⛰️ Núi",
+    "culture": "🏛️ Văn hóa",
+    "family": "👨‍👩‍👧 Gia đình",
+    "food": "🍜 Ẩm thực"
+  }
+}

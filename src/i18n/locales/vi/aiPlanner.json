@@ -1,0 +1,91 @@
+{
+  "title": "Lập kế hoạch AI",
+  "subtitle": "AI tạo lịch trình\nriêng cho bạn",
+  "hint": "Nhập sở thích để nhận gợi ý chuyến đi hoàn hảo",
+  "destination": "📍 Chọn điểm đến",
+  "duration": "📅 Thời gian chuyến đi",
+  "travelStyle": "🎯 Phong cách du lịch (nhiều lựa chọn)",
+  "travelerType": "👤 Loại hành khách",
+  "budget": "💰 Mức ngân sách",
+  "styles": {
+    "cultural": "Văn hóa & Di sản",
+    "beach": "Biển & Nghỉ dưỡng",
+    "adventure": "Phiêu lưu",
+    "food": "Ẩm thực",
+    "shopping": "Mua sắm",
+    "relaxation": "Thư giãn & Spa"
+  },
+  "travelerTypes": {
+    "solo": "Du lịch một mình",
+    "couple": "Cặp đôi",
+    "family": "Gia đình",
+    "friends": "Bạn bè"
+  },
+  "budgets": {
+    "budget": "Tiết kiệm",
+    "medium": "Trung bình",
+    "luxury": "Sang trọng"
+  },
+  "budgetDesc": {
+    "budget": "~₩500K/ngày",
+    "medium": "₩500K–1M/ngày",
+    "luxury": "₩1M+/ngày"
+  },
+  "generateHint": "AI sẽ tạo lịch trình {{days}} đêm {{nextDays}} ngày tối ưu cho bạn",
+  "generate": "Tạo lịch trình AI",
+  "generating": "AI đang tạo lịch trình...",
+  "generatingSubtitle": "Đang phân tích kế hoạch {{days}} đêm tốt nhất cho {{destination}}",
+  "nightsDays": "{{days}} đêm {{nextDays}} ngày",
+  "activities": "{{count}} hoạt động",
+  "generateFailed": "Tạo lịch trình thất bại",
+  "savedSuccess": "Đã lưu!",
+  "savedSuccessHint": "Lịch trình đã được lưu vào Chuyến đi của tôi!",
+  "regenerate": "Tạo lại",
+  "saveTrip": "Lưu lịch trình",
+  "saved": "✓ Đã lưu",
+  "day": "NGÀY {{number}}",
+  "estimatedCost": "Chi phí ước tính",
+  "travelPeriod": "Thời gian",
+  "pace": "🚶 Tốc độ du lịch",
+  "paces": {
+    "relaxed": "Thư thái",
+    "moderate": "Cân bằng",
+    "intensive": "Tích cực"
+  },
+  "interests": "💡 Sở thích (nhiều lựa chọn)",
+  "interestsList": {
+    "history": "Lịch sử",
+    "nature": "Thiên nhiên",
+    "nightlife": "Cuộc sống đêm",
+    "art": "Nghệ thuật",
+    "sports": "Thể thao",
+    "wellness": "Sức khỏe",
+    "photography": "Nhiếp ảnh",
+    "local": "Ẩm thực địa phương"
+  },
+  "aiInsightsTitle": "✨ Mẹo thông minh AI",
+  "bookingReminder": "Cần đặt trước",
+  "bookingRequired": "Đặt trước",
+  "destinations": {
+    "danang": "Đà Nẵng",
+    "hoian": "Hội An",
+    "hanoi": "Hà Nội",
+    "hochiminh": "TP. Hồ Chí Minh",
+    "phuquoc": "Phú Quốc",
+    "halong": "Vịnh Hạ Long",
+    "sapa": "Sa Pa",
+    "nhatrang": "Nha Trang",
+    "hue": "Huế"
+  },
+  "results": {
+    "aiGenerated": "AI tạo",
+    "nightsDays": "{{days}} đêm {{nextDays}} ngày",
+    "travelPeriod": "Thời gian",
+    "totalActivities": "Tổng hoạt động",
+    "estimatedCost": "Chi phí ước tính (KRW)",
+    "bookingWarning": "Cần đặt trước",
+    "insightsTitle": "Mẹo thông minh AI",
+    "dayFallback": "Khám phá {{destination}}",
+    "dayCount": "{{count}} hoạt động"
+  }
+}

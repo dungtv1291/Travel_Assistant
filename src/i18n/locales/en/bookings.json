@@ -1,0 +1,16 @@
+{
+  "title": "My Bookings",
+  "countLabel": "{{count}} bookings",
+  "hotels": "Hotels",
+  "transport": "Transport",
+  "hotel": "Hotel",
+  "confirmed": "Confirmed",
+  "pending": "Pending",
+  "cancelled": "Cancelled",
+  "completed": "Completed",
+  "adultsNights": "Adults · {{nights}} nights",
+  "totalAmount": "Total Amount",
+  "airportPickup": "Airport Pickup",
+  "noBookings": "No bookings yet",
+  "filteredCount": "{{count}} booking(s)"
+}

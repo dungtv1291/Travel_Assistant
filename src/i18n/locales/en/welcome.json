@@ -1,0 +1,27 @@
+{
+  "skip": "Skip",
+  "start": "Get Started",
+  "alreadyHaveAccount": "Already have an account?",
+  "login": "Log In",
+  "guestBrowse": "Browse as Guest",
+  "slide1": {
+    "titleBefore": "Discover\nBeautiful ",
+    "titleAccent": "Vietnam",
+    "subtitle": "From Ha Long Bay to Hoi An\nexplore Vietnam's hidden gems"
+  },
+  "slide2": {
+    "titleBefore": "AI-Powered\n",
+    "titleAccent": "Itineraries",
+    "subtitle": "Weather, crowds, routes —\nAI crafts your perfect travel plan"
+  },
+  "slide3": {
+    "titleBefore": "Flights to Hotels,\n",
+    "titleAccent": "All in One",
+    "subtitle": "From budget flights to luxury resorts\nplan everything in one app"
+  },
+  "slide4": {
+    "titleBefore": "Tailored\n",
+    "titleAccent": "Travel",
+    "subtitle": "Korean language support, flights from Korea\npersonalized recommendations for Korean travelers"
+  }
+}

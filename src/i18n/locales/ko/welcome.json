@@ -1,0 +1,27 @@
+{
+  "skip": "건너뛰기",
+  "start": "시작하기",
+  "alreadyHaveAccount": "이미 계정이 있으신가요?",
+  "login": "로그인",
+  "guestBrowse": "게스트로 둘러보기",
+  "slide1": {
+    "titleBefore": "아름다운\n베트남을 ",
+    "titleAccent": "발견해요",
+    "subtitle": "하롱베이부터 호이안까지\n베트남의 숨겨진 보석을 찾아보세요"
+  },
+  "slide2": {
+    "titleBefore": "AI가 만드는\n",
+    "titleAccent": "완벽한 일정",
+    "subtitle": "날씨, 혼잡도, 동선까지\nAI가 분석하여 최적의 여행 계획 제공"
+  },
+  "slide3": {
+    "titleBefore": "항공부터 호텔까지\n한번에 ",
+    "titleAccent": "예약",
+    "subtitle": "저렴한 항공권부터 럭셔리 리조트까지\n모든 여행 준비를 한 앱에서"
+  },
+  "slide4": {
+    "titleBefore": "한국인을 위한\n맞춤 ",
+    "titleAccent": "여행",
+    "subtitle": "한국어 지원, 한국 출발 항공편\n한국인 여행자 맞춤 추천"
+  }
+}

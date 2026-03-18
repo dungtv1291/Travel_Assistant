@@ -1,0 +1,16 @@
+{
+  "title": "Lịch sử đặt chỗ",
+  "countLabel": "{{count}} đặt chỗ",
+  "hotels": "Khách sạn",
+  "transport": "Phương tiện",
+  "hotel": "Khách sạn",
+  "confirmed": "Đã xác nhận",
+  "pending": "Chờ xử lý",
+  "cancelled": "Đã hủy",
+  "completed": "Hoàn thành",
+  "adultsNights": "Người lớn · {{nights}} đêm",
+  "totalAmount": "Tổng tiền",
+  "airportPickup": "Đón sân bay",
+  "noBookings": "Chưa có đặt chỗ nào",
+  "filteredCount": "{{count}} đặt chỗ"
+}

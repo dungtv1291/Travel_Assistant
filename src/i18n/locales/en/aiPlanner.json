@@ -1,0 +1,91 @@
+{
+  "title": "AI Travel Planner",
+  "subtitle": "AI creates your\ncustomized itinerary",
+  "hint": "Enter your preferences for the perfect trip recommendation",
+  "destination": "📍 Choose Destination",
+  "duration": "📅 Trip Duration",
+  "travelStyle": "🎯 Travel Style (multiple)",
+  "travelerType": "👤 Traveler Type",
+  "budget": "💰 Budget Level",
+  "styles": {
+    "cultural": "Culture & Heritage",
+    "beach": "Beach & Relaxation",
+    "adventure": "Adventure",
+    "food": "Food & Dining",
+    "shopping": "Shopping",
+    "relaxation": "Wellness & Spa"
+  },
+  "travelerTypes": {
+    "solo": "Solo",
+    "couple": "Couple",
+    "family": "Family",
+    "friends": "Friends"
+  },
+  "budgets": {
+    "budget": "Budget",
+    "medium": "Mid-range",
+    "luxury": "Luxury"
+  },
+  "budgetDesc": {
+    "budget": "~₩500K/day",
+    "medium": "₩500K–1M/day",
+    "luxury": "₩1M+/day"
+  },
+  "generateHint": "AI will create the perfect {{days}}-night, {{nextDays}}-day itinerary for you",
+  "generate": "Generate AI Itinerary",
+  "generating": "AI is generating your itinerary...",
+  "generatingSubtitle": "Analyzing the best {{days}}-night plan for {{destination}}",
+  "nightsDays": "{{days}} nights {{nextDays}} days",
+  "activities": "{{count}} activities",
+  "generateFailed": "Generation Failed",
+  "savedSuccess": "Saved!",
+  "savedSuccessHint": "Itinerary saved to My Trips!",
+  "regenerate": "Regenerate",
+  "saveTrip": "Save Trip",
+  "saved": "✓ Saved",
+  "day": "DAY {{number}}",
+  "estimatedCost": "Estimated Cost",
+  "travelPeriod": "Travel Period",
+  "pace": "🚶 Travel Pace",
+  "paces": {
+    "relaxed": "Relaxed",
+    "moderate": "Balanced",
+    "intensive": "Intensive"
+  },
+  "interests": "💡 Interests (multiple)",
+  "interestsList": {
+    "history": "History",
+    "nature": "Nature",
+    "nightlife": "Nightlife",
+    "art": "Art",
+    "sports": "Sports",
+    "wellness": "Wellness",
+    "photography": "Photography",
+    "local": "Local Food"
+  },
+  "aiInsightsTitle": "✨ AI Smart Tips",
+  "bookingReminder": "Advance Booking Required",
+  "bookingRequired": "Book in advance",
+  "destinations": {
+    "danang": "Da Nang",
+    "hoian": "Hoi An",
+    "hanoi": "Hanoi",
+    "hochiminh": "Ho Chi Minh City",
+    "phuquoc": "Phu Quoc",
+    "halong": "Ha Long Bay",
+    "sapa": "Sapa",
+    "nhatrang": "Nha Trang",
+    "hue": "Hue"
+  },
+  "results": {
+    "aiGenerated": "AI Generated",
+    "nightsDays": "{{days}} nights {{nextDays}} days",
+    "travelPeriod": "Travel Period",
+    "totalActivities": "Total Activities",
+    "estimatedCost": "Estimated Cost (KRW)",
+    "bookingWarning": "Advance Booking Required",
+    "insightsTitle": "AI Smart Tips",
+    "dayFallback": "{{destination}} Exploration",
+    "dayCount": "{{count}} activities"
+  }
+}

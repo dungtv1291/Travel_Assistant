@@ -1,0 +1,9 @@
+{
+  "title": "탐색",
+  "popularPlaces": "인기 장소",
+  "searchPlaceholder": "여행지, 도시, 활동 검색...",
+  "recentSearches": "최근 검색",
+  "resultsCount": "{{count}}개 여행지",
+  "resetFilter": "필터 초기화",
+  "noDestinations": "등록된 여행지가 없습니다"
+}

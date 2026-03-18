@@ -1,0 +1,34 @@
+{
+  "searchBarPlaceholder": "Search destinations, hotels, attractions...",
+  "aiBanner": {
+    "tag": "✨ AI Planner",
+    "title": "Generate Your\nPerfect Itinerary",
+    "subtitle": "AI analyzes weather, crowds & routes\nto craft your optimal plan",
+    "cta": "Start Now",
+    "badge": "Auto-generate\n5-day trip"
+  },
+  "hotelCard": {
+    "recommended": "Recommended"
+  },
+  "flightDealCard": {
+    "from": "From",
+    "directFlight": "Direct",
+    "stopover": "{{count}} stop(s)",
+    "cheapest": "Cheapest",
+    "fastest": "Fastest",
+    "bestValue": "Best Value",
+    "popular": "Popular"
+  },
+  "timelineItem": {
+    "estimatedCost": "Est. ₩{{cost}}"
+  },
+  "filterChips": {
+    "all": "All",
+    "beach": "🏖️ Beach",
+    "city": "🌆 City",
+    "mountain": "⛰️ Mountain",
+    "culture": "🏛️ Culture",
+    "family": "👨‍👩‍👧 Family",
+    "food": "🍜 Food"
+  }
+}

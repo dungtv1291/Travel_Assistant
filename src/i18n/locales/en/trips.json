@@ -1,0 +1,14 @@
+{
+  "title": "My Trips",
+  "newTrip": "New Itinerary",
+  "savedTrips": "Saved Trips",
+  "favorites": "Wishlist",
+  "noSavedTrips": "No saved trips yet",
+  "noSavedTripsHint": "Use AI Planner to create your perfect Vietnam trip!",
+  "createAITrip": "Create AI Trip",
+  "noFavorites": "No favorites yet",
+  "noFavoritesHint": "Browse destinations and add them to your wishlist!",
+  "exploreDest": "Explore Destinations",
+  "aiGenerated": "AI Itinerary",
+  "activities": " Activities"
+}

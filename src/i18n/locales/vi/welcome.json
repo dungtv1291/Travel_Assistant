@@ -1,0 +1,27 @@
+{
+  "skip": "Bỏ qua",
+  "start": "Bắt đầu",
+  "alreadyHaveAccount": "Đã có tài khoản?",
+  "login": "Đăng nhập",
+  "guestBrowse": "Duyệt với tư cách khách",
+  "slide1": {
+    "titleBefore": "Khám phá vẻ đẹp\n",
+    "titleAccent": "Việt Nam",
+    "subtitle": "Từ Vịnh Hạ Long đến Hội An\nkhám phá những viên ngọc ẩn của Việt Nam"
+  },
+  "slide2": {
+    "titleBefore": "Lịch trình hoàn hảo\ncùng ",
+    "titleAccent": "AI",
+    "subtitle": "Thời tiết, mật độ, tuyến đường —\nAI phân tích để tạo kế hoạch du lịch tối ưu"
+  },
+  "slide3": {
+    "titleBefore": "Từ vé máy bay đến khách sạn\n",
+    "titleAccent": "Tất cả trong một",
+    "subtitle": "Từ vé rẻ đến resort cao cấp\nchuẩn bị mọi thứ trong một ứng dụng"
+  },
+  "slide4": {
+    "titleBefore": "Du lịch\n",
+    "titleAccent": "cá nhân hóa",
+    "subtitle": "Hỗ trợ tiếng Hàn, chuyến bay từ Hàn Quốc\ngợi ý phù hợp cho du khách người Hàn"
+  }
+}

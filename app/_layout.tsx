@@ -4,11 +4,18 @@ import { StatusBar } from 'expo-status-bar';
 import { useAuthStore } from '../store/auth.store';
 import { router } from 'expo-router';
 
+// Initialize i18next and restore the user's saved language from AsyncStorage.
+// This import must come before any component that calls useTranslation().
+import '../src/i18n';
+import { restoreLanguage } from '../src/i18n/language';
+
 export default function RootLayout() {
-  const { isAuthenticated, restoreSession, isLoading } = useAuthStore();
+  const { restoreSession } = useAuthStore();
 
   useEffect(() => {
+    // Restore auth session and language preference in parallel
     restoreSession();
+    restoreLanguage();
   }, []);
 
   return (

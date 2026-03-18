@@ -1,0 +1,14 @@
+{
+  "title": "Chuyến đi của tôi",
+  "newTrip": "Tạo lịch trình mới",
+  "savedTrips": "Lịch trình đã lưu",
+  "favorites": "Yêu thích",
+  "noSavedTrips": "Chưa có lịch trình nào",
+  "noSavedTripsHint": "Dùng AI Planner để lên kế hoạch chuyến đi Việt Nam hoàn hảo!",
+  "createAITrip": "Tạo lịch trình AI",
+  "noFavorites": "Chưa có điểm đến yêu thích",
+  "noFavoritesHint": "Khám phá và thêm điểm đến vào danh sách yêu thích!",
+  "exploreDest": "Khám phá điểm đến",
+  "aiGenerated": "Lịch trình AI",
+  "activities": " Hoạt động"
+}

@@ -1,0 +1,34 @@
+{
+  "searchBarPlaceholder": "목적지, 호텔, 명소를 검색하세요...",
+  "aiBanner": {
+    "tag": "✨ AI 플래너",
+    "title": "완벽한\n여행 일정 생성",
+    "subtitle": "AI가 날씨, 인기도, 동선을\n분석해 최적 일정을 만들어 드려요",
+    "cta": "지금 시작하기",
+    "badge": "5일 일정\n자동 생성"
+  },
+  "hotelCard": {
+    "recommended": "추천"
+  },
+  "flightDealCard": {
+    "from": "부터",
+    "directFlight": "직항",
+    "stopover": "경유 {{count}}회",
+    "cheapest": "최저가",
+    "fastest": "최단시간",
+    "bestValue": "가성비",
+    "popular": "인기"
+  },
+  "timelineItem": {
+    "estimatedCost": "{{cost}}원 예상"
+  },
+  "filterChips": {
+    "all": "전체",
+    "beach": "🏖️ 해변",
+    "city": "🌆 도시",
+    "mountain": "⛰️ 산악",
+    "culture": "🏛️ 문화",
+    "family": "👨‍👩‍👧 가족",
+    "food": "🍜 미식"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "title": "Khám phá",
+  "popularPlaces": "Địa điểm nổi tiếng",
+  "searchPlaceholder": "Tìm điểm đến, thành phố, hoạt động...",
+  "recentSearches": "Tìm kiếm gần đây",
+  "resultsCount": "{{count}} điểm đến",
+  "resetFilter": "Đặt lại bộ lọc",
+  "noDestinations": "Không có điểm đến nào"
+}

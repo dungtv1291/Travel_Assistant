@@ -1,0 +1,9 @@
+{
+  "title": "Explore",
+  "popularPlaces": "Popular Places",
+  "searchPlaceholder": "Search destinations, cities, activities...",
+  "recentSearches": "Recent Searches",
+  "resultsCount": "{{count}} destinations",
+  "resetFilter": "Reset Filters",
+  "noDestinations": "No destinations found"
+}
