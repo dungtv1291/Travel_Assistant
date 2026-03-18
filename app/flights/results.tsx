@@ -70,7 +70,7 @@ export default function FlightResultsScreen() {
             <Ionicons name="arrow-back" size={22} color={Colors.textPrimary} />
           </TouchableOpacity>
           <View style={styles.headerCenter}>
-            <Text style={styles.headerRoute}>{origin ?? '인천'} → {destination ?? '다낭'}</Text>
+            <Text style={styles.headerRoute}>{origin ?? 'ICN'} → {destination ?? 'DAD'}</Text>
             <Text style={styles.headerSub}>{departDate} · {passengers} · {flightClass}</Text>
           </View>
           <TouchableOpacity style={styles.sortBtn} onPress={() => setShowSort(!showSort)}>

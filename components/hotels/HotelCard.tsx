@@ -41,7 +41,7 @@ export default function HotelCard({ hotel, onPress }: HotelCardProps) {
           {hotel.isRecommended ? (
             <View style={styles.recommendBadge}>
               <Ionicons name="sparkles" size={10} color="#FFFFFF" />
-              <Text style={styles.recommendText}>추천</Text>
+              <Text style={styles.recommendText}>{t('components.hotelCard.recommended')}</Text>
             </View>
           ) : <View />}
           <TouchableOpacity style={styles.heartBtn} activeOpacity={0.8}>

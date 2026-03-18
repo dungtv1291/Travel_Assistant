@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColors } from '../../hooks/useThemeColors';
+import { useTranslation } from '../../hooks/useTranslation';
 import { Radius, Shadow, Spacing } from '../../constants/spacing';
 import { FontSize } from '../../constants/typography';
 
@@ -26,7 +27,7 @@ interface SearchBarProps {
 export const SearchBar: React.FC<SearchBarProps> = ({
   value,
   onChangeText,
-  placeholder = '목적지, 호텔, 명소를 검색하세요...',
+  placeholder,
   onSubmit,
   onFilterPress,
   style,
@@ -35,11 +36,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t('components.searchBarPlaceholder');
   if (!editable && onPress) {
     return (
       <TouchableOpacity style={[styles.container, style]} onPress={onPress} activeOpacity={0.8}>
         <Ionicons name="search" size={20} color={Colors.textMuted} />
-        <Text style={[styles.input, styles.placeholder]}>{placeholder}</Text>
+        <Text style={[styles.input, styles.placeholder]}>{resolvedPlaceholder}</Text>
       </TouchableOpacity>
     );
   }
@@ -50,7 +53,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       <TextInput
         value={value}
         onChangeText={onChangeText}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         placeholderTextColor={Colors.textMuted}
         style={styles.input}
         returnKeyType="search"

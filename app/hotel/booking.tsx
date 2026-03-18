@@ -83,7 +83,7 @@ export default function HotelBookingScreen() {
         totalPrice: GRAND_TOTAL,
         currency: 'KRW',
         status: 'confirmed',
-        guestName: user?.name ?? '김여행',
+        guestName: user?.name ?? t('home.traveler'),
         guestEmail: user?.email ?? '',
       } as any);
       addHotelBooking(booking);
@@ -143,11 +143,11 @@ export default function HotelBookingScreen() {
               <Text style={styles.cardTitle}>{t('hotels.guestInfo')}</Text>
               <View style={styles.guestRow}>
                 <View style={styles.guestAvatar}>
-                  <Text style={styles.guestAvatarText}>{user?.name?.[0] ?? 'K'}</Text>
+                  <Text style={styles.guestAvatarText}>{user?.name?.[0] ?? t('home.traveler')[0]}</Text>
                 </View>
                 <View>
-                  <Text style={styles.guestName}>{user?.name ?? '김여행'}</Text>
-                  <Text style={styles.guestEmail}>{user?.email ?? 'kim@travel.com'}</Text>
+                  <Text style={styles.guestName}>{user?.name ?? t('home.traveler')}</Text>
+                  <Text style={styles.guestEmail}>{user?.email ?? ''}</Text>
                 </View>
                 <View style={styles.verifiedBadge}>
                   <Ionicons name="checkmark-circle" size={16} color={Colors.success} />

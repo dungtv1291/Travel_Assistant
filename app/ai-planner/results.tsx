@@ -17,14 +17,12 @@ import { TimelineItem } from '../../components/trips/TimelineItem';
 import { LoadingState } from '../../components/common/LoadingState';
 import { Button } from '../../components/common/Button';
 import { useTranslation } from '../../hooks/useTranslation';
-import { useLanguageStore } from '../../store/language.store';
 import { formatKRWPrice, formatVNDPrice } from '../../utils/format';
 
 export default function AIPlannerResultsScreen() {
   const Colors = useThemeColors();
   const styles = useMemo(() => makeStyles(Colors), [Colors]);
   const { t } = useTranslation();
-  const { locale } = useLanguageStore();
   const { destination, days, travelStyle, travelerType, budget, pace, interests } = useLocalSearchParams<Record<string, string>>();
   const { saveTrip } = useTripsStore();
   const [trip, setTrip] = useState<Trip | null>(null);
@@ -32,7 +30,7 @@ export default function AIPlannerResultsScreen() {
   const [selectedDay, setSelectedDay] = useState(0);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const defaultDest = locale === 'ko' ? '다낭' : 'Da Nang';
+  const defaultDest = '다낭'; // canonical Korean name for mock service lookup
 
   useEffect(() => {
     aiPlannerService.generateItinerary({
@@ -229,7 +227,7 @@ export default function AIPlannerResultsScreen() {
                   <Text style={styles.warningTitle}>{t('aiPlanner.results.bookingWarning')}</Text>
                   <View style={styles.warningCountBadge}>
                     <Text style={styles.warningCountText}>
-                      {dayItinerary.activities.filter(a => a.bookingRequired).length}건
+                      {t('bookings.countLabel', { count: dayItinerary.activities.filter(a => a.bookingRequired).length })}
                     </Text>
                   </View>
                 </View>
