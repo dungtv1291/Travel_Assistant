@@ -1,0 +1,15 @@
+dist/
+node_modules/
+
+# Environment files — only .env.example is tracked
+.env
+.env.*
+!.env.example
+
+coverage/
+*.log
+.DS_Store
+
+# Uploaded files — keep directory stubs, ignore contents
+uploads/**/*
+!uploads/**/.gitkeep

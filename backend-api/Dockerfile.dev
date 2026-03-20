@@ -1,0 +1,22 @@
+# Travel Assistant — Backend API
+# Dockerfile for local development
+# Uses nest start --watch for hot-reload via ts-node.
+# Production image: use the sibling Dockerfile (multi-stage build).
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies first so this layer is cached when only src changes.
+COPY package*.json ./
+RUN npm ci
+
+# Copy the rest of the project.
+# src/ is bind-mounted at runtime by docker-compose, so changes
+# on the host are reflected inside the container instantly.
+COPY . .
+
+EXPOSE 3000
+
+# nest start --watch runs ts-node under the hood — no manual build step needed.
+CMD ["npm", "run", "start:dev"]

@@ -1,0 +1,658 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ItineraryResponse",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "destination",
+    "summary",
+    "dayTabs",
+    "days",
+    "meta"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique itinerary id"
+    },
+    "title": {
+      "type": "string",
+      "description": "Rendered title shown in trip list and itinerary header"
+    },
+    "destination": {
+      "type": "object",
+      "required": ["id", "slug", "name", "code"],
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string",
+          "description": "Short code, e.g. DAD, HAN"
+        },
+        "name": {
+          "type": "string",
+          "description": "Localized destination name already resolved for current UI language"
+        },
+        "heroImage": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "nights",
+        "days",
+        "totalActivities",
+        "estimatedCost",
+        "budgetLabel"
+      ],
+      "properties": {
+        "nights": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "totalActivities": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "estimatedCost": {
+          "$ref": "#/$defs/money"
+        },
+        "budgetLabel": {
+          "type": "string",
+          "description": "Localized label such as '예상 경비' or 'Estimated budget'"
+        },
+        "generatedBy": {
+          "type": "string",
+          "enum": ["ai", "template", "manual"],
+          "default": "ai"
+        }
+      }
+    },
+    "dayTabs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "dayNumber",
+          "label",
+          "dateLabel",
+          "activityCount",
+          "isActive"
+        ],
+        "properties": {
+          "dayNumber": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "label": {
+            "type": "string",
+            "description": "Localized day label, e.g. DAY 1 / NGÀY 1 / DAY 1"
+          },
+          "dateLabel": {
+            "type": "string",
+            "description": "Compact UI date label, e.g. 3.18"
+          },
+          "activityCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "days": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/day"
+      }
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "language",
+        "currency",
+        "travelerType",
+        "pace",
+        "budgetLevel",
+        "travelStyles",
+        "interests",
+        "saved"
+      ],
+      "properties": {
+        "language": {
+          "type": "string",
+          "enum": ["ko", "en", "vi"]
+        },
+        "currency": {
+          "type": "string",
+          "enum": ["KRW", "VND", "USD"]
+        },
+        "travelerType": {
+          "type": "string",
+          "enum": ["solo", "couple", "family", "friends"]
+        },
+        "pace": {
+          "type": "string",
+          "enum": ["relaxed", "balanced", "active"]
+        },
+        "budgetLevel": {
+          "type": "string",
+          "enum": ["budget", "medium", "luxury"]
+        },
+        "travelStyles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "culture",
+              "beach",
+              "activity",
+              "food",
+              "shopping",
+              "healing"
+            ]
+          }
+        },
+        "interests": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "history",
+              "nature",
+              "nightlife",
+              "art",
+              "sports",
+              "wellness",
+              "photography",
+              "local_food"
+            ]
+          }
+        },
+        "saved": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "money": {
+      "type": "object",
+      "required": ["currency", "amount", "display"],
+      "properties": {
+        "currency": {
+          "type": "string",
+          "enum": ["KRW", "VND", "USD"]
+        },
+        "amount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Raw numeric amount, no formatting"
+        },
+        "display": {
+          "type": "string",
+          "description": "Localized display string prepared by backend or formatter layer, e.g. ₩3,000,000 or 600.000₫"
+        }
+      }
+    },
+    "weatherSummary": {
+      "type": "object",
+      "required": [
+        "conditionCode",
+        "conditionLabel",
+        "temperatureC",
+        "note"
+      ],
+      "properties": {
+        "conditionCode": {
+          "type": "string",
+          "enum": [
+            "sunny",
+            "cloudy",
+            "partly_cloudy",
+            "rain",
+            "storm",
+            "windy"
+          ]
+        },
+        "conditionLabel": {
+          "type": "string",
+          "description": "Localized label for current UI language"
+        },
+        "temperatureC": {
+          "type": "integer"
+        },
+        "note": {
+          "type": "string",
+          "description": "Localized short weather recommendation"
+        },
+        "iconKey": {
+          "type": ["string", "null"],
+          "description": "Optional frontend icon key"
+        }
+      }
+    },
+    "warning": {
+      "type": "object",
+      "required": ["type", "text"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "weather",
+            "booking_required",
+            "crowded",
+            "timing",
+            "transport",
+            "general"
+          ]
+        },
+        "title": {
+          "type": ["string", "null"]
+        },
+        "text": {
+          "type": "string"
+        },
+        "count": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        }
+      }
+    },
+    "tip": {
+      "type": "object",
+      "required": ["orderNo", "text"],
+      "properties": {
+        "orderNo": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "text": {
+          "type": "string"
+        },
+        "iconKey": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "timelineItem": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "startTime",
+        "durationMinutes",
+        "durationLabel",
+        "title",
+        "description",
+        "location",
+        "accentColor",
+        "iconKey"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "food",
+            "transport",
+            "beach",
+            "attraction",
+            "shopping",
+            "hotel",
+            "cafe",
+            "nightlife",
+            "wellness",
+            "photo"
+          ]
+        },
+        "startTime": {
+          "type": "string",
+          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+        },
+        "durationMinutes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "durationLabel": {
+          "type": "string",
+          "description": "Localized UI label, e.g. 1시간 / 30분 / 2.5 hrs"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "location": {
+          "type": "object",
+          "required": ["name"],
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "address": {
+              "type": ["string", "null"]
+            },
+            "lat": {
+              "type": ["number", "null"]
+            },
+            "lng": {
+              "type": ["number", "null"]
+            }
+          }
+        },
+        "estimatedCost": {
+          "anyOf": [
+            { "$ref": "#/$defs/money" },
+            { "type": "null" }
+          ]
+        },
+        "tipText": {
+          "type": ["string", "null"],
+          "description": "Highlighted inline AI note shown inside card"
+        },
+        "bookingRequired": {
+          "type": "boolean",
+          "default": false
+        },
+        "bookingUrl": {
+          "type": ["string", "null"]
+        },
+        "accentColor": {
+          "type": "string",
+          "enum": [
+            "orange",
+            "blue",
+            "cyan",
+            "green",
+            "purple",
+            "gray"
+          ]
+        },
+        "iconKey": {
+          "type": "string",
+          "enum": [
+            "meal",
+            "car",
+            "beach",
+            "camera",
+            "shopping",
+            "bed",
+            "coffee",
+            "moon",
+            "leaf",
+            "pin"
+          ]
+        },
+        "imageUrl": {
+          "type": ["string", "null"]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "day": {
+      "type": "object",
+      "required": [
+        "dayNumber",
+        "date",
+        "dateLabel",
+        "label",
+        "title",
+        "weather",
+        "estimatedCost",
+        "items",
+        "warnings",
+        "smartTips"
+      ],
+      "properties": {
+        "dayNumber": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "dateLabel": {
+          "type": "string",
+          "description": "Compact UI date label for tab/header"
+        },
+        "label": {
+          "type": "string",
+          "description": "Localized day label"
+        },
+        "title": {
+          "type": "string",
+          "description": "Day title shown below day tab"
+        },
+        "weather": {
+          "$ref": "#/$defs/weatherSummary"
+        },
+        "estimatedCost": {
+          "$ref": "#/$defs/money"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/timelineItem"
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/warning"
+          }
+        },
+        "bookingNeeded": {
+          "type": "object",
+          "required": ["count", "items"],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "default": {
+            "count": 0,
+            "items": []
+          }
+        },
+        "smartTips": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tip"
+          }
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "id": "iti_2026_03_18_dad_001",
+      "title": "AI 추천 다낭 5박 6일",
+      "destination": {
+        "id": 1,
+        "slug": "da-nang",
+        "code": "DAD",
+        "name": "다낭",
+        "heroImage": "/uploads/destinations/da-nang-cover.jpg"
+      },
+      "summary": {
+        "nights": 5,
+        "days": 6,
+        "totalActivities": 40,
+        "estimatedCost": {
+          "currency": "KRW",
+          "amount": 3000000,
+          "display": "300만원"
+        },
+        "budgetLabel": "예상 원화 경비",
+        "generatedBy": "ai"
+      },
+      "dayTabs": [
+        {
+          "dayNumber": 1,
+          "label": "DAY 1",
+          "dateLabel": "3.18",
+          "activityCount": 8,
+          "isActive": true
+        },
+        {
+          "dayNumber": 2,
+          "label": "DAY 2",
+          "dateLabel": "3.19",
+          "activityCount": 8,
+          "isActive": false
+        }
+      ],
+      "days": [
+        {
+          "dayNumber": 1,
+          "date": "2026-03-18",
+          "dateLabel": "3.18",
+          "label": "DAY 1",
+          "title": "도착 & 해변 탐방",
+          "weather": {
+            "conditionCode": "sunny",
+            "conditionLabel": "맑음",
+            "temperatureC": 30,
+            "note": "자외선 차단제 필수",
+            "iconKey": "sun"
+          },
+          "estimatedCost": {
+            "currency": "VND",
+            "amount": 600000,
+            "display": "600K đ"
+          },
+          "items": [
+            {
+              "id": "item_d1_01",
+              "type": "food",
+              "startTime": "07:30",
+              "durationMinutes": 60,
+              "durationLabel": "1시간",
+              "title": "반미 아침식사",
+              "description": "다낭 최고의 반미 맛집 — Anthony Bourdain이 극찬",
+              "location": {
+                "name": "Banh Mi Phuong",
+                "address": "다낭 시내",
+                "lat": null,
+                "lng": null
+              },
+              "estimatedCost": {
+                "currency": "VND",
+                "amount": 35000,
+                "display": "35K đ"
+              },
+              "tipText": "오전 7시~10시 방문 추천. 대기 줄 있음",
+              "bookingRequired": false,
+              "bookingUrl": null,
+              "accentColor": "orange",
+              "iconKey": "meal",
+              "imageUrl": null,
+              "tags": []
+            },
+            {
+              "id": "item_d1_02",
+              "type": "transport",
+              "startTime": "09:00",
+              "durationMinutes": 30,
+              "durationLabel": "30분",
+              "title": "그랩 택시 이동",
+              "description": "앱으로 편리하게 호출 — 오토바이 택시가 더 저렴",
+              "location": {
+                "name": "다낭 시내",
+                "address": null,
+                "lat": null,
+                "lng": null
+              },
+              "estimatedCost": {
+                "currency": "VND",
+                "amount": 80000,
+                "display": "80K đ"
+              },
+              "tipText": null,
+              "bookingRequired": false,
+              "bookingUrl": null,
+              "accentColor": "gray",
+              "iconKey": "car",
+              "imageUrl": null,
+              "tags": []
+            }
+          ],
+          "warnings": [
+            {
+              "type": "booking_required",
+              "title": "사전 예약 필요",
+              "text": "한강 야경 크루즈",
+              "count": 1
+            }
+          ],
+          "bookingNeeded": {
+            "count": 1,
+            "items": ["한강 야경 크루즈"]
+          },
+          "smartTips": [
+            {
+              "orderNo": 1,
+              "text": "4~5월은 다낭의 건기로 여행 최적 시기입니다",
+              "iconKey": "sparkles"
+            },
+            {
+              "orderNo": 2,
+              "text": "황금다리는 평일 오전이 가장 한산합니다",
+              "iconKey": "sparkles"
+            }
+          ]
+        }
+      ],
+      "meta": {
+        "language": "ko",
+        "currency": "KRW",
+        "travelerType": "couple",
+        "pace": "balanced",
+        "budgetLevel": "medium",
+        "travelStyles": ["food", "beach", "shopping"],
+        "interests": ["local_food", "photography"],
+        "saved": false,
+        "createdAt": "2026-03-18T05:00:00Z",
+        "updatedAt": "2026-03-18T05:10:00Z"
+      }
+    }
+  ]
+}
